@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 7: Config-Driven Backup Planner | Cybersecurity Programming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --terminal-bg: #0d0d0d;
+            --accent-red: #ff0a3c;
+            --accent-red-glow: rgba(255, 10, 60, 0.3);
+            --text-primary: #e0e0e0;
+            --text-secondary: #999;
+            --text-dim: #666;
+            --border-color: #333;
+            --success-green: #00ff41;
+            --warning-amber: #ffaa00;
+            --code-bg: #151515;
+            --shadow-glow: 0 0 20px rgba(255, 10, 60, 0.2);
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background scanlines */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(255, 10, 60, 0.03) 0px,
+                transparent 1px,
+                transparent 2px,
+                rgba(255, 10, 60, 0.03) 3px
+            );
+            pointer-events: none;
+            z-index: 1;
+            animation: scanlines 8s linear infinite;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        /* Grid background effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 10, 60, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 10, 60, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--terminal-bg) 100%);
+            border: 2px solid var(--accent-red);
+            border-radius: 0;
+            padding: 40px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-glow);
+        }
+
+        header::before {
+            content: '>';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 100px;
+            color: var(--accent-red);
+            opacity: 0.1;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3em;
+            font-weight: 900;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--accent-red-glow), 0 0 20px var(--accent-red-glow);
+            position: relative;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: var(--accent-red);
+            color: var(--primary-bg);
+            padding: 8px 20px;
+            font-size: 0.9em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .subtitle {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--terminal-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-text {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-red);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-red) 0%, #ff4d6d 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            position: relative;
+            box-shadow: 0 0 10px var(--accent-red-glow);
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            padding: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn {
+            background: var(--terminal-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 12px 20px;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '>';
+            position: absolute;
+            left: -20px;
+            color: var(--accent-red);
+            transition: left 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-red);
+            color: var(--primary-bg);
+            border-color: var(--accent-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--accent-red-glow);
+        }
+
+        .nav-btn:hover::before {
+            left: 10px;
+        }
+
+        .nav-btn.active {
+            background: var(--accent-red);
+            color: var(--primary-bg);
+            border-color: var(--accent-red);
+            font-weight: 700;
+            box-shadow: 0 0 15px var(--accent-red-glow);
+        }
+
+        .nav-btn.completed::after {
+            content: ' ✓';
+            color: var(--success-green);
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-box {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-red);
+            padding: 30px;
+            margin-bottom: 25px;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .content-box::before {
+            content: '//';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: var(--border-color);
+            font-size: 1.5em;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2em;
+            color: var(--accent-red);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4em;
+            color: var(--text-primary);
+            margin: 25px 0 15px 0;
+            letter-spacing: 2px;
+        }
+
+        h4 {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1em;
+            color: var(--accent-red);
+            margin: 20px 0 10px 0;
+            letter-spacing: 1px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+
+        /* Terminal/Code Boxes */
+        .terminal {
+            background: var(--code-bg);
+            border: 1px solid var(--accent-red);
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95em;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px var(--accent-red-glow);
+        }
+
+        .terminal::before {
+            content: 'TERMINAL';
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--code-bg);
+            padding: 0 10px;
+            color: var(--accent-red);
+            font-size: 0.8em;
+            letter-spacing: 2px;
+        }
+
+        .terminal-header {
+            color: var(--accent-red);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        code {
+            background: var(--code-bg);
+            color: var(--success-green);
+            padding: 2px 6px;
+            border-radius: 0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9em;
+            border: 1px solid var(--border-color);
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        /* Interactive Elements */
+        .json-editor {
+            background: var(--code-bg);
+            border: 2px solid var(--accent-red);
+            padding: 15px;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: 0 0 15px var(--accent-red-glow);
+        }
+
+        .json-editor::before {
+            content: 'JSON EDITOR';
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: var(--code-bg);
+            padding: 0 10px;
+            color: var(--accent-red);
+            font-size: 0.8em;
+            letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            background: var(--terminal-bg);
+            border: 1px solid var(--border-color);
+            color: var(--success-green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9em;
+            padding: 15px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 10px var(--accent-red-glow);
+        }
+
+        .btn {
+            background: var(--accent-red);
+            color: var(--primary-bg);
+            border: none;
+            padding: 12px 30px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            box-shadow: 0 0 20px var(--accent-red-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--terminal-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--accent-red);
+        }
+
+        .output {
+            background: var(--terminal-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .output-line {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .output-line::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--accent-red);
+        }
+
+        .error {
+            color: var(--accent-red);
+        }
+
+        .success {
+            color: var(--success-green);
+        }
+
+        .warning {
+            color: var(--warning-amber);
+        }
+
+        .info {
+            color: var(--text-secondary);
+        }
+
+        /* Challenge Cards */
+        .challenge-card {
+            background: var(--terminal-bg);
+            border: 2px solid var(--border-color);
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-card:hover {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 15px var(--accent-red-glow);
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .challenge-number {
+            background: var(--accent-red);
+            color: var(--primary-bg);
+            padding: 8px 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .difficulty {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85em;
+            padding: 5px 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .difficulty.easy {
+            border-color: var(--success-green);
+            color: var(--success-green);
+        }
+
+        .difficulty.medium {
+            border-color: var(--warning-amber);
+            color: var(--warning-amber);
+        }
+
+        .difficulty.hard {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .challenge-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3em;
+            color: var(--text-primary);
+            margin: 15px 0;
+            letter-spacing: 1px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            background: var(--terminal-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            background: var(--secondary-bg);
+        }
+
+        .tab.active {
+            background: var(--accent-red);
+            color: var(--primary-bg);
+            border-color: var(--accent-red);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-left: 4px solid;
+            font-family: 'Share Tech Mono', monospace;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .alert::before {
+            position: absolute;
+            left: 15px;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .alert-info {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: var(--success-green);
+            color: var(--success-green);
+        }
+
+        .alert-info::before {
+            content: 'ℹ';
+        }
+
+        .alert-warning {
+            background: rgba(255, 170, 0, 0.1);
+            border-color: var(--warning-amber);
+            color: var(--warning-amber);
+        }
+
+        .alert-warning::before {
+            content: '⚠';
+        }
+
+        .alert-danger {
+            background: rgba(255, 10, 60, 0.1);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .alert-danger::before {
+            content: '✖';
+        }
+
+        /* Knowledge Check */
+        .quiz-question {
+            background: var(--terminal-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quiz-options {
+            margin-top: 15px;
+        }
+
+        .quiz-option {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .quiz-option::before {
+            content: attr(data-option);
+            position: absolute;
+            left: 15px;
+            color: var(--accent-red);
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .quiz-option:hover {
+            background: var(--secondary-bg);
+            border-color: var(--accent-red);
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: var(--success-green);
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 10, 60, 0.1);
+            border-color: var(--accent-red);
+        }
+
+        /* Copilot Prompt Box */
+        .copilot-prompt {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #4a5568;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            border-radius: 4px;
+        }
+
+        .copilot-prompt::before {
+            content: 'GITHUB COPILOT PROMPT';
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: #1a1a2e;
+            padding: 0 10px;
+            color: #7b68ee;
+            font-size: 0.8em;
+            letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .copilot-icon {
+            color: #7b68ee;
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .nav-btn {
+                min-width: 100%;
+            }
+
+            .challenge-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--accent-red);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-red);
+            background: var(--code-bg);
+            cursor: pointer;
+            position: relative;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--accent-red);
+            font-weight: 700;
+        }
+
+        /* Highlight boxes */
+        .highlight-box {
+            background: rgba(255, 10, 60, 0.05);
+            border-left: 4px solid var(--accent-red);
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .highlight-box-success {
+            background: rgba(0, 255, 65, 0.05);
+            border-left: 4px solid var(--success-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="week-badge">WEEK 7</div>
+            <h1>Config-Driven Backup Planner</h1>
+            <p class="subtitle">JSON Configuration • Validation • Function Design • Dry-Run Simulation</p>
+        </header>
+
+        <!-- Progress Tracker -->
+        <div class="progress-container">
+            <div class="progress-header">
+                <span class="progress-text">MODULE PROGRESS</span>
+                <span class="progress-text"><span id="progress-percentage">0</span>%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div style="margin-top: 10px; text-align: center; color: var(--text-dim); font-size: 0.8em;">
+                <span style="color: var(--accent-red)">TIP:</span> Use Alt + ← → to navigate sections
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav>
+            <button class="nav-btn active" onclick="showSection(0)">Introduction</button>
+            <button class="nav-btn" onclick="showSection(1)">JSON Schema Design</button>
+            <button class="nav-btn" onclick="showSection(2)">Config Validation</button>
+            <button class="nav-btn" onclick="showSection(3)">Function Structure</button>
+            <button class="nav-btn" onclick="showSection(4)">Dry-Run Simulation</button>
+            <button class="nav-btn" onclick="showSection(5)">GitHub Copilot</button>
+            <button class="nav-btn" onclick="showSection(6)">Challenges</button>
+            <button class="nav-btn" onclick="showSection(7)">Knowledge Check</button>
+        </nav>
+
+        <!-- Section 0: Introduction -->
+        <div class="section active" id="section-0">
+            <div class="content-box">
+                <h2>// Introduction to Config-Driven Programming</h2>
+                
+                <p>Welcome to Week 7! This week, you'll learn a critical skill for cybersecurity professionals: designing and implementing configuration-driven systems. Whether you're building automated backup systems for security logs, incident response tools, or SIEM data collectors, configuration files are your foundation.</p>
+
+                <h3>What is Config-Driven Programming?</h3>
+                <p>Config-driven programming separates <strong>what your program does</strong> (the logic) from <strong>how it does it</strong> (the configuration). Instead of hardcoding paths, schedules, and rules into your Python scripts, you store them in external configuration files—typically JSON or YAML.</p>
+
+                <div class="terminal">
+                    <div class="terminal-header">WHY USE CONFIG FILES?</div>
+                    <div class="output-line success">✓ Flexibility: Change behavior without modifying code</div>
+                    <div class="output-line success">✓ Reusability: Same script, different configs for different scenarios</div>
+                    <div class="output-line success">✓ Security: Keep sensitive settings separate from source code</div>
+                    <div class="output-line success">✓ Version Control: Track configuration changes over time</div>
+                    <div class="output-line success">✓ Collaboration: Non-programmers can adjust settings</div>
+                </div>
+
+                <h3>Real-World Cybersecurity Use Cases</h3>
+                <ul>
+                    <li><strong>Security Log Backup:</strong> Automatically backup firewall logs, IDS alerts, and authentication logs based on retention policies defined in JSON</li>
+                    <li><strong>Incident Response:</strong> Configure which systems to collect forensic data from, what artifacts to preserve, and where to store evidence</li>
+                    <li><strong>SIEM Data Collection:</strong> Define data sources, collection intervals, and parsing rules without touching your Python code</li>
+                    <li><strong>Disaster Recovery:</strong> Maintain backup plans for critical infrastructure with different schedules and retention policies</li>
+                </ul>
+
+                <h3>This Week's Learning Objectives</h3>
+                <div class="highlight-box">
+                    <p><strong>By the end of this module, you will:</strong></p>
+                    <ol>
+                        <li>Design comprehensive JSON schemas for backup configurations</li>
+                        <li>Implement robust validation logic with helpful error messages</li>
+                        <li>Structure programs to separate config loading from business logic</li>
+                        <li>Build dry-run simulation capabilities for testing</li>
+                        <li>Leverage GitHub Copilot to accelerate development and testing</li>
+                    </ol>
+                </div>
+
+                <h3>The Backup Planner Project</h3>
+                <p>Throughout this week, you'll build a <strong>Config-Driven Backup Planner</strong> that reads JSON configuration files and simulates backup operations. Your system will:</p>
+
+                <div class="terminal">
+                    <div class="output-line info">📁 Read backup plans from JSON files</div>
+                    <div class="output-line info">✓ Validate configuration structure and values</div>
+                    <div class="output-line info">🔍 Perform dry-run simulations (no actual file operations)</div>
+                    <div class="output-line info">📊 Generate detailed reports of what would be backed up</div>
+                    <div class="output-line info">⚠️ Provide clear error messages for invalid configs</div>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>IMPORTANT:</strong> This week focuses on the design and validation phase. You'll build the simulation logic, not actual file copying. In future weeks, you'll extend this to perform real backup operations.
+                </div>
+
+                <button class="btn" onclick="showSection(1)">Begin Module →</button>
+            </div>
+        </div>
+
+        <!-- Section 1: JSON Schema Design -->
+        <div class="section" id="section-1">
+            <div class="content-box">
+                <h2>// JSON Schema Design</h2>
+
+                <p>Before writing any code, you need to design your JSON schema. A well-designed schema is the foundation of a maintainable, extensible backup system.</p>
+
+                <h3>Understanding JSON Basics</h3>
+                <p>JSON (JavaScript Object Notation) is a lightweight data format perfect for configuration files. It consists of:</p>
+
+                <div class="terminal">
+                    <div class="output-line">• Objects (key-value pairs): {"key": "value"}</div>
+                    <div class="output-line">• Arrays (ordered lists): ["item1", "item2"]</div>
+                    <div class="output-line">• Strings: "text"</div>
+                    <div class="output-line">• Numbers: 42, 3.14</div>
+                    <div class="output-line">• Booleans: true, false</div>
+                    <div class="output-line">• Null: null</div>
+                </div>
+
+                <h3>Backup Configuration Schema Components</h3>
+                <p>A comprehensive backup configuration needs several key components:</p>
+
+                <h4>1. Metadata (Who, What, When)</h4>
+                <pre><code>{
+  "plan_name": "Security Logs Daily Backup",
+  "version": "1.0",
+  "created_by": "security_team",
+  "description": "Daily backup of all security-related logs"
+}</code></pre>
+
+                <h4>2. Source Definitions (What to Backup)</h4>
+                <pre><code>{
+  "sources": [
+    {
+      "name": "Firewall Logs",
+      "path": "/var/log/firewall",
+      "recursive": true,
+      "include_patterns": ["*.log", "*.txt"],
+      "exclude_patterns": ["*.tmp", "debug_*"]
+    },
+    {
+      "name": "IDS Alerts",
+      "path": "/var/log/suricata",
+      "recursive": false,
+      "include_patterns": ["fast.log", "eve.json"]
+    }
+  ]
+}</code></pre>
+
+                <h4>3. Destination Settings (Where to Store Backups)</h4>
+                <pre><code>{
+  "destination": {
+    "base_path": "/backup/security_logs",
+    "create_timestamped_folders": true,
+    "compression": "gzip",
+    "retention_days": 90
+  }
+}</code></pre>
+
+                <h4>4. Schedule & Options</h4>
+                <pre><code>{
+  "schedule": {
+    "frequency": "daily",
+    "time": "02:00",
+    "day_of_week": null
+  },
+  "options": {
+    "verify_backups": true,
+    "notify_on_failure": true,
+    "notification_email": "security@company.com"
+  }
+}</code></pre>
+
+                <h3>Complete Example Schema</h3>
+                <p>Here's a complete backup configuration for security logs:</p>
+
+                <div class="json-editor">
+                    <textarea id="schema-example" readonly>{
+  "plan_name": "Critical Security Logs Backup",
+  "version": "1.0",
+  "created_by": "security_operations",
+  "description": "Daily backup of firewall, IDS, and authentication logs",
+  
+  "sources": [
+    {
+      "name": "Firewall Logs",
+      "path": "/var/log/firewall",
+      "recursive": true,
+      "include_patterns": ["*.log"],
+      "exclude_patterns": ["*.tmp", "debug_*"]
+    },
+    {
+      "name": "IDS Alerts",
+      "path": "/var/log/suricata",
+      "recursive": false,
+      "include_patterns": ["fast.log", "eve.json"],
+      "exclude_patterns": []
+    },
+    {
+      "name": "Auth Logs",
+      "path": "/var/log/auth",
+      "recursive": false,
+      "include_patterns": ["auth.log*"],
+      "exclude_patterns": ["*.gz"]
+    }
+  ],
+  
+  "destination": {
+    "base_path": "/backup/security_logs",
+    "create_timestamped_folders": true,
+    "compression": "gzip",
+    "retention_days": 90
+  },
+  
+  "schedule": {
+    "frequency": "daily",
+    "time": "02:00"
+  },
+  
+  "options": {
+    "verify_backups": true,
+    "max_file_size_mb": 100,
+    "follow_symlinks": false,
+    "notify_on_failure": true,
+    "notification_email": "security@company.com"
+  }
+}</textarea>
+                    <button class="btn btn-secondary" onclick="downloadJSON('schema-example', 'backup_config.json')">Download Config</button>
+                    <button class="btn btn-secondary" onclick="copyToClipboard('schema-example')">Copy to Clipboard</button>
+                </div>
+
+                <h3>Design Principles for Good Schemas</h3>
+                <div class="highlight-box">
+                    <ol>
+                        <li><strong>Required vs Optional:</strong> Clearly define which fields are mandatory</li>
+                        <li><strong>Default Values:</strong> Provide sensible defaults for optional fields</li>
+                        <li><strong>Type Consistency:</strong> Use consistent data types (strings for paths, booleans for flags)</li>
+                        <li><strong>Nested Structure:</strong> Group related settings (sources, destination, options)</li>
+                        <li><strong>Future-Proof:</strong> Use version numbers to allow schema evolution</li>
+                        <li><strong>Human-Readable:</strong> Use clear, descriptive key names</li>
+                    </ol>
+                </div>
+
+                <h3>Interactive: Design Your Schema</h3>
+                <p>Think about what would happen if you needed to backup different types of data. What fields would you add?</p>
+
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(event, 'schema-basic')">Basic</div>
+                    <div class="tab" onclick="switchTab(event, 'schema-advanced')">Advanced</div>
+                    <div class="tab" onclick="switchTab(event, 'schema-incident')">Incident Response</div>
+                </div>
+
+                <div id="schema-basic" class="tab-content active">
+                    <p><strong>Basic Backup:</strong> Simple file backup with source and destination</p>
+                    <pre><code>{
+  "plan_name": "Basic Backup",
+  "sources": [{"path": "/data", "recursive": true}],
+  "destination": {"base_path": "/backup"}
+}</code></pre>
+                </div>
+
+                <div id="schema-advanced" class="tab-content">
+                    <p><strong>Advanced Backup:</strong> Multiple sources with filtering and compression</p>
+                    <pre><code>{
+  "plan_name": "Advanced Backup",
+  "sources": [
+    {"path": "/data", "include_patterns": ["*.pdf", "*.docx"]},
+    {"path": "/logs", "exclude_patterns": ["*.tmp"]}
+  ],
+  "destination": {"base_path": "/backup", "compression": "gzip"}
+}</code></pre>
+                </div>
+
+                <div id="schema-incident" class="tab-content">
+                    <p><strong>Incident Response:</strong> Specialized config for evidence collection during security incidents</p>
+                    <pre><code>{
+  "plan_name": "Incident Evidence Collection",
+  "incident_id": "INC-2024-0234",
+  "incident_type": "ransomware_attack",
+  "priority": "critical",
+  "analyst": "soc_team",
+  
+  "sources": [
+    {
+      "name": "System Logs",
+      "path": "/var/log",
+      "recursive": true,
+      "include_patterns": ["*.log", "syslog*"],
+      "preserve_timestamps": true
+    },
+    {
+      "name": "Suspicious Files",
+      "path": "/tmp",
+      "include_patterns": ["suspicious_*", "*.exe", "*.dll"],
+      "calculate_hash": true
+    },
+    {
+      "name": "User Activity",
+      "path": "/home/compromised_user",
+      "recursive": true,
+      "include_patterns": [".bash_history", ".ssh/*"],
+      "preserve_permissions": true
+    },
+    {
+      "name": "Network Captures",
+      "path": "/var/log/network",
+      "include_patterns": ["*.pcap", "*.pcapng"]
+    }
+  ],
+  
+  "destination": {
+    "base_path": "/evidence/INC-2024-0234",
+    "create_timestamped_folders": true,
+    "hash_algorithm": "sha256",
+    "generate_manifest": true,
+    "chain_of_custody": {
+      "enabled": true,
+      "custodian": "security_team",
+      "location": "secure_storage_01"
+    }
+  },
+  
+  "options": {
+    "compress_evidence": true,
+    "encryption": "aes256",
+    "verify_integrity": true,
+    "log_all_operations": true,
+    "notify_on_completion": true,
+    "notification_email": "incident-response@company.com"
+  }
+}</code></pre>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>BEST PRACTICE:</strong> Start with a minimal schema and expand as needed. It's easier to add fields than to remove them later without breaking existing configs.
+                </div>
+
+                <button class="btn" onclick="markSectionComplete(1); showSection(2)">Continue to Validation →</button>
+            </div>
+        </div>
+
+        <!-- Section 2: Config Validation -->
+        <div class="section" id="section-2">
+            <div class="content-box">
+                <h2>// Configuration Validation</h2>
+
+                <p>A configuration file is only useful if it's valid. Your backup system needs robust validation to catch errors before attempting any operations.</p>
+
+                <h3>Why Validation Matters</h3>
+                <div class="terminal">
+                    <div class="output-line error">✖ Invalid path → Backup fails at runtime</div>
+                    <div class="output-line error">✖ Missing required field → Unexpected behavior</div>
+                    <div class="output-line error">✖ Wrong data type → Python crashes</div>
+                    <div class="output-line error">✖ Conflicting settings → Unpredictable results</div>
+                    <div class="output-line success">✓ Proper validation → Fail fast with clear errors</div>
+                </div>
+
+                <h3>Validation Levels</h3>
+
+                <h4>Level 1: Structure Validation</h4>
+                <p>Check that the JSON is properly formatted and contains required keys:</p>
+
+                <pre><code>import json
+
+def load_config(filepath):
+    """Load and parse JSON config file."""
+    try:
+        with open(filepath, 'r') as f:
+            config = json.load(f)
+        return config
+    except json.JSONDecodeError as e:
+        return None, f"Invalid JSON syntax: {e}"
+    except FileNotFoundError:
+        return None, "Config file not found"</code></pre>
+
+                <h4>Level 2: Required Fields</h4>
+                <p>Verify that all required fields are present:</p>
+
+                <pre><code>def validate_required_fields(config):
+    """Check for required top-level fields."""
+    required = ['plan_name', 'sources', 'destination']
+    errors = []
+    
+    for field in required:
+        if field not in config:
+            errors.append(f"Missing required field: '{field}'")
+    
+    return len(errors) == 0, errors</code></pre>
+
+                <h4>Level 3: Type Validation</h4>
+                <p>Ensure fields have the correct data types:</p>
+
+                <pre><code>def validate_types(config):
+    """Validate data types of configuration fields."""
+    errors = []
+    
+    # plan_name should be a string
+    if not isinstance(config.get('plan_name'), str):
+        errors.append("'plan_name' must be a string")
+    
+    # sources should be a list
+    if not isinstance(config.get('sources'), list):
+        errors.append("'sources' must be a list")
+    
+    # destination should be a dictionary
+    if not isinstance(config.get('destination'), dict):
+        errors.append("'destination' must be an object")
+    
+    return len(errors) == 0, errors</code></pre>
+
+                <h4>Level 4: Value Validation</h4>
+                <p>Check that values make logical sense:</p>
+
+                <pre><code>def validate_values(config):
+    """Validate logical correctness of values."""
+    errors = []
+    
+    # Check if sources list is not empty
+    if len(config.get('sources', [])) == 0:
+        errors.append("'sources' list cannot be empty")
+    
+    # Validate each source
+    for i, source in enumerate(config.get('sources', [])):
+        if 'path' not in source:
+            errors.append(f"Source {i}: missing 'path' field")
+        
+        # Check for valid patterns (if specified)
+        if 'include_patterns' in source:
+            if not isinstance(source['include_patterns'], list):
+                errors.append(f"Source {i}: 'include_patterns' must be a list")
+    
+    # Validate destination path
+    dest = config.get('destination', {})
+    if 'base_path' not in dest:
+        errors.append("Destination: missing 'base_path' field")
+    
+    return len(errors) == 0, errors</code></pre>
+
+                <h3>Creating Helpful Error Messages</h3>
+                <p>Good error messages help users fix problems quickly:</p>
+
+                <div class="terminal">
+                    <div class="output-line error">❌ BAD: "Invalid config"</div>
+                    <div class="output-line success">✓ GOOD: "Missing required field: 'sources'"</div>
+                    <div class="output-line">---</div>
+                    <div class="output-line error">❌ BAD: "Type error"</div>
+                    <div class="output-line success">✓ GOOD: "'sources' must be a list, got string"</div>
+                    <div class="output-line">---</div>
+                    <div class="output-line error">❌ BAD: "Bad value"</div>
+                    <div class="output-line success">✓ GOOD: "Source 0: 'path' field cannot be empty"</div>
+                </div>
+
+                <h3>Interactive Validation Demo</h3>
+                <p>Try validating different configurations. Edit the JSON below and click "Validate Config":</p>
+
+                <div class="json-editor">
+                    <textarea id="validation-input">{
+  "plan_name": "Test Backup",
+  "sources": [
+    {
+      "path": "/var/log/test",
+      "recursive": true
+    }
+  ],
+  "destination": {
+    "base_path": "/backup/test"
+  }
+}</textarea>
+                    <button class="btn" onclick="validateConfig()">Validate Config</button>
+                    <button class="btn btn-secondary" onclick="loadInvalidExample()">Load Invalid Example</button>
+                </div>
+
+                <div class="output" id="validation-output">
+                    <div class="output-line info">Validation results will appear here...</div>
+                </div>
+
+                <h3>Complete Validation Function</h3>
+                <p>Here's how to combine all validation levels into a single function:</p>
+
+                <pre><code>def validate_backup_config(config):
+    """
+    Comprehensive validation of backup configuration.
+    Returns: (is_valid: bool, errors: list)
+    """
+    all_errors = []
+    
+    # Level 1: Check JSON was loaded successfully
+    if config is None:
+        return False, ["Failed to load configuration file"]
+    
+    # Level 2: Required fields
+    valid, errors = validate_required_fields(config)
+    all_errors.extend(errors)
+    
+    # Level 3: Type validation
+    valid, errors = validate_types(config)
+    all_errors.extend(errors)
+    
+    # Level 4: Value validation
+    valid, errors = validate_values(config)
+    all_errors.extend(errors)
+    
+    return len(all_errors) == 0, all_errors
+
+
+# Usage
+config = load_config('backup_plan.json')
+is_valid, errors = validate_backup_config(config)
+
+if is_valid:
+    print("✓ Configuration is valid!")
+else:
+    print("✖ Configuration has errors:")
+    for error in errors:
+        print(f"  - {error}")</code></pre>
+
+                <div class="alert alert-info">
+                    <strong>PRO TIP:</strong> Always validate configurations at the start of your program, before any operations. This "fail fast" approach prevents partial execution and makes debugging much easier.
+                </div>
+
+                <button class="btn" onclick="markSectionComplete(2); showSection(3)">Continue to Function Structure →</button>
+            </div>
+        </div>
+
+        <!-- Section 3: Function Structure -->
+        <div class="section" id="section-3">
+            <div class="content-box">
+                <h2>// Function Structure & Separation of Concerns</h2>
+
+                <p>Good program architecture separates different responsibilities into focused functions. This makes your code testable, maintainable, and reusable.</p>
+
+                <h3>The Principle: Separation of Concerns</h3>
+                <p>Each function should have a single, well-defined purpose:</p>
+
+                <div class="terminal">
+                    <div class="output-line info">📂 Config Loading → Read and parse JSON files</div>
+                    <div class="output-line info">✓ Validation → Check config correctness</div>
+                    <div class="output-line info">🔧 Business Logic → Perform backup operations</div>
+                    <div class="output-line info">📊 Reporting → Generate output and logs</div>
+                </div>
+
+                <h3>Anti-Pattern: The Monolithic Function</h3>
+                <p>Here's what NOT to do:</p>
+
+                <pre><code class="error">def do_backup(config_file):
+    """DON'T DO THIS - Too many responsibilities!"""
+    # Load config
+    with open(config_file) as f:
+        config = json.load(f)
+    
+    # Validate config
+    if 'sources' not in config:
+        print("Error!")
+        return
+    
+    # Perform backup
+    for source in config['sources']:
+        # ... backup logic ...
+        pass
+    
+    # Generate report
+    print("Backup complete!")
+    
+# Problems:
+# - Can't test validation separately
+# - Can't reuse config loading
+# - Hard to add new features
+# - Difficult to debug</code></pre>
+
+                <h3>Better Pattern: Modular Functions</h3>
+                <p>Break down responsibilities into focused functions:</p>
+
+                <pre><code>def load_config(filepath):
+    """
+    Load JSON configuration from file.
+    Returns: config dict or None if error
+    """
+    try:
+        with open(filepath, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error loading config: {e}")
+        return None
+
+
+def validate_config(config):
+    """
+    Validate backup configuration structure.
+    Returns: (is_valid: bool, errors: list)
+    """
+    errors = []
+    
+    # Check required fields
+    required = ['plan_name', 'sources', 'destination']
+    for field in required:
+        if field not in config:
+            errors.append(f"Missing required field: '{field}'")
+    
+    # Validate sources
+    if not isinstance(config.get('sources'), list):
+        errors.append("'sources' must be a list")
+    
+    return len(errors) == 0, errors
+
+
+def plan_backup(config):
+    """
+    Generate backup plan from validated config.
+    Returns: list of operations to perform
+    """
+    operations = []
+    
+    for source in config['sources']:
+        op = {
+            'type': 'backup',
+            'source': source['path'],
+            'destination': config['destination']['base_path'],
+            'patterns': source.get('include_patterns', ['*'])
+        }
+        operations.append(op)
+    
+    return operations
+
+
+def execute_dry_run(operations):
+    """
+    Simulate backup operations without file I/O.
+    Returns: report dict
+    """
+    report = {
+        'total_operations': len(operations),
+        'operations': []
+    }
+    
+    for op in operations:
+        report['operations'].append({
+            'source': op['source'],
+            'destination': op['destination'],
+            'status': 'would_execute'
+        })
+    
+    return report
+
+
+# Main program flow
+def main():
+    """Main program orchestration."""
+    # Step 1: Load configuration
+    config = load_config('backup_plan.json')
+    if config is None:
+        return
+    
+    # Step 2: Validate configuration
+    is_valid, errors = validate_config(config)
+    if not is_valid:
+        print("Configuration errors:")
+        for error in errors:
+            print(f"  - {error}")
+        return
+    
+    # Step 3: Plan backup operations
+    operations = plan_backup(config)
+    
+    # Step 4: Execute dry run
+    report = execute_dry_run(operations)
+    
+    # Step 5: Display results
+    print(f"Dry run complete: {report['total_operations']} operations planned")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+
+                <h3>Benefits of This Structure</h3>
+                <div class="highlight-box-success">
+                    <ol>
+                        <li><strong>Testability:</strong> Each function can be tested independently</li>
+                        <li><strong>Reusability:</strong> Functions can be used in different contexts</li>
+                        <li><strong>Debugging:</strong> Easy to isolate where problems occur</li>
+                        <li><strong>Extensibility:</strong> Add new features without rewriting everything</li>
+                        <li><strong>Readability:</strong> Code is self-documenting with clear function names</li>
+                    </ol>
+                </div>
+
+                <h3>Function Design Best Practices</h3>
+
+                <h4>1. Single Responsibility</h4>
+                <p>Each function should do ONE thing well:</p>
+                <div class="terminal">
+                    <div class="output-line success">✓ load_config() → Only loads JSON</div>
+                    <div class="output-line success">✓ validate_config() → Only validates</div>
+                    <div class="output-line error">✖ load_and_validate() → Does too much</div>
+                </div>
+
+                <h4>2. Clear Return Values</h4>
+                <p>Functions should return useful data structures:</p>
+                <pre><code># Good: Returns structured data
+def validate_config(config):
+    return is_valid, error_list
+
+# Good: Returns processed data
+def plan_backup(config):
+    return operation_list</code></pre>
+
+                <h4>3. Descriptive Names</h4>
+                <p>Function names should describe what they do:</p>
+                <div class="terminal">
+                    <div class="output-line success">✓ calculate_backup_size() - Clear purpose</div>
+                    <div class="output-line success">✓ generate_report() - Action-oriented</div>
+                    <div class="output-line error">✖ process() - Too vague</div>
+                    <div class="output-line error">✖ do_stuff() - Not descriptive</div>
+                </div>
+
+                <h4>4. Consistent Error Handling</h4>
+                <p>Decide on an error handling strategy and stick to it:</p>
+                <pre><code># Option 1: Return error status
+def load_config(filepath):
+    try:
+        with open(filepath) as f:
+            return json.load(f), None
+    except Exception as e:
+        return None, str(e)
+
+# Option 2: Raise exceptions
+def load_config(filepath):
+    with open(filepath) as f:
+        return json.load(f)  # Let exceptions propagate</code></pre>
+
+                <h3>Interactive Exercise: Identify Issues</h3>
+                <p>Review this code and identify what's wrong with the function structure:</p>
+
+                <div class="json-editor">
+                    <textarea id="code-review" readonly>def backup_system(filename):
+    config = json.load(open(filename))
+    if config['sources']:
+        for s in config['sources']:
+            files = os.listdir(s['path'])
+            for f in files:
+                if f.endswith('.log'):
+                    shutil.copy(f, config['destination'])
+                    with open('report.txt', 'a') as r:
+                        r.write(f + '\n')
+    print("Done!")
+
+# What's wrong with this function?
+# Click "Check Issues" to see the problems</textarea>
+                    <button class="btn" onclick="showCodeIssues()">Check Issues</button>
+                </div>
+
+                <div class="output" id="code-issues" style="display: none;">
+                    <div class="output-line error">❌ Multiple responsibilities: loading, validating, copying, reporting</div>
+                    <div class="output-line error">❌ No error handling for file operations</div>
+                    <div class="output-line error">❌ No validation of config structure</div>
+                    <div class="output-line error">❌ Hardcoded file extension check ('.log')</div>
+                    <div class="output-line error">❌ Mixing I/O operations (read files, copy files, write report)</div>
+                    <div class="output-line error">❌ No return value for testing</div>
+                    <div class="output-line success">✓ Should be split into: load_config(), validate_config(), find_files(), copy_files(), generate_report()</div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>REMEMBER:</strong> If you can't easily write unit tests for a function, it probably has too many responsibilities. Break it down!
+                </div>
+
+                <button class="btn" onclick="markSectionComplete(3); showSection(4)">Continue to Dry-Run Simulation →</button>
+            </div>
+        </div>
+
+        <!-- Section 4: Dry-Run Simulation -->
+        <div class="section" id="section-4">
+            <div class="content-box">
+                <h2>// Dry-Run Simulation</h2>
+
+                <p>A dry-run mode lets you test backup plans without actually copying files. This is crucial for validating configurations and estimating backup sizes before executing real operations.</p>
+
+                <h3>Why Dry-Run Mode Matters</h3>
+                <div class="terminal">
+                    <div class="output-line info">🔍 Preview what will be backed up</div>
+                    <div class="output-line info">📊 Estimate storage requirements</div>
+                    <div class="output-line info">⚡ Validate paths and permissions</div>
+                    <div class="output-line info">🛡️ Catch errors before actual execution</div>
+                    <div class="output-line info">📈 Generate reports for planning</div>
+                </div>
+
+                <h3>Implementing Dry-Run Logic</h3>
+                <p>The key is to separate "what to do" from "actually doing it":</p>
+
+                <pre><code>def simulate_backup(config, dry_run=True):
+    """
+    Simulate or execute backup based on config.
+    
+    Args:
+        config: Validated backup configuration
+        dry_run: If True, only simulate; if False, perform actual backup
+    
+    Returns:
+        Report dictionary with operation details
+    """
+    report = {
+        'mode': 'DRY-RUN' if dry_run else 'EXECUTE',
+        'timestamp': datetime.now().isoformat(),
+        'plan_name': config['plan_name'],
+        'operations': [],
+        'summary': {
+            'total_files': 0,
+            'total_size_bytes': 0,
+            'errors': []
+        }
+    }
+    
+    for source in config['sources']:
+        # Find files to backup (does not require actual I/O)
+        files = find_matching_files(source)
+        
+        for filepath in files:
+            operation = {
+                'source_file': filepath,
+                'destination': build_destination_path(filepath, config),
+                'size_bytes': get_file_size(filepath) if not dry_run else estimate_size(filepath),
+                'status': 'WOULD_COPY' if dry_run else 'COPYING'
+            }
+            
+            if not dry_run:
+                # Actually perform the copy
+                try:
+                    copy_file(filepath, operation['destination'])
+                    operation['status'] = 'SUCCESS'
+                except Exception as e:
+                    operation['status'] = 'FAILED'
+                    operation['error'] = str(e)
+                    report['summary']['errors'].append(str(e))
+            
+            report['operations'].append(operation)
+            report['summary']['total_files'] += 1
+            report['summary']['total_size_bytes'] += operation['size_bytes']
+    
+    return report</code></pre>
+
+                <h3>Finding Files Without Copying</h3>
+                <p>You can scan the filesystem to see what WOULD be backed up:</p>
+
+                <pre><code>import os
+import fnmatch
+
+def find_matching_files(source_config):
+    """
+    Find files matching source configuration.
+    
+    Args:
+        source_config: Source dict with path, patterns, etc.
+    
+    Returns:
+        List of file paths that would be backed up
+    """
+    matched_files = []
+    source_path = source_config['path']
+    include_patterns = source_config.get('include_patterns', ['*'])
+    exclude_patterns = source_config.get('exclude_patterns', [])
+    recursive = source_config.get('recursive', False)
+    
+    if recursive:
+        # Walk directory tree
+        for root, dirs, files in os.walk(source_path):
+            for filename in files:
+                filepath = os.path.join(root, filename)
+                
+                # Check include patterns
+                if any(fnmatch.fnmatch(filename, pattern) for pattern in include_patterns):
+                    # Check exclude patterns
+                    if not any(fnmatch.fnmatch(filename, pattern) for pattern in exclude_patterns):
+                        matched_files.append(filepath)
+    else:
+        # Only top-level directory
+        try:
+            for filename in os.listdir(source_path):
+                filepath = os.path.join(source_path, filename)
+                if os.path.isfile(filepath):
+                    if any(fnmatch.fnmatch(filename, pattern) for pattern in include_patterns):
+                        if not any(fnmatch.fnmatch(filename, pattern) for pattern in exclude_patterns):
+                            matched_files.append(filepath)
+        except PermissionError:
+            pass  # Handle permission errors gracefully
+    
+    return matched_files</code></pre>
+
+                <h3>Generating Detailed Reports</h3>
+                <p>A good dry-run report shows exactly what would happen:</p>
+
+                <pre><code>def generate_report(report_data):
+    """
+    Generate human-readable report from dry-run results.
+    
+    Args:
+        report_data: Report dictionary from simulate_backup()
+    """
+    print("=" * 70)
+    print(f"BACKUP REPORT - {report_data['mode']}")
+    print("=" * 70)
+    print(f"Plan: {report_data['plan_name']}")
+    print(f"Timestamp: {report_data['timestamp']}")
+    print()
+    
+    # Summary
+    print("SUMMARY:")
+    print(f"  Total Files: {report_data['summary']['total_files']}")
+    size_mb = report_data['summary']['total_size_bytes'] / (1024 * 1024)
+    print(f"  Total Size: {size_mb:.2f} MB")
+    print(f"  Errors: {len(report_data['summary']['errors'])}")
+    print()
+    
+    # Operations
+    print("OPERATIONS:")
+    for i, op in enumerate(report_data['operations'][:10], 1):  # Show first 10
+        print(f"  {i}. {op['source_file']}")
+        print(f"     → {op['destination']}")
+        print(f"     Status: {op['status']} ({op['size_bytes']} bytes)")
+        print()
+    
+    if len(report_data['operations']) > 10:
+        print(f"  ... and {len(report_data['operations']) - 10} more files")
+    
+    print("=" * 70)</code></pre>
+
+                <h3>Interactive Dry-Run Simulator</h3>
+                <p>Try the dry-run simulator with a sample configuration:</p>
+
+                <div class="json-editor">
+                    <textarea id="dryrun-config">{
+  "plan_name": "Security Logs Backup",
+  "sources": [
+    {
+      "name": "Firewall Logs",
+      "path": "/var/log/firewall",
+      "recursive": true,
+      "include_patterns": ["*.log"],
+      "exclude_patterns": ["*.tmp"]
+    }
+  ],
+  "destination": {
+    "base_path": "/backup/security_logs",
+    "create_timestamped_folders": true
+  }
+}</textarea>
+                    <button class="btn" onclick="runDryRunSimulation()">Run Dry-Run Simulation</button>
+                </div>
+
+                <div class="output" id="dryrun-output">
+                    <div class="output-line info">Simulation results will appear here...</div>
+                </div>
+
+                <h3>Key Differences: Dry-Run vs. Execution</h3>
+                <div class="terminal">
+                    <div class="terminal-header">DRY-RUN MODE</div>
+                    <div class="output-line success">✓ Scans directories and lists files</div>
+                    <div class="output-line success">✓ Estimates sizes (may use approximations)</div>
+                    <div class="output-line success">✓ Checks permissions and paths</div>
+                    <div class="output-line success">✓ Generates "would do" report</div>
+                    <div class="output-line error">✖ Does NOT copy files</div>
+                    <div class="output-line error">✖ Does NOT modify filesystem</div>
+                </div>
+
+                <div class="terminal">
+                    <div class="terminal-header">EXECUTION MODE</div>
+                    <div class="output-line info">→ Performs actual file copying</div>
+                    <div class="output-line info">→ Creates destination directories</div>
+                    <div class="output-line info">→ Applies compression if configured</div>
+                    <div class="output-line info">→ Generates completion report</div>
+                    <div class="output-line warning">⚠ Requires write permissions</div>
+                    <div class="output-line warning">⚠ Can consume significant disk space</div>
+                </div>
+
+                <h3>Best Practices for Dry-Run</h3>
+                <div class="highlight-box">
+                    <ol>
+                        <li><strong>Always run dry-run first:</strong> Validate before executing</li>
+                        <li><strong>Check estimated size:</strong> Ensure destination has enough space</li>
+                        <li><strong>Review file list:</strong> Confirm patterns match correctly</li>
+                        <li><strong>Test with small configs:</strong> Verify logic before large backups</li>
+                        <li><strong>Save dry-run reports:</strong> Document planned operations</li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-danger">
+                    <strong>CRITICAL:</strong> For this week's assignment, implement ONLY dry-run functionality. Actual file copying will be covered in future weeks. Focus on accurate simulation and reporting.
+                </div>
+
+                <button class="btn" onclick="markSectionComplete(4); showSection(5)">Continue to GitHub Copilot →</button>
+            </div>
+        </div>
+
+        <!-- Section 5: GitHub Copilot -->
+        <div class="section" id="section-5">
+            <div class="content-box">
+                <h2>// GitHub Copilot Integration</h2>
+
+                <p>GitHub Copilot is an AI-powered coding assistant that can dramatically accelerate your development. Learn how to use it effectively for this project.</p>
+
+                <h3>What is GitHub Copilot?</h3>
+                <p>GitHub Copilot is an AI pair programmer that suggests code completions, entire functions, and even test cases as you type. It's trained on billions of lines of code and understands context from your comments and code.</p>
+
+                <div class="terminal">
+                    <div class="output-line info">🤖 Real-time code suggestions</div>
+                    <div class="output-line info">📝 Function generation from comments</div>
+                    <div class="output-line info">🧪 Test case generation</div>
+                    <div class="output-line info">📚 Documentation writing</div>
+                    <div class="output-line info">🔄 Code refactoring assistance</div>
+                </div>
+
+                <h3>Setting Up Copilot</h3>
+                <ol>
+                    <li>Sign up for GitHub Copilot (free for students via GitHub Student Developer Pack)</li>
+                    <li>Install the Copilot extension in VS Code or your IDE</li>
+                    <li>Authenticate with your GitHub account</li>
+                    <li>Start coding - Copilot activates automatically</li>
+                </ol>
+
+                <h3>Using Copilot for This Project</h3>
+
+                <h4>1. Designing JSON Schemas</h4>
+                <div class="copilot-prompt">
+                    <div class="copilot-icon">🤖</div>
+                    <strong>Prompt for Copilot:</strong>
+                    <pre><code># Create a JSON schema for a backup configuration system
+# The schema should include:
+# - plan_name: string
+# - sources: list of source objects with path, patterns
+# - destination: object with base_path and options
+# - schedule: object with frequency and time
+# Generate a complete example JSON config:</code></pre>
+                </div>
+
+                <p>Copilot will generate a complete JSON structure based on your comment!</p>
+
+                <h4>2. Generating Validation Functions</h4>
+                <div class="copilot-prompt">
+                    <div class="copilot-icon">🤖</div>
+                    <strong>Prompt for Copilot:</strong>
+                    <pre><code>def validate_backup_config(config):
+    """
+    Validate a backup configuration dictionary.
+    
+    Checks:
+    - Required fields: plan_name, sources, destination
+    - sources is a list with at least one item
+    - Each source has a valid path field
+    - destination has a base_path field
+    
+    Returns: (is_valid: bool, errors: list of strings)
+    """
+    # Copilot will complete this function!</code></pre>
+                </div>
+
+                <h4>3. Creating Test Cases</h4>
+                <div class="copilot-prompt">
+                    <div class="copilot-icon">🤖</div>
+                    <strong>Prompt for Copilot:</strong>
+                    <pre><code># Generate 5 test cases for backup config validation:
+# 1. Valid config with all required fields
+# 2. Missing 'plan_name' field
+# 3. 'sources' is not a list
+# 4. Empty sources list
+# 5. Source missing 'path' field
+
+test_cases = [
+    # Copilot will generate test case dictionaries
+]</code></pre>
+                </div>
+
+                <h4>4. Building File Pattern Matching</h4>
+                <div class="copilot-prompt">
+                    <div class="copilot-icon">🤖</div>
+                    <strong>Prompt for Copilot:</strong>
+                    <pre><code>def match_patterns(filename, include_patterns, exclude_patterns):
+    """
+    Check if filename matches include patterns and doesn't match exclude patterns.
+    Supports wildcards: * and ?
+    
+    Args:
+        filename: Name of file to check
+        include_patterns: List of patterns to include (e.g., ['*.log', '*.txt'])
+        exclude_patterns: List of patterns to exclude (e.g., ['*.tmp'])
+    
+    Returns: True if file should be included, False otherwise
+    """
+    # Copilot suggests implementation using fnmatch</code></pre>
+                </div>
+
+                <h3>Effective Copilot Prompting Strategies</h3>
+
+                <div class="highlight-box">
+                    <h4>Write Detailed Comments First</h4>
+                    <p>Copilot works best when you explain what you want in plain English:</p>
+                    <pre><code># Good: Detailed description
+# Create a function that loads a JSON config file,
+# validates the required fields, and returns the config
+# dict if valid or None with error messages if invalid
+
+# Bad: Vague comment
+# Load config</code></pre>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Provide Context with Examples</h4>
+                    <p>Show Copilot what format you expect:</p>
+                    <pre><code># Generate invalid backup configs for testing validation logic
+# Example invalid config: missing 'sources' field
+invalid_configs = [
+    {
+        "plan_name": "Test",
+        "destination": {"base_path": "/backup"}
+        # Missing 'sources' field
+    },
+    # Copilot will suggest more invalid examples
+]</code></pre>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Iterate and Refine</h4>
+                    <p>Use Copilot's suggestions as starting points, then refine:</p>
+                    <ol>
+                        <li>Write a comment describing the function</li>
+                        <li>Let Copilot suggest implementation</li>
+                        <li>Review and modify the suggestion</li>
+                        <li>Add additional comments for edge cases</li>
+                        <li>Let Copilot suggest edge case handling</li>
+                    </ol>
+                </div>
+
+                <h3>Practice Prompts for This Week's Project</h3>
+
+                <h4>Prompt 1: Schema Design</h4>
+                <div class="copilot-prompt">
+                    <div class="copilot-icon">🤖</div>
+                    <pre><code># Design a JSON schema for backing up security logs
+# Include support for:
+# - Multiple source directories
+# - Include/exclude patterns using wildcards
+# - Destination with timestamped folders
+# - Compression options (none, gzip, zip)
+# - Retention policy in days
+# - Email notifications on failure
+# Create a complete example:</code></pre>
+                </div>
+
+                <h4>Prompt 2: Validation with Helpful Errors</h4>
+                <div class="copilot-prompt">
+                    <div class="copilot-icon">🤖</div>
+                    <pre><code># Create a validation function that checks backup config
+# and returns helpful error messages like:
+# "Missing required field: 'plan_name'"
+# "Source 0: 'path' field cannot be empty"
+# "'compression' must be one of: none, gzip, zip"
+# The function should validate all issues and return all errors:</code></pre>
+                </div>
+
+                <h4>Prompt 3: Dry-Run Simulator</h4>
+                <div class="copilot-prompt">
+                    <div class="copilot-icon">🤖</div>
+                    <pre><code># Create a dry-run function that simulates backup operations
+# It should:
+# - Find all files matching patterns in source directories
+# - Calculate total size that would be backed up
+# - Generate a report showing what would be copied
+# - NOT actually copy any files
+# Return a dictionary with operation details:</code></pre>
+                </div>
+
+                <h4>Prompt 4: Test Case Generation</h4>
+                <div class="copilot-prompt">
+                    <div class="copilot-icon">🤖</div>
+                    <pre><code># Generate 10 test configurations for backup validation:
+# - 2 completely valid configs
+# - 2 with missing required fields
+# - 2 with wrong data types
+# - 2 with invalid values (empty lists, negative numbers)
+# - 2 with conflicting settings
+# Each should have a comment explaining what's wrong:</code></pre>
+                </div>
+
+                <h3>Copilot Best Practices</h3>
+                <div class="terminal">
+                    <div class="output-line success">✓ Review all suggestions - don't blindly accept</div>
+                    <div class="output-line success">✓ Use Copilot to speed up boilerplate, not replace thinking</div>
+                    <div class="output-line success">✓ Test generated code thoroughly</div>
+                    <div class="output-line success">✓ Refine prompts if suggestions aren't helpful</div>
+                    <div class="output-line warning">⚠ Don't rely on Copilot for security-critical code without review</div>
+                    <div class="output-line warning">⚠ Understand the code Copilot generates</div>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>LEARNING TIP:</strong> Use Copilot to learn new patterns and techniques. When it suggests something unfamiliar, research that approach to understand why it works.
+                </div>
+
+                <button class="btn" onclick="markSectionComplete(5); showSection(6)">Continue to Challenges →</button>
+            </div>
+        </div>
+
+        <!-- Section 6: Challenges -->
+        <div class="section" id="section-6">
+            <div class="content-box">
+                <h2>// Hands-On Challenges</h2>
+
+                <p>Apply what you've learned with these progressive challenges. Each builds on the previous one.</p>
+
+                <!-- Challenge 1 -->
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <div class="challenge-number">CHALLENGE 1</div>
+                        <div class="difficulty easy">EASY</div>
+                    </div>
+                    <div class="challenge-title">Basic Schema Design</div>
+                    <p><strong>Objective:</strong> Design a minimal JSON schema for a backup configuration.</p>
+                    
+                    <p><strong>Requirements:</strong></p>
+                    <ul>
+                        <li>Create a JSON config with: plan_name, one source with a path, and a destination</li>
+                        <li>The source should specify recursive: true or false</li>
+                        <li>The destination should have a base_path</li>
+                    </ul>
+
+                    <p><strong>Example Output:</strong></p>
+                    <pre><code>{
+  "plan_name": "My First Backup",
+  "sources": [
+    {
+      "path": "/home/user/documents",
+      "recursive": true
+    }
+  ],
+  "destination": {
+    "base_path": "/backup/documents"
+  }
+}</code></pre>
+
+                    <div class="json-editor">
+                        <textarea id="challenge1-input" placeholder="Write your JSON schema here..."></textarea>
+                        <button class="btn" onclick="checkChallenge(1)">Check Solution</button>
+                        <button class="btn btn-secondary" onclick="showHint(1)">Show Hint</button>
+                    </div>
+
+                    <div class="output" id="challenge1-output" style="display: none;"></div>
+                    <div class="alert alert-info" id="hint1" style="display: none;">
+                        <strong>HINT:</strong> Start with the basic structure: curly braces for the main object, "plan_name" as a string, "sources" as an array with one object, and "destination" as an object. Make sure to use double quotes for keys and string values!
+                    </div>
+                </div>
+
+                <!-- Challenge 2 -->
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <div class="challenge-number">CHALLENGE 2</div>
+                        <div class="difficulty easy">EASY</div>
+                    </div>
+                    <div class="challenge-title">Add Include/Exclude Patterns</div>
+                    <p><strong>Objective:</strong> Extend your schema to support file filtering.</p>
+                    
+                    <p><strong>Requirements:</strong></p>
+                    <ul>
+                        <li>Add "include_patterns" to your source (list of wildcards like ["*.log", "*.txt"])</li>
+                        <li>Add "exclude_patterns" to your source (list of wildcards like ["*.tmp"])</li>
+                        <li>Create a config for backing up security logs: include only .log files, exclude debug_*.log files</li>
+                    </ul>
+
+                    <div class="json-editor">
+                        <textarea id="challenge2-input" placeholder="Extend your Challenge 1 schema..."></textarea>
+                        <button class="btn" onclick="checkChallenge(2)">Check Solution</button>
+                        <button class="btn btn-secondary" onclick="showHint(2)">Show Hint</button>
+                    </div>
+
+                    <div class="output" id="challenge2-output" style="display: none;"></div>
+                    <div class="alert alert-info" id="hint2" style="display: none;">
+                        <strong>HINT:</strong> Add two new fields to the source object: "include_patterns" and "exclude_patterns", both should be arrays of strings. Use * as a wildcard (e.g., "*.log" matches any file ending in .log).
+                    </div>
+                </div>
+
+                <!-- Challenge 3 -->
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <div class="challenge-number">CHALLENGE 3</div>
+                        <div class="difficulty medium">MEDIUM</div>
+                    </div>
+                    <div class="challenge-title">Implement Basic Validation</div>
+                    <p><strong>Objective:</strong> Write Python code to validate required fields.</p>
+                    
+                    <p><strong>Requirements:</strong></p>
+                    <ul>
+                        <li>Write a function called <code>validate_required_fields(config)</code></li>
+                        <li>Check for required fields: plan_name, sources, destination</li>
+                        <li>Return a tuple: (is_valid: bool, errors: list)</li>
+                        <li>If valid, return (True, [])</li>
+                        <li>If invalid, return (False, ["Missing field: 'sources'", ...])</li>
+                    </ul>
+
+                    <p><strong>Starter Code:</strong></p>
+                    <pre><code>def validate_required_fields(config):
+    """Check for required fields in backup config."""
+    required_fields = ['plan_name', 'sources', 'destination']
+    errors = []
+    
+    # YOUR CODE HERE
+    
+    return len(errors) == 0, errors
+
+# Test it
+test_config = {"plan_name": "Test"}  # Missing sources and destination
+is_valid, errors = validate_required_fields(test_config)
+print(f"Valid: {is_valid}")
+print(f"Errors: {errors}")</code></pre>
+
+                    <div class="json-editor">
+                        <textarea id="challenge3-input" placeholder="Write your validation function here..."></textarea>
+                        <button class="btn" onclick="checkChallenge(3)">Check Solution</button>
+                        <button class="btn btn-secondary" onclick="showHint(3)">Show Hint</button>
+                    </div>
+
+                    <div class="output" id="challenge3-output" style="display: none;"></div>
+                    <div class="alert alert-info" id="hint3" style="display: none;">
+                        <strong>HINT:</strong> Use a for loop to iterate through required_fields. For each field, check if it's in the config dictionary using: <code>if field not in config</code>. If missing, append an error message to the errors list.
+                    </div>
+                </div>
+
+                <!-- Challenge 4 -->
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <div class="challenge-number">CHALLENGE 4</div>
+                        <div class="difficulty medium">MEDIUM</div>
+                    </div>
+                    <div class="challenge-title">Type and Value Validation</div>
+                    <p><strong>Objective:</strong> Extend validation to check data types and values.</p>
+                    
+                    <p><strong>Requirements:</strong></p>
+                    <ul>
+                        <li>Check that 'sources' is a list (not a string or dict)</li>
+                        <li>Check that 'sources' is not empty</li>
+                        <li>Check that 'destination' is a dictionary</li>
+                        <li>Check that each source has a 'path' field</li>
+                        <li>Return descriptive error messages for each violation</li>
+                    </ul>
+
+                    <p><strong>Expected Error Messages:</strong></p>
+                    <pre><code>"'sources' must be a list, got str"
+"'sources' list cannot be empty"
+"'destination' must be a dictionary, got str"
+"Source 0: missing 'path' field"</code></pre>
+
+                    <div class="json-editor">
+                        <textarea id="challenge4-input" placeholder="Write your extended validation function..."></textarea>
+                        <button class="btn" onclick="checkChallenge(4)">Check Solution</button>
+                        <button class="btn btn-secondary" onclick="showHint(4)">Show Hint</button>
+                    </div>
+
+                    <div class="output" id="challenge4-output" style="display: none;"></div>
+                    <div class="alert alert-info" id="hint4" style="display: none;">
+                        <strong>HINT:</strong> Use <code>isinstance()</code> to check types: <code>isinstance(config.get('sources'), list)</code>. Use <code>len()</code> to check if lists are empty. Use <code>enumerate()</code> to iterate through sources with their index for error messages.
+                    </div>
+                </div>
+
+                <!-- Challenge 5 -->
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <div class="challenge-number">CHALLENGE 5</div>
+                        <div class="difficulty hard">HARD</div>
+                    </div>
+                    <div class="challenge-title">Complete Dry-Run Simulator</div>
+                    <p><strong>Objective:</strong> Build a dry-run simulator that generates a detailed report.</p>
+                    
+                    <p><strong>Requirements:</strong></p>
+                    <ul>
+                        <li>Create a function <code>simulate_backup(config)</code> that returns a report dictionary</li>
+                        <li>The report should include: plan_name, total_sources, total_files (simulated), total_size_mb (simulated)</li>
+                        <li>For each source, generate a list of "would backup" operations</li>
+                        <li>Simulate 5-10 files per source with random sizes (use random.randint())</li>
+                        <li>Generate realistic file names based on patterns (e.g., firewall_2024.log, alerts.txt)</li>
+                    </ul>
+
+                    <p><strong>Example Report Structure:</strong></p>
+                    <pre><code>{
+  "plan_name": "Security Logs",
+  "mode": "DRY-RUN",
+  "total_sources": 2,
+  "total_files": 15,
+  "total_size_mb": 245.6,
+  "operations": [
+    {
+      "source": "Firewall Logs",
+      "files": [
+        {"name": "firewall_2024-01-15.log", "size_mb": 12.3},
+        {"name": "firewall_2024-01-16.log", "size_mb": 11.8}
+      ]
+    }
+  ]
+}</code></pre>
+
+                    <div class="json-editor">
+                        <textarea id="challenge5-input" placeholder="Write your complete dry-run simulator..."></textarea>
+                        <button class="btn" onclick="checkChallenge(5)">Check Solution</button>
+                        <button class="btn btn-secondary" onclick="showHint(5)">Show Hint</button>
+                    </div>
+
+                    <div class="output" id="challenge5-output" style="display: none;"></div>
+                    <div class="alert alert-info" id="hint5" style="display: none;">
+                        <strong>HINT:</strong> Break this into functions: one to generate fake filenames based on patterns, one to generate random file sizes, and one to build the report structure. Use a for loop to iterate through sources and generate 5-10 files for each. Don't forget to import random at the top!
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>SUBMISSION:</strong> Complete at least 3 of the 5 challenges. Submit your code along with test outputs showing your validation and simulation working correctly.
+                </div>
+
+                <button class="btn" onclick="markSectionComplete(6); showSection(7)">Continue to Knowledge Check →</button>
+            </div>
+        </div>
+
+        <!-- Section 7: Knowledge Check -->
+        <div class="section" id="section-7">
+            <div class="content-box">
+                <h2>// Knowledge Check</h2>
+
+                <p>Test your understanding of this week's concepts:</p>
+
+                <div class="quiz-question">
+                    <h4>Question 1: What is the primary benefit of using configuration files?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="A" onclick="selectQuizOption(1, 'A', false)">
+                            Configuration files make your code run faster
+                        </div>
+                        <div class="quiz-option" data-option="B" onclick="selectQuizOption(1, 'B', true)">
+                            Configuration files separate behavior settings from code logic
+                        </div>
+                        <div class="quiz-option" data-option="C" onclick="selectQuizOption(1, 'C', false)">
+                            Configuration files prevent all runtime errors
+                        </div>
+                        <div class="quiz-option" data-option="D" onclick="selectQuizOption(1, 'D', false)">
+                            Configuration files automatically validate user input
+                        </div>
+                    </div>
+                    <div id="quiz1-feedback" class="output" style="display: none;"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>Question 2: In validation functions, what should you return when errors are found?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="A" onclick="selectQuizOption(2, 'A', false)">
+                            Return None
+                        </div>
+                        <div class="quiz-option" data-option="B" onclick="selectQuizOption(2, 'B', false)">
+                            Raise an exception immediately
+                        </div>
+                        <div class="quiz-option" data-option="C" onclick="selectQuizOption(2, 'C', true)">
+                            Return False and a list of descriptive error messages
+                        </div>
+                        <div class="quiz-option" data-option="D" onclick="selectQuizOption(2, 'D', false)">
+                            Print errors to the console and continue
+                        </div>
+                    </div>
+                    <div id="quiz2-feedback" class="output" style="display: none;"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>Question 3: What is the main purpose of a dry-run mode?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="A" onclick="selectQuizOption(3, 'A', false)">
+                            To make backups run faster by skipping validation
+                        </div>
+                        <div class="quiz-option" data-option="B" onclick="selectQuizOption(3, 'B', true)">
+                            To simulate operations and generate reports without actually modifying files
+                        </div>
+                        <div class="quiz-option" data-option="C" onclick="selectQuizOption(3, 'C', false)">
+                            To delete old backups before creating new ones
+                        </div>
+                        <div class="quiz-option" data-option="D" onclick="selectQuizOption(3, 'D', false)">
+                            To compress files more efficiently
+                        </div>
+                    </div>
+                    <div id="quiz3-feedback" class="output" style="display: none;"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>Question 4: Which of these is a principle of good function structure?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="A" onclick="selectQuizOption(4, 'A', false)">
+                            Functions should do as many things as possible to reduce code
+                        </div>
+                        <div class="quiz-option" data-option="B" onclick="selectQuizOption(4, 'B', true)">
+                            Each function should have a single, well-defined responsibility
+                        </div>
+                        <div class="quiz-option" data-option="C" onclick="selectQuizOption(4, 'C', false)">
+                            All functions should be at least 100 lines long
+                        </div>
+                        <div class="quiz-option" data-option="D" onclick="selectQuizOption(4, 'D', false)">
+                            Functions should never return more than one value
+                        </div>
+                    </div>
+                    <div id="quiz4-feedback" class="output" style="display: none;"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>Question 5: When using GitHub Copilot, what's the best practice?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" data-option="A" onclick="selectQuizOption(5, 'A', false)">
+                            Accept all suggestions without review
+                        </div>
+                        <div class="quiz-option" data-option="B" onclick="selectQuizOption(5, 'B', false)">
+                            Never use Copilot for real projects
+                        </div>
+                        <div class="quiz-option" data-option="C" onclick="selectQuizOption(5, 'C', true)">
+                            Review suggestions, test thoroughly, and understand generated code
+                        </div>
+                        <div class="quiz-option" data-option="D" onclick="selectQuizOption(5, 'D', false)">
+                            Only use Copilot for writing comments
+                        </div>
+                    </div>
+                    <div id="quiz5-feedback" class="output" style="display: none;"></div>
+                </div>
+
+                <button class="btn" onclick="calculateQuizScore()">Calculate Score</button>
+                <div class="output" id="quiz-score" style="display: none;"></div>
+
+                <div class="alert alert-info">
+                    <strong>CONGRATULATIONS!</strong> You've completed Week 7: Config-Driven Backup Planner. You now have the skills to design robust configuration systems, implement validation logic, structure programs effectively, and leverage AI tools for development.
+                </div>
+
+                <h3>Next Steps</h3>
+                <ul>
+                    <li>Complete the 5 coding challenges and submit your solutions</li>
+                    <li>Design a backup configuration for your own use case (personal files, projects, etc.)</li>
+                    <li>Experiment with GitHub Copilot on this project</li>
+                    <li>Read about JSON Schema formal specification for advanced validation</li>
+                    <li>Prepare for Week 8 where you'll implement actual file operations!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Section Navigation
+        let currentSection = 0;
+        const totalSections = 8;
+        let completedSections = new Set();
+        let quizAnswers = {};
+
+        function showSection(index) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(`section-${index}`).classList.add('active');
+
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+                btn.classList.remove('active');
+                if (i === index) {
+                    btn.classList.add('active');
+                }
+            });
+
+            currentSection = index;
+            updateProgress();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function markSectionComplete(index) {
+            completedSections.add(index);
+            const btn = document.querySelectorAll('.nav-btn')[index];
+            if (btn && !btn.classList.contains('completed')) {
+                btn.classList.add('completed');
+            }
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = (completedSections.size / totalSections) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-percentage').textContent = Math.round(progress);
+        }
+
+        // Tab Switching
+        function switchTab(event, tabId) {
+            const tabContainer = event.target.parentElement.parentElement;
+            
+            // Hide all tab contents
+            tabContainer.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Deactivate all tabs
+            tabContainer.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+
+            // Activate clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Validation Demo
+        function validateConfig() {
+            const input = document.getElementById('validation-input').value;
+            const output = document.getElementById('validation-output');
+            output.innerHTML = '';
+
+            try {
+                const config = JSON.parse(input);
+                const errors = [];
+
+                // Check required fields
+                const required = ['plan_name', 'sources', 'destination'];
+                required.forEach(field => {
+                    if (!config[field]) {
+                        errors.push(`Missing required field: '${field}'`);
+                    }
+                });
+
+                // Check types
+                if (config.sources && !Array.isArray(config.sources)) {
+                    errors.push("'sources' must be a list");
+                }
+
+                if (config.sources && config.sources.length === 0) {
+                    errors.push("'sources' list cannot be empty");
+                }
+
+                // Check each source
+                if (Array.isArray(config.sources)) {
+                    config.sources.forEach((source, i) => {
+                        if (!source.path) {
+                            errors.push(`Source ${i}: missing 'path' field`);
+                        }
+                    });
+                }
+
+                // Check destination
+                if (config.destination && typeof config.destination !== 'object') {
+                    errors.push("'destination' must be an object");
+                } else if (config.destination && !config.destination.base_path) {
+                    errors.push("Destination: missing 'base_path' field");
+                }
+
+                // Display results
+                if (errors.length === 0) {
+                    output.innerHTML = '<div class="output-line success">✓ Configuration is valid!</div>';
+                } else {
+                    output.innerHTML = '<div class="output-line error">✖ Configuration has errors:</div>';
+                    errors.forEach(error => {
+                        output.innerHTML += `<div class="output-line error">  - ${error}</div>`;
+                    });
+                }
+
+            } catch (e) {
+                output.innerHTML = `<div class="output-line error">✖ Invalid JSON syntax: ${e.message}</div>`;
+            }
+        }
+
+        function loadInvalidExample() {
+            const invalidConfig = {
+                "plan_name": "Invalid Test",
+                "sources": "should_be_a_list",
+                "destination": "/should/be/an/object"
+            };
+            document.getElementById('validation-input').value = JSON.stringify(invalidConfig, null, 2);
+        }
+
+        // Dry-Run Simulator
+        function runDryRunSimulation() {
+            const input = document.getElementById('dryrun-config').value;
+            const output = document.getElementById('dryrun-output');
+            output.innerHTML = '';
+
+            try {
+                const config = JSON.parse(input);
+                
+                output.innerHTML = '<div class="output-line info">========== DRY-RUN SIMULATION ==========</div>';
+                output.innerHTML += `<div class="output-line success">Plan: ${config.plan_name}</div>`;
+                output.innerHTML += '<div class="output-line info">Mode: DRY-RUN (no files will be copied)</div>';
+                output.innerHTML += '<div class="output-line">---</div>';
+
+                let totalFiles = 0;
+                let totalSize = 0;
+
+                config.sources.forEach((source, i) => {
+                    const fileCount = Math.floor(Math.random() * 10) + 5; // 5-15 files
+                    totalFiles += fileCount;
+
+                    output.innerHTML += `<div class="output-line warning">Source ${i + 1}: ${source.name || source.path}</div>`;
+                    output.innerHTML += `<div class="output-line info">  Path: ${source.path}</div>`;
+                    output.innerHTML += `<div class="output-line info">  Files Found: ${fileCount}</div>`;
+
+                    // Simulate some files with realistic security log names
+                    const securityFiles = [
+                        'firewall_access.log', 'ids_alerts.log', 'auth_attempts.log',
+                        'syslog_events.log', 'security_audit.log', 'threat_intel.json',
+                        'incident_report.txt', 'network_traffic.pcap', 'forensic_data.log'
+                    ];
+                    for (let j = 0; j < Math.min(fileCount, 3); j++) {
+                        const fileName = securityFiles[Math.floor(Math.random() * securityFiles.length)];
+                        const size = (Math.random() * 50 + 1).toFixed(2);
+                        totalSize += parseFloat(size);
+                        output.innerHTML += `<div class="output-line">    → ${fileName} (${size} MB)</div>`;
+                    }
+
+                    if (fileCount > 3) {
+                        output.innerHTML += `<div class="output-line">    ... and ${fileCount - 3} more files</div>`;
+                    }
+                });
+
+                output.innerHTML += '<div class="output-line">---</div>';
+                output.innerHTML += `<div class="output-line success">SUMMARY:</div>`;
+                output.innerHTML += `<div class="output-line success">  Total Sources: ${config.sources.length}</div>`;
+                output.innerHTML += `<div class="output-line success">  Total Files: ${totalFiles}</div>`;
+                output.innerHTML += `<div class="output-line success">  Estimated Size: ${totalSize.toFixed(2)} MB</div>`;
+                output.innerHTML += `<div class="output-line info">  Destination: ${config.destination.base_path}</div>`;
+                output.innerHTML += '<div class="output-line warning">⚠ This is a simulation - no files were copied</div>';
+
+            } catch (e) {
+                output.innerHTML = `<div class="output-line error">✖ Error: ${e.message}</div>`;
+            }
+        }
+
+        // Code Review
+        function showCodeIssues() {
+            document.getElementById('code-issues').style.display = 'block';
+        }
+
+        // Challenge Checking
+        function checkChallenge(challengeNum) {
+            const input = document.getElementById(`challenge${challengeNum}-input`).value;
+            const output = document.getElementById(`challenge${challengeNum}-output`);
+            output.style.display = 'block';
+            output.innerHTML = '';
+
+            if (!input.trim()) {
+                output.innerHTML = '<div class="output-line error">✖ Please write your solution first!</div>';
+                return;
+            }
+
+            // Simple checks for each challenge
+            if (challengeNum === 1) {
+                try {
+                    const config = JSON.parse(input);
+                    if (config.plan_name && config.sources && config.destination) {
+                        output.innerHTML = '<div class="output-line success">✓ Great! Your schema has all required fields!</div>';
+                        output.innerHTML += '<div class="output-line success">✓ Basic structure looks good!</div>';
+                        markSectionComplete(6);
+                    } else {
+                        output.innerHTML = '<div class="output-line error">✖ Missing required fields. Check for plan_name, sources, and destination.</div>';
+                    }
+                } catch (e) {
+                    output.innerHTML = '<div class="output-line error">✖ Invalid JSON syntax. Check your brackets and commas.</div>';
+                }
+            } else if (challengeNum === 2) {
+                try {
+                    const config = JSON.parse(input);
+                    if (config.sources[0].include_patterns && config.sources[0].exclude_patterns) {
+                        output.innerHTML = '<div class="output-line success">✓ Excellent! You added include and exclude patterns!</div>';
+                        output.innerHTML += '<div class="output-line success">✓ Your schema now supports file filtering!</div>';
+                    } else {
+                        output.innerHTML = '<div class="output-line error">✖ Add include_patterns and exclude_patterns to your source.</div>';
+                    }
+                } catch (e) {
+                    output.innerHTML = '<div class="output-line error">✖ Invalid JSON syntax.</div>';
+                }
+            } else if (challengeNum === 3) {
+                if (input.includes('validate_required_fields') && input.includes('for') && input.includes('if')) {
+                    output.innerHTML = '<div class="output-line success">✓ Good start! Your function has the right structure!</div>';
+                    output.innerHTML += '<div class="output-line info">Make sure to test with various configs!</div>';
+                } else {
+                    output.innerHTML = '<div class="output-line error">✖ Your function needs a loop to check each required field.</div>';
+                }
+            } else if (challengeNum === 4) {
+                if (input.includes('isinstance') && input.includes('len')) {
+                    output.innerHTML = '<div class="output-line success">✓ Great! You\'re using type checking functions!</div>';
+                    output.innerHTML += '<div class="output-line success">✓ Your validation is more robust now!</div>';
+                } else {
+                    output.innerHTML = '<div class="output-line error">✖ Use isinstance() to check types and len() to check if lists are empty.</div>';
+                }
+            } else if (challengeNum === 5) {
+                if (input.includes('def simulate_backup') && input.includes('random')) {
+                    output.innerHTML = '<div class="output-line success">✓ Excellent! You built a complete simulator!</div>';
+                    output.innerHTML += '<div class="output-line success">✓ This is a great foundation for real backup systems!</div>';
+                    markSectionComplete(6);
+                } else {
+                    output.innerHTML = '<div class="output-line error">✖ Your simulator needs a function definition and random file generation.</div>';
+                }
+            }
+        }
+
+        function showHint(challengeNum) {
+            document.getElementById(`hint${challengeNum}`).style.display = 'block';
+        }
+
+        // Quiz Functions
+        function selectQuizOption(questionNum, option, isCorrect) {
+            const feedback = document.getElementById(`quiz${questionNum}-feedback`);
+            feedback.style.display = 'block';
+            
+            quizAnswers[questionNum] = isCorrect;
+
+            // Update UI
+            const container = feedback.parentElement;
+            container.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            const selectedOption = container.querySelector(`[data-option="${option}"]`);
+            
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                feedback.innerHTML = '<div class="output-line success">✓ Correct!</div>';
+            } else {
+                selectedOption.classList.add('incorrect');
+                feedback.innerHTML = '<div class="output-line error">✖ Incorrect. Review the material and try again.</div>';
+            }
+        }
+
+        function calculateQuizScore() {
+            const totalQuestions = 5;
+            const correctAnswers = Object.values(quizAnswers).filter(answer => answer === true).length;
+            const score = (correctAnswers / totalQuestions) * 100;
+
+            const scoreOutput = document.getElementById('quiz-score');
+            scoreOutput.style.display = 'block';
+
+            if (score === 100) {
+                scoreOutput.innerHTML = `<div class="output-line success">🎉 PERFECT SCORE: ${correctAnswers}/${totalQuestions} (${score}%)</div>`;
+                scoreOutput.innerHTML += '<div class="output-line success">✓ Excellent understanding of the material!</div>';
+                markSectionComplete(7);
+            } else if (score >= 60) {
+                scoreOutput.innerHTML = `<div class="output-line info">SCORE: ${correctAnswers}/${totalQuestions} (${score}%)</div>`;
+                scoreOutput.innerHTML += '<div class="output-line info">Good job! Review the incorrect answers.</div>';
+                markSectionComplete(7);
+            } else {
+                scoreOutput.innerHTML = `<div class="output-line warning">SCORE: ${correctAnswers}/${totalQuestions} (${score}%)</div>`;
+                scoreOutput.innerHTML += '<div class="output-line warning">Review the material and try again.</div>';
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            showSection(0);
+            updateProgress();
+        };
+
+        // Helper Functions
+        function downloadJSON(textareaId, filename) {
+            const content = document.getElementById(textareaId).value;
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function copyToClipboard(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            textarea.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.style.background = 'var(--success-green)';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 2000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Alt + Left Arrow: Previous section
+            if (e.altKey && e.key === 'ArrowLeft' && currentSection > 0) {
+                showSection(currentSection - 1);
+            }
+            // Alt + Right Arrow: Next section
+            if (e.altKey && e.key === 'ArrowRight' && currentSection < totalSections - 1) {
+                showSection(currentSection + 1);
+            }
+        });
+    </script>
+</body>
+</html>
