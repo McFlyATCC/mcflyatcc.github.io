@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Fundamentals | Cybersecurity Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght:700;900&amp;family=Fira+Code:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@300;400;600&amp;display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-red: #ff2a2a;
+            --accent-red-dim: #cc0000;
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --border-gray: #333333;
+            --code-bg: #0d0d0d;
+            --success-green: #00ff41;
+            --warning-yellow: #ffaa00;
+            --terminal-green: #00ff41;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Scanline effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            position: relative;
+            border-bottom: 2px solid var(--accent-red);
+            background: linear-gradient(180deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+        }
+
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 42, 42, 0.5);
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--secondary-bg);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-gray);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-gray);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-red-dim), var(--accent-red));
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px var(--accent-red);
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-tab {
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-gray);
+            color: var(--text-primary);
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent-red), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-tab:hover::before {
+            left: 100%;
+        }
+
+        .nav-tab:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255, 42, 42, 0.3);
+        }
+
+        .nav-tab.active {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-gray);
+            border-left: 4px solid var(--accent-red);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-left-width: 8px;
+            transform: translateX(4px);
+            box-shadow: -4px 4px 20px rgba(255, 42, 42, 0.2);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            color: var(--accent-red);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Platform Selector */
+        .platform-selector {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .platform-btn {
+            background: var(--code-bg);
+            border: 2px solid var(--border-gray);
+            color: var(--text-primary);
+            padding: 1.5rem 2.5rem;
+            cursor: pointer;
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .platform-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            transform: scale(1.05);
+        }
+
+        .platform-btn.active {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* Terminal Simulator */
+        .terminal {
+            background: var(--code-bg);
+            border: 2px solid var(--border-gray);
+            border-radius: 4px;
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-red);
+        }
+
+        .terminal-dot:nth-child(2) {
+            background: var(--warning-yellow);
+        }
+
+        .terminal-dot:nth-child(3) {
+            background: var(--success-green);
+        }
+
+        .terminal-line {
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .terminal-prompt {
+            color: var(--terminal-green);
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .terminal-command {
+            color: var(--text-primary);
+        }
+
+        .terminal-output {
+            color: var(--text-secondary);
+            margin-left: 0;
+            white-space: pre-wrap;
+        }
+
+        .terminal-error {
+            color: var(--accent-red);
+        }
+
+        /* Code Editor */
+        .code-editor {
+            background: var(--code-bg);
+            border: 2px solid var(--border-gray);
+            border-radius: 4px;
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .code-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .file-name {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border-gray);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .code-line {
+            display: flex;
+            margin: 0.3rem 0;
+        }
+
+        .line-number {
+            color: var(--text-secondary);
+            margin-right: 1.5rem;
+            user-select: none;
+            min-width: 2rem;
+            text-align: right;
+        }
+
+        .code-content {
+            color: var(--text-primary);
+        }
+
+        .keyword { color: #ff79c6; }
+        .function { color: #50fa7b; }
+        .string { color: #f1fa8c; }
+        .comment { color: #6272a4; font-style: italic; }
+        .number { color: #bd93f9; }
+
+        /* Interactive Code Editor */
+        .interactive-editor {
+            margin: 2rem 0;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            min-height: 200px;
+            background: var(--code-bg);
+            border: 2px solid var(--border-gray);
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            padding: 1rem;
+            resize: vertical;
+            border-radius: 4px;
+        }
+
+        .editor-textarea:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 10px rgba(255, 42, 42, 0.3);
+        }
+
+        .run-btn {
+            background: var(--accent-red);
+            border: none;
+            color: #000;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .run-btn:hover {
+            background: #ff4444;
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(255, 42, 42, 0.4);
+        }
+
+        .output-display {
+            background: var(--code-bg);
+            border: 2px solid var(--border-gray);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace;
+            min-height: 80px;
+        }
+
+        /* Quiz Section */
+        .quiz {
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-gray);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 4px;
+        }
+
+        .quiz-question {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            background: var(--code-bg);
+            border: 2px solid var(--border-gray);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--accent-red);
+            transform: translateX(8px);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success-green);
+            background: rgba(0, 255, 65, 0.1);
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(255, 42, 42, 0.1);
+        }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(0, 255, 65, 0.2);
+            border: 2px solid var(--success-green);
+            color: var(--success-green);
+        }
+
+        .quiz-feedback.incorrect {
+            background: rgba(255, 42, 42, 0.2);
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Step-by-Step Guide */
+        .steps {
+            counter-reset: step-counter;
+        }
+
+        .step {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-gray);
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            padding-left: 5rem;
+            border-radius: 4px;
+        }
+
+        .step::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--accent-red);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            border-radius: 4px;
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-red);
+        }
+
+        .step-content {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Complete Button */
+        .complete-btn {
+            background: transparent;
+            border: 2px solid var(--border-gray);
+            color: var(--text-primary);
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-family: 'Fira Code', monospace;
+            margin: 2rem 0;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .complete-btn:hover {
+            border-color: var(--success-green);
+            color: var(--success-green);
+        }
+
+        .complete-btn.completed {
+            background: var(--success-green);
+            border-color: var(--success-green);
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* Debug Challenge */
+        .debug-challenge {
+            background: var(--secondary-bg);
+            border: 2px solid var(--accent-red);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 4px;
+        }
+
+        .challenge-title {
+            font-family: 'Orbitron', monospace;
+            color: var(--accent-red);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .hint-btn {
+            background: var(--code-bg);
+            border: 1px solid var(--border-gray);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .hint-btn:hover {
+            border-color: var(--warning-yellow);
+            color: var(--warning-yellow);
+        }
+
+        .hint-content {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid var(--warning-yellow);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .hint-content.show {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .platform-selector {
+                flex-direction: column;
+            }
+
+            .step {
+                padding-left: 4rem;
+            }
+
+            .step::before {
+                left: 1rem;
+                width: 2rem;
+                height: 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: rgba(0, 255, 65, 0.1);
+            border-left: 4px solid var(--success-green);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: rgba(255, 170, 0, 0.1);
+            border-left: 4px solid var(--warning-yellow);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .error-box {
+            background: rgba(255, 42, 42, 0.1);
+            border-left: 4px solid var(--accent-red);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .box-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Print styles for certificate */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #completion-certificate, #completion-certificate * {
+                visibility: visible;
+            }
+            #completion-certificate {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+                color: black !important;
+                border: 4px solid black !important;
+                padding: 4rem !important;
+            }
+            #completion-certificate h3 {
+                color: black !important;
+                text-shadow: none !important;
+            }
+            #completion-certificate p {
+                color: black !important;
+            }
+            .run-btn {
+                display: none;
+            }
+        }
+    </style>
+</head><body><header>
+<h1>Python Fundamentals</h1>
+<p class="subtitle">Cybersecurity Edition | Interactive Learning Platform</p>
+</header>
+<div class="progress-container">
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+<div class="progress-text" id="progressText">Progress: 0/12 Sections Completed</div>
+</div>
+<div class="container"><nav class="nav-tabs"><button class="nav-tab active" data-section="intro">Introduction</button> <button class="nav-tab" data-section="installation">Installation &amp; Setup</button> <button class="nav-tab" data-section="running">Running Python</button> <button class="nav-tab" data-section="errors">Errors &amp; Debugging</button></nav><!-- Introduction Section -->
+<section id="intro" class="content-section active">
+<div class="card">
+<h2 class="card-title">Welcome, Cyber Defender</h2>
+<p style="margin-bottom: 1rem;">This interactive platform will guide you through Python fundamentals with a cybersecurity focus. You'll learn by doing, building real security tools as you progress.</p>
+<div class="info-box">
+<div class="box-title">🎯 What You'll Learn</div>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+<li>Install and configure Python 3.x development environment</li>
+<li>Set up VS Code with essential extensions</li>
+<li>Create and run Python scripts</li>
+<li>Execute code from VS Code and terminal</li>
+<li>Understand and debug error messages</li>
+<li>Apply concepts to security tools and scenarios</li>
+</ul>
+</div>
+<div class="warning-box">
+<div class="box-title">⚡ Interactive Features</div>
+<p style="color: var(--text-secondary); margin-top: 0.5rem;">This isn't just reading—you'll use simulated terminals, write and execute code, solve debugging challenges, and complete knowledge checks. Track your progress as you complete each section.</p>
+</div>
+<button class="complete-btn" onclick="markComplete('intro')">Mark Section Complete</button></div>
+</section>
+<!-- Installation & Setup Section -->
+<section id="installation" class="content-section">
+<div class="card">
+<h2 class="card-title">Module 1: Installation &amp; Setup</h2>
+<p style="margin-bottom: 2rem;">Let's get your Python development environment ready. Choose your operating system:</p>
+<div class="platform-selector"><button class="platform-btn active" onclick="selectPlatform('windows')">🪟 Windows</button> <button class="platform-btn" onclick="selectPlatform('mac')">🍎 macOS</button> <button class="platform-btn" onclick="selectPlatform('linux')">🐧 Linux</button></div>
+</div>
+<!-- Windows Instructions -->
+<div id="platform-windows" class="platform-content">
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Installing Python 3.x on Windows</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Download Python</div>
+<div class="step-content">Navigate to <a href="https://www.python.org/downloads/" style="color: var(--accent-red);">python.org/downloads</a> and download the latest Python 3.x installer for Windows (64-bit recommended).</div>
+</div>
+<div class="step">
+<div class="step-title">Run the Installer</div>
+<div class="step-content"><strong style="color: var(--accent-red);">CRITICAL:</strong> Check "Add Python to PATH" before clicking "Install Now". This allows you to run Python from any command prompt.
+<div class="warning-box" style="margin-top: 1rem;">
+<div class="box-title">⚠️ Common Mistake</div>
+Forgetting to check "Add Python to PATH" is the #1 reason students have issues. If you forgot, uninstall and reinstall with this option checked.</div>
+</div>
+</div>
+<div class="step">
+<div class="step-title">Verify Installation</div>
+<div class="step-content">Open Command Prompt (Win + R, type "cmd", press Enter) and verify Python is installed:
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">C:\Users\student&gt;</span> <span class="terminal-command">python --version</span></div>
+<div class="terminal-line"><span class="terminal-output">Python 3.12.0</span></div>
+<div class="terminal-line"><span class="terminal-prompt">C:\Users\student&gt;</span> <span class="terminal-command">pip --version</span></div>
+<div class="terminal-line"><span class="terminal-output">pip 23.3.1 from C:\Python312\lib\site-packages\pip (python 3.12)</span></div>
+</div>
+</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('install-python-windows')">Complete Python Installation</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Installing VS Code</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Download VS Code</div>
+<div class="step-content">Visit <a href="https://code.visualstudio.com/" style="color: var(--accent-red);">code.visualstudio.com</a> and download the Windows installer.</div>
+</div>
+<div class="step">
+<div class="step-title">Install with Recommended Options</div>
+<div class="step-content">During installation, check these options:
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+<li>Add "Open with Code" action to Windows Explorer file context menu</li>
+<li>Add "Open with Code" action to Windows Explorer directory context menu</li>
+<li>Register Code as an editor for supported file types</li>
+<li>Add to PATH</li>
+</ul>
+</div>
+</div>
+<div class="step">
+<div class="step-title">Launch and Verify</div>
+<div class="step-content">Launch VS Code. You should see the welcome screen. You're ready for extensions!</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('install-vscode-windows')">Complete VS Code Installation</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Essential Extensions</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Python Extension</div>
+<div class="step-content">Press <code style="background: var(--code-bg); padding: 0.2rem 0.5rem; color: var(--accent-red);">Ctrl+Shift+X</code> to open Extensions. Search for "Python" by Microsoft and click Install.
+<div class="info-box" style="margin-top: 1rem;">
+<div class="box-title">✨ What This Gives You</div>
+Intelligent code completion, linting, debugging, code formatting, unit testing, and more.</div>
+</div>
+</div>
+<div class="step">
+<div class="step-title">Git Extension</div>
+<div class="step-content">Download Git from <a href="https://git-scm.com/downloads" style="color: var(--accent-red);">git-scm.com/downloads</a> and install. VS Code will automatically detect it. This is essential for version control in security research.</div>
+</div>
+<div class="step">
+<div class="step-title">GitHub Copilot (Optional)</div>
+<div class="step-content">If you have access (free for students), install GitHub Copilot extension. It provides AI-powered code suggestions—helpful for learning patterns.
+<div class="warning-box" style="margin-top: 1rem;">
+<div class="box-title">🎓 Student Tip</div>
+Apply for free GitHub Student Developer Pack at education.github.com. Includes Copilot access.</div>
+</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('install-extensions-windows')">Complete Extensions Setup</button></div>
+</div>
+<!-- macOS Instructions -->
+<div id="platform-mac" class="platform-content" style="display: none;">
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Installing Python 3.x on macOS</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Check Existing Python</div>
+<div class="step-content">macOS comes with Python 2.7 (outdated). Open Terminal and check:
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">student@macbook ~ %</span> <span class="terminal-command">python3 --version</span></div>
+<div class="terminal-line"><span class="terminal-output">zsh: command not found: python3</span></div>
+</div>
+If you see "command not found", you need to install Python 3.</div>
+</div>
+<div class="step">
+<div class="step-title">Install via Homebrew (Recommended)</div>
+<div class="step-content">First, install Homebrew if you haven't:
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">student@macbook ~ %</span> <span class="terminal-command">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</span></div>
+</div>
+Then install Python 3:
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">student@macbook ~ %</span> <span class="terminal-command">brew install python3</span></div>
+</div>
+</div>
+</div>
+<div class="step">
+<div class="step-title">Verify Installation</div>
+<div class="step-content">
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">student@macbook ~ %</span> <span class="terminal-command">python3 --version</span></div>
+<div class="terminal-line"><span class="terminal-output">Python 3.12.0</span></div>
+<div class="terminal-line"><span class="terminal-prompt">student@macbook ~ %</span> <span class="terminal-command">pip3 --version</span></div>
+<div class="terminal-line"><span class="terminal-output">pip 23.3.1 from /opt/homebrew/lib/python3.12/site-packages/pip (python 3.12)</span></div>
+</div>
+</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('install-python-mac')">Complete Python Installation</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Installing VS Code</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Download VS Code</div>
+<div class="step-content">Visit <a href="https://code.visualstudio.com/" style="color: var(--accent-red);">code.visualstudio.com</a> and download the macOS version.</div>
+</div>
+<div class="step">
+<div class="step-title">Install the Application</div>
+<div class="step-content">Open the downloaded .zip file, drag Visual Studio Code to your Applications folder, then launch it.</div>
+</div>
+<div class="step">
+<div class="step-title">Add to PATH (Optional but Recommended)</div>
+<div class="step-content">In VS Code, press <code style="background: var(--code-bg); padding: 0.2rem 0.5rem; color: var(--accent-red);">Cmd+Shift+P</code>, type "shell command", and select "Install 'code' command in PATH". This lets you open files from terminal with <code>code filename.py</code>.</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('install-vscode-mac')">Complete VS Code Installation</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Essential Extensions</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Python Extension</div>
+<div class="step-content">Press <code style="background: var(--code-bg); padding: 0.2rem 0.5rem; color: var(--accent-red);">Cmd+Shift+X</code> to open Extensions. Search for "Python" by Microsoft and click Install.</div>
+</div>
+<div class="step">
+<div class="step-title">Git Extension</div>
+<div class="step-content">macOS includes Git by default. Open terminal and type <code>git --version</code> to verify. VS Code will detect it automatically.</div>
+</div>
+<div class="step">
+<div class="step-title">GitHub Copilot (Optional)</div>
+<div class="step-content">If you have access (free for students), install GitHub Copilot extension.</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('install-extensions-mac')">Complete Extensions Setup</button></div>
+</div>
+<!-- Linux Instructions -->
+<div id="platform-linux" class="platform-content" style="display: none;">
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Installing Python 3.x on Linux</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Check Existing Python</div>
+<div class="step-content">Most Linux distributions include Python 3. Check your version:
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">student@kali:~$</span> <span class="terminal-command">python3 --version</span></div>
+<div class="terminal-line"><span class="terminal-output">Python 3.11.4</span></div>
+</div>
+If Python 3.8 or higher is installed, you're good. Otherwise, continue to install.</div>
+</div>
+<div class="step">
+<div class="step-title">Install Python 3 (Ubuntu/Debian/Kali)</div>
+<div class="step-content">
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">student@kali:~$</span> <span class="terminal-command">sudo apt update</span></div>
+<div class="terminal-line"><span class="terminal-prompt">student@kali:~$</span> <span class="terminal-command">sudo apt install python3 python3-pip python3-venv</span></div>
+</div>
+For Fedora/RHEL: <code style="background: var(--code-bg); padding: 0.2rem 0.5rem;">sudo dnf install python3 python3-pip</code></div>
+</div>
+<div class="step">
+<div class="step-title">Verify Installation</div>
+<div class="step-content">
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">student@kali:~$</span> <span class="terminal-command">python3 --version</span></div>
+<div class="terminal-line"><span class="terminal-output">Python 3.11.4</span></div>
+<div class="terminal-line"><span class="terminal-prompt">student@kali:~$</span> <span class="terminal-command">pip3 --version</span></div>
+<div class="terminal-line"><span class="terminal-output">pip 23.0.1 from /usr/lib/python3/dist-packages/pip (python 3.11)</span></div>
+</div>
+</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('install-python-linux')">Complete Python Installation</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Installing VS Code</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Download VS Code</div>
+<div class="step-content">Visit <a href="https://code.visualstudio.com/" style="color: var(--accent-red);">code.visualstudio.com</a> and download the .deb (Debian/Ubuntu) or .rpm (Fedora/RHEL) package.</div>
+</div>
+<div class="step">
+<div class="step-title">Install Package</div>
+<div class="step-content">For .deb packages:
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">student@kali:~$</span> <span class="terminal-command">sudo dpkg -i code_*.deb</span></div>
+<div class="terminal-line"><span class="terminal-prompt">student@kali:~$</span> <span class="terminal-command">sudo apt-get install -f</span></div>
+</div>
+For .rpm packages: <code style="background: var(--code-bg); padding: 0.2rem 0.5rem;">sudo rpm -i code-*.rpm</code></div>
+</div>
+<div class="step">
+<div class="step-title">Launch VS Code</div>
+<div class="step-content">Type <code style="background: var(--code-bg); padding: 0.2rem 0.5rem;">code</code> in terminal or find it in your applications menu.</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('install-vscode-linux')">Complete VS Code Installation</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Essential Extensions</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Python Extension</div>
+<div class="step-content">Press <code style="background: var(--code-bg); padding: 0.2rem 0.5rem; color: var(--accent-red);">Ctrl+Shift+X</code> to open Extensions. Search for "Python" by Microsoft and click Install.</div>
+</div>
+<div class="step">
+<div class="step-title">Git Extension</div>
+<div class="step-content">Install Git if not present: <code style="background: var(--code-bg); padding: 0.2rem 0.5rem;">sudo apt install git</code>. VS Code will detect it.</div>
+</div>
+<div class="step">
+<div class="step-title">GitHub Copilot (Optional)</div>
+<div class="step-content">If you have access (free for students), install GitHub Copilot extension.</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('install-extensions-linux')">Complete Extensions Setup</button></div>
+</div>
+</section>
+<!-- Running Python Section -->
+<section id="running" class="content-section">
+<div class="card">
+<h2 class="card-title">Module 2: Running Python</h2>
+<p style="margin-bottom: 1rem;">Now that your environment is set up, let's write and execute your first Python program.</p>
+</div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Creating hello_world.py</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Create Project Folder</div>
+<div class="step-content">Open VS Code, press <code style="background: var(--code-bg); padding: 0.2rem 0.5rem; color: var(--accent-red);">Ctrl+K Ctrl+O</code> (or Cmd+K Cmd+O on Mac), and create a new folder called "python_basics".</div>
+</div>
+<div class="step">
+<div class="step-title">Create New File</div>
+<div class="step-content">In VS Code, press <code style="background: var(--code-bg); padding: 0.2rem 0.5rem; color: var(--accent-red);">Ctrl+N</code> (Cmd+N on Mac) to create a new file. Save it as <code>hello_world.py</code> in your python_basics folder.</div>
+</div>
+<div class="step">
+<div class="step-title">Write Your First Program</div>
+<div class="step-content">Type this code in your file:
+<div class="code-editor">
+<div class="code-editor-header"><span class="file-name">hello_world.py</span> <button class="copy-btn" onclick="copyCode('code1')">Copy Code</button></div>
+<div id="code1">
+<div class="code-line"><span class="line-number">1</span> <span class="code-content"><span class="comment"># My first Python program - Cybersecurity Edition</span></span></div>
+<div class="code-line"><span class="line-number">2</span> <span class="code-content"><span class="keyword">print</span>(<span class="string">"Hello, Cyber World!"</span>)</span></div>
+<div class="code-line"><span class="line-number">3</span> <span class="code-content"><span class="keyword">print</span>(<span class="string">"Initializing security protocols..."</span>)</span></div>
+</div>
+</div>
+<div class="info-box" style="margin-top: 1rem;">
+<div class="box-title">💡 Code Breakdown</div>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+<li><strong>Line 1:</strong> Comments start with # and are ignored by Python</li>
+<li><strong>Line 2-3:</strong> print() displays text to the console</li>
+<li><strong>Strings:</strong> Text wrapped in quotes ("..." or '...')</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('create-hello-world')">Complete Hello World Creation</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Running from VS Code</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Using the Run Button</div>
+<div class="step-content">With hello_world.py open, click the "Run" button (▶️) in the top-right corner of VS Code, or press <code style="background: var(--code-bg); padding: 0.2rem 0.5rem; color: var(--accent-red);">Ctrl+Alt+N</code>.
+<div class="terminal" style="margin-top: 1rem;">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<span style="color: var(--text-secondary); margin-left: 1rem; font-size: 0.9rem;">OUTPUT</span></div>
+<div class="terminal-line"><span class="terminal-output" style="color: var(--terminal-green);">Hello, Cyber World!</span></div>
+<div class="terminal-line"><span class="terminal-output" style="color: var(--terminal-green);">Initializing security protocols...</span></div>
+</div>
+</div>
+</div>
+<div class="step">
+<div class="step-title">Using F5 (Debug Mode)</div>
+<div class="step-content">Press <code style="background: var(--code-bg); padding: 0.2rem 0.5rem; color: var(--accent-red);">F5</code> to run in debug mode. This allows you to:
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+<li>Set breakpoints (pause execution at specific lines)</li>
+<li>Inspect variable values</li>
+<li>Step through code line by line</li>
+</ul>
+We'll explore debugging in detail later.</div>
+</div>
+<div class="step">
+<div class="step-title">Right-Click Run</div>
+<div class="step-content">Right-click anywhere in your code and select "Run Python File in Terminal". This opens an integrated terminal and runs your script.</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('run-vscode')">Complete VS Code Execution</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Running from Terminal</h3>
+<div class="steps">
+<div class="step">
+<div class="step-title">Open Terminal in VS Code</div>
+<div class="step-content">Press <code style="background: var(--code-bg); padding: 0.2rem 0.5rem; color: var(--accent-red);">Ctrl+`</code> (Cmd+` on Mac) to open the integrated terminal, or use Terminal → New Terminal from the menu.</div>
+</div>
+<div class="step">
+<div class="step-title">Navigate to Your Script</div>
+<div class="step-content">Use <code>cd</code> (change directory) to navigate to where your script is saved:
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">$</span> <span class="terminal-command">cd python_basics</span></div>
+<div class="terminal-line"><span class="terminal-prompt">$</span> <span class="terminal-command">ls</span></div>
+<div class="terminal-line"><span class="terminal-output">hello_world.py</span></div>
+</div>
+</div>
+</div>
+<div class="step">
+<div class="step-title">Execute the Script</div>
+<div class="step-content">Run your Python script with the python command:
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-prompt">$</span> <span class="terminal-command">python hello_world.py</span></div>
+<div class="terminal-line"><span class="terminal-output" style="color: var(--terminal-green);">Hello, Cyber World!</span></div>
+<div class="terminal-line"><span class="terminal-output" style="color: var(--terminal-green);">Initializing security protocols...</span></div>
+</div>
+<div class="warning-box" style="margin-top: 1rem;">
+<div class="box-title">⚠️ Windows Note</div>
+On Windows, use <code>python</code>. On Mac/Linux, you might need <code>python3</code> to ensure you're using Python 3.x.</div>
+</div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('run-terminal')">Complete Terminal Execution</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">🎯 Interactive Code Challenge</h3>
+<div class="interactive-editor">
+<p style="margin-bottom: 1rem; color: var(--text-secondary);">Modify the code below to create a security tool banner. Make it print a title, version, and author line. Then click "Run Code" to see the output!</p>
+<textarea class="editor-textarea" id="interactive-code-1">print("=== Security Scanner v1.0 ===")
+# Add your code here!</textarea> <button class="run-btn" onclick="runInteractiveCode('interactive-code-1', 'output-1')">Run Code</button>
+<div class="output-display" id="output-1"><span style="color: var(--text-secondary);">Output will appear here...</span></div>
+</div>
+<button class="complete-btn" onclick="markComplete('interactive-challenge-1')">Complete Challenge</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">🧪 Try It Live: Build Security Tools</h3>
+<p style="color: var(--text-secondary); margin-bottom: 2rem;">Practice writing Python code for common security tasks. These exercises build on what you've learned.</p>
+<h4 style="color: var(--accent-red); margin-top: 2rem; margin-bottom: 1rem; font-family: 'Fira Code', monospace;">Exercise 1: Basic Port Reporter</h4>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Create a simple script that prints a list of common ports and their services.</p>
+<div class="interactive-editor"><textarea class="editor-textarea" id="exercise-1"># Print common ports and services
+# Format: "Port 80: HTTP"
+# Include: 21 (FTP), 22 (SSH), 80 (HTTP), 443 (HTTPS)
+
+</textarea> <button class="run-btn" onclick="runInteractiveCode('exercise-1', 'exercise-output-1')">Run Code</button>
+<div class="output-display" id="exercise-output-1"><span style="color: var(--text-secondary);">Output will appear here...</span></div>
+</div>
+<h4 style="color: var(--accent-red); margin-top: 2rem; margin-bottom: 1rem; font-family: 'Fira Code', monospace;">Exercise 2: Security Status Banner</h4>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Create a decorative banner for a security tool using ASCII art and print statements.</p>
+<div class="interactive-editor"><textarea class="editor-textarea" id="exercise-2"># Create a banner with:
+# - A title line with decorative borders
+# - Tool name and version
+# - A bottom border
+# Example: print("=" * 40)
+
+</textarea> <button class="run-btn" onclick="runInteractiveCode('exercise-2', 'exercise-output-2')">Run Code</button>
+<div class="output-display" id="exercise-output-2"><span style="color: var(--text-secondary);">Output will appear here...</span></div>
+</div>
+<h4 style="color: var(--accent-red); margin-top: 2rem; margin-bottom: 1rem; font-family: 'Fira Code', monospace;">Exercise 3: Hash Display Tool</h4>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Print sample MD5 hashes and their corresponding passwords (demonstrating why weak passwords are bad).</p>
+<div class="interactive-editor"><textarea class="editor-textarea" id="exercise-3"># Display weak passwords and their MD5 hashes
+# Format: "password123 -&gt; [hash value]"
+# Include at least 3 weak passwords
+# Hashes: password123 -&gt; 482c811da5d5b4bc6d497ffa98491e38
+#         admin -&gt; 21232f297a57a5a743894a0e4a801fc3
+
+</textarea> <button class="run-btn" onclick="runInteractiveCode('exercise-3', 'exercise-output-3')">Run Code</button>
+<div class="output-display" id="exercise-output-3"><span style="color: var(--text-secondary);">Output will appear here...</span></div>
+</div>
+<button class="complete-btn" onclick="markComplete('try-it-live')">Complete Practice Exercises</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">📝 Knowledge Check</h3>
+<div class="quiz" id="quiz-1">
+<div class="quiz-question">What command runs a Python script named "scanner.py" from the terminal?</div>
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer('quiz-1', this, false)">A) run scanner.py</div>
+<div class="quiz-option" onclick="checkAnswer('quiz-1', this, false)">B) execute scanner.py</div>
+<div class="quiz-option" onclick="checkAnswer('quiz-1', this, true)">C) python scanner.py</div>
+<div class="quiz-option" onclick="checkAnswer('quiz-1', this, false)">D) scanner.py</div>
+</div>
+<div class="quiz-feedback" id="quiz-1-feedback"></div>
+</div>
+</div>
+</section>
+<!-- Errors & Debugging Section -->
+<section id="errors" class="content-section">
+<div class="card">
+<h2 class="card-title">Module 3: Errors &amp; Debugging</h2>
+<p style="margin-bottom: 1rem;">Errors are not failures—they're feedback. Understanding error messages is crucial for becoming an effective cybersecurity developer.</p>
+</div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Understanding Python Errors</h3>
+<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">When Python encounters an error, it provides a <strong style="color: var(--accent-red);">traceback</strong>—a detailed report showing what went wrong and where. Learning to read tracebacks efficiently is essential.</p>
+<div class="error-box">
+<div class="box-title">🔴 Common Error Types</div>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+<li><strong>SyntaxError:</strong> Code doesn't follow Python's grammar rules</li>
+<li><strong>NameError:</strong> Variable/function name doesn't exist</li>
+<li><strong>TypeError:</strong> Operation on wrong data type</li>
+<li><strong>IndentationError:</strong> Incorrect spacing/indentation</li>
+<li><strong>AttributeError:</strong> Object doesn't have the requested attribute</li>
+<li><strong>ImportError:</strong> Module can't be found or imported</li>
+</ul>
+</div>
+</div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Anatomy of a Traceback</h3>
+<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Let's dissect a traceback to understand each component:</p>
+<div class="code-editor">
+<div class="code-editor-header"><span class="file-name">port_scanner.py</span></div>
+<div>
+<div class="code-line"><span class="line-number">1</span> <span class="code-content"><span class="comment"># Buggy port scanner</span></span></div>
+<div class="code-line"><span class="line-number">2</span> <span class="code-content"><span class="keyword">import</span> socket</span></div>
+<div class="code-line"><span class="line-number">3</span> <span class="code-content"></span></div>
+<div class="code-line"><span class="line-number">4</span> <span class="code-content">target = <span class="string">"192.168.1.1"</span></span></div>
+<div class="code-line"><span class="line-number">5</span> <span class="code-content">port = <span class="string">"80"</span> <span class="comment"># BUG: Should be int, not string</span></span></div>
+<div class="code-line"><span class="line-number">6</span> <span class="code-content"></span></div>
+<div class="code-line"><span class="line-number">7</span> <span class="code-content">sock = socket.socket()</span></div>
+<div class="code-line"><span class="line-number">8</span> <span class="code-content">result = sock.connect_ex((target, port))</span></div>
+</div>
+</div>
+<p style="color: var(--text-secondary); margin: 1.5rem 0;">When you run this code, Python gives you this traceback:</p>
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<span style="color: var(--text-secondary); margin-left: 1rem; font-size: 0.9rem;">ERROR TRACEBACK</span></div>
+<div class="terminal-line"><span class="terminal-output">Traceback (most recent call last):</span></div>
+<div class="terminal-line"><span class="terminal-output"> File "port_scanner.py", line 8, in &lt;module&gt;</span></div>
+<div class="terminal-line"><span class="terminal-output"> result = sock.connect_ex((target, port))</span></div>
+<div class="terminal-line"><span class="terminal-error">TypeError: an integer is required (got type str)</span></div>
+</div>
+<div class="info-box" style="margin-top: 1.5rem;">
+<div class="box-title">🔍 Breaking It Down</div>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+<li><strong>Traceback (most recent call last):</strong> Header indicating error trace</li>
+<li><strong>File "port_scanner.py", line 8:</strong> Where the error occurred</li>
+<li><strong>result = sock.connect_ex(...):</strong> The problematic code line</li>
+<li><strong>TypeError:</strong> The error type</li>
+<li><strong>an integer is required (got type str):</strong> What went wrong—port should be int, not string</li>
+</ul>
+</div>
+<button class="complete-btn" onclick="markComplete('understand-traceback')">Complete Traceback Understanding</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">Common Errors in Action</h3>
+<h4 style="color: var(--accent-red); margin-top: 2rem; margin-bottom: 1rem; font-family: 'Fira Code', monospace;">1. SyntaxError</h4>
+<div class="code-editor">
+<div class="code-editor-header"><span class="file-name">syntax_error.py</span></div>
+<div>
+<div class="code-line"><span class="line-number">1</span> <span class="code-content"><span class="keyword">print</span>(<span class="string">"Checking firewall status..."</span></span></div>
+<div class="code-line"><span class="line-number">2</span> <span class="code-content"><span class="comment"># Missing closing parenthesis above!</span></span></div>
+</div>
+</div>
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-output"> File "syntax_error.py", line 2</span></div>
+<div class="terminal-line"><span class="terminal-output"> # Missing closing parenthesis above!</span></div>
+<div class="terminal-line"><span class="terminal-output"> ^</span></div>
+<div class="terminal-line"><span class="terminal-error">SyntaxError: invalid syntax</span></div>
+</div>
+<h4 style="color: var(--accent-red); margin-top: 2rem; margin-bottom: 1rem; font-family: 'Fira Code', monospace;">2. NameError</h4>
+<div class="code-editor">
+<div class="code-editor-header"><span class="file-name">name_error.py</span></div>
+<div>
+<div class="code-line"><span class="line-number">1</span> <span class="code-content">password_hash = <span class="string">"5f4dcc3b5aa765d61d8327deb882cf99"</span></span></div>
+<div class="code-line"><span class="line-number">2</span> <span class="code-content"><span class="keyword">print</span>(pasword_hash) <span class="comment"># Typo: "pasword" not "password"</span></span></div>
+</div>
+</div>
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-output">Traceback (most recent call last):</span></div>
+<div class="terminal-line"><span class="terminal-output"> File "name_error.py", line 2, in &lt;module&gt;</span></div>
+<div class="terminal-line"><span class="terminal-output"> print(pasword_hash)</span></div>
+<div class="terminal-line"><span class="terminal-error">NameError: name 'pasword_hash' is not defined</span></div>
+</div>
+<h4 style="color: var(--accent-red); margin-top: 2rem; margin-bottom: 1rem; font-family: 'Fira Code', monospace;">3. IndentationError</h4>
+<div class="code-editor">
+<div class="code-editor-header"><span class="file-name">indentation_error.py</span></div>
+<div>
+<div class="code-line"><span class="line-number">1</span> <span class="code-content"><span class="keyword">def</span> <span class="function">scan_network</span>():</span></div>
+<div class="code-line"><span class="line-number">2</span> <span class="code-content"><span class="keyword">print</span>(<span class="string">"Starting scan..."</span>)</span></div>
+<div class="code-line"><span class="line-number">3</span> <span class="code-content"> <span class="keyword">print</span>(<span class="string">"Scan complete"</span>) <span class="comment"># Inconsistent indent</span></span></div>
+</div>
+</div>
+<div class="terminal">
+<div class="terminal-header">
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+<div class="terminal-dot"></div>
+</div>
+<div class="terminal-line"><span class="terminal-output"> File "indentation_error.py", line 2</span></div>
+<div class="terminal-line"><span class="terminal-output"> print("Starting scan...")</span></div>
+<div class="terminal-line"><span class="terminal-output"> ^</span></div>
+<div class="terminal-line"><span class="terminal-error">IndentationError: expected an indented block</span></div>
+</div>
+<button class="complete-btn" onclick="markComplete('common-errors')">Complete Error Examples</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">🎯 Debug Challenge #1</h3>
+<div class="debug-challenge">
+<div class="challenge-title">Find and Fix the Bugs</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">This password strength checker has THREE bugs. Can you find and fix them all?</p>
+<div class="interactive-editor"><textarea class="editor-textarea" id="debug-challenge-1">import string
+
+password = input("Enter password: ")
+strength = 0
+
+# Check length
+if len(password) &gt;= 8
+    strength += 1
+
+# Check for uppercase
+if any(c.isupper() for c in pasword):
+    strength += 1
+
+# Check for numbers
+if any(c.isdigit() for c in password):
+    strenght += 1
+
+print(f"Password strength: {{strength}}/3")</textarea> <button class="run-btn" onclick="runDebugChallenge('debug-challenge-1', 'debug-output-1')">Test Your Fix</button> <button class="hint-btn" onclick="toggleHint('hint-1')">Show Hint</button>
+<div class="hint-content" id="hint-1"><strong>Hints:</strong>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+<li>Line 7: Check syntax around the if statement</li>
+<li>Line 11: Check the variable name carefully</li>
+<li>Line 16: Look for a typo in the variable name</li>
+</ul>
+</div>
+<div class="output-display" id="debug-output-1"><span style="color: var(--text-secondary);">Run your code to see results...</span></div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('debug-challenge-1')">Complete Debug Challenge</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">🎯 Debug Challenge #2</h3>
+<div class="debug-challenge">
+<div class="challenge-title">IP Address Validator</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">This IP validator should check if an address is valid, but it has errors. Fix them!</p>
+<div class="interactive-editor"><textarea class="editor-textarea" id="debug-challenge-2">def validate_ip(ip_address):
+    octets = ip_address.split(".")
+    
+    if len(octets) != 4:
+        return False
+    
+    for octet in octets
+        if not octet.isdigit():
+            return False
+        if int(octet) &lt; 0 or int(octet) &gt; 255:
+            return False
+    
+    return True
+
+# Test cases
+test_ips = ["192.168.1.1", "256.1.1.1", "10.0.0", "172.16.0.1"]
+
+for ip in test_ips:
+print(f"{{ip}}: {validate_ip(ip)}")</textarea> <button class="run-btn" onclick="runDebugChallenge('debug-challenge-2', 'debug-output-2')">Test Your Fix</button> <button class="hint-btn" onclick="toggleHint('hint-2')">Show Hint</button>
+<div class="hint-content" id="hint-2"><strong>Hints:</strong>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+<li>Line 7: Missing punctuation after the for statement</li>
+<li>Line 18: Check the indentation</li>
+</ul>
+</div>
+<div class="output-display" id="debug-output-2"><span style="color: var(--text-secondary);">Run your code to see results...</span></div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('debug-challenge-2')">Complete Debug Challenge</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">📝 Final Knowledge Check</h3>
+<div class="quiz" id="quiz-2">
+<div class="quiz-question">What does a traceback tell you when Python encounters an error?</div>
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer('quiz-2', this, false)">A) Only the error type</div>
+<div class="quiz-option" onclick="checkAnswer('quiz-2', this, true)">B) Error type, location (file and line), and description of what went wrong</div>
+<div class="quiz-option" onclick="checkAnswer('quiz-2', this, false)">C) Only the line number where the error occurred</div>
+<div class="quiz-option" onclick="checkAnswer('quiz-2', this, false)">D) Just the file name with the error</div>
+</div>
+<div class="quiz-feedback" id="quiz-2-feedback"></div>
+</div>
+<div class="quiz" id="quiz-3" style="margin-top: 2rem;">
+<div class="quiz-question">Which error occurs when you use a variable name that hasn't been defined?</div>
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer('quiz-3', this, false)">A) SyntaxError</div>
+<div class="quiz-option" onclick="checkAnswer('quiz-3', this, true)">B) NameError</div>
+<div class="quiz-option" onclick="checkAnswer('quiz-3', this, false)">C) TypeError</div>
+<div class="quiz-option" onclick="checkAnswer('quiz-3', this, false)">D) ValueError</div>
+</div>
+<div class="quiz-feedback" id="quiz-3-feedback"></div>
+</div>
+</div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">🎯 Debug Challenge #3</h3>
+<div class="debug-challenge">
+<div class="challenge-title">Port Scanner Bug Hunt</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">This basic port scanner has FOUR bugs preventing it from running. Find and fix them all!</p>
+<div class="interactive-editor"><textarea class="editor-textarea" id="debug-challenge-3">import socket
+
+def scan_port(target, port):
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1)
+        result = sock.connect_ex((target port))
+        sock.close()
+        return result == 0
+    except socket.error:
+        return False
+
+target_host = "127.0.0.1"
+ports_to_scan = [22, 80, 443, 8080
+
+for port in ports_to_scan:
+    if scan_port(target_host, port)
+        print(f"Port {{port}}: OPEN")
+    else:
+        print(f"Port {{port}}: CLOSED")</textarea> <button class="run-btn" onclick="runDebugChallenge('debug-challenge-3', 'debug-output-3')">Test Your Fix</button> <button class="hint-btn" onclick="toggleHint('hint-3')">Show Hint</button>
+<div class="hint-content" id="hint-3"><strong>Hints:</strong>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+<li>Line 7: Check the syntax of the connect_ex() arguments</li>
+<li>Line 13: Look at the list brackets</li>
+<li>Line 16: Missing punctuation after the if statement</li>
+</ul>
+</div>
+<div class="output-display" id="debug-output-3"><span style="color: var(--text-secondary);">Run your code to see results...</span></div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('debug-challenge-3')">Complete Debug Challenge</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">🎯 Debug Challenge #4</h3>
+<div class="debug-challenge">
+<div class="challenge-title">Hash Generator Fix</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">This MD5 hash generator should work but has THREE errors. Debug it!</p>
+<div class="interactive-editor"><textarea class="editor-textarea" id="debug-challenge-4">import hashlib
+
+def generate_hash(text):
+    # Create MD5 hash object
+    hash_obj = hashlib.md5()
+    
+    # Update with text (must be bytes)
+    hash_obj.update(text)
+    
+    # Return hexadecimal representation
+    return hash_obj.hexdigest()
+
+# Test with common passwords
+passwords = ["password123", "admin", "letmein"]
+
+for pwd in passwords
+    hash_value = generate_hash(pwd)
+    print(f"{{pwd}} -&gt; {hash_value}"</textarea> <button class="run-btn" onclick="runDebugChallenge('debug-challenge-4', 'debug-output-4')">Test Your Fix</button> <button class="hint-btn" onclick="toggleHint('hint-4')">Show Hint</button>
+<div class="hint-content" id="hint-4"><strong>Hints:</strong>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+<li>Line 8: hashlib needs bytes, not string. Use .encode()</li>
+<li>Line 15: Missing punctuation after for statement</li>
+<li>Line 17: Missing closing parenthesis</li>
+</ul>
+</div>
+<div class="output-display" id="debug-output-4"><span style="color: var(--text-secondary);">Run your code to see results...</span></div>
+</div>
+</div>
+<button class="complete-btn" onclick="markComplete('debug-challenge-4')">Complete Debug Challenge</button></div>
+<div class="card">
+<h3 class="card-title" style="font-size: 1.4rem;">📚 Additional Resources</h3>
+<div class="info-box">
+<div class="box-title">📖 Official Documentation</div>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+<li><a href="https://docs.python.org/3/" style="color: var(--accent-red);">Python Official Documentation</a> - Comprehensive reference</li>
+<li><a href="https://code.visualstudio.com/docs/python/python-tutorial" style="color: var(--accent-red);">VS Code Python Tutorial</a> - IDE-specific guidance</li>
+<li><a href="https://docs.python.org/3/tutorial/errors.html" style="color: var(--accent-red);">Errors and Exceptions</a> - Deep dive into error handling</li>
+</ul>
+</div>
+<div class="warning-box" style="margin-top: 1.5rem;">
+<div class="box-title">🔒 Cybersecurity Python Resources</div>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+<li><a href="https://www.sans.org/reading-room/" style="color: var(--warning-yellow);">SANS Reading Room</a> - Security research papers</li>
+<li><a href="https://attack.mitre.org/" style="color: var(--warning-yellow);">MITRE ATT&amp;CK</a> - Threat intelligence framework</li>
+<li><a href="https://owasp.org/www-project-top-ten/" style="color: var(--warning-yellow);">OWASP Top 10</a> - Web security risks</li>
+<li><a href="https://www.cybrary.it/" style="color: var(--warning-yellow);">Cybrary</a> - Free cybersecurity courses</li>
+</ul>
+</div>
+<div class="error-box" style="margin-top: 1.5rem;">
+<div class="box-title">🛠️ Practice Platforms</div>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+<li><a href="https://www.hackerrank.com/domains/python" style="color: var(--accent-red);">HackerRank Python</a> - Coding challenges</li>
+<li><a href="https://www.codewars.com/" style="color: var(--accent-red);">Codewars</a> - Community-driven challenges</li>
+<li><a href="https://tryhackme.com/" style="color: var(--accent-red);">TryHackMe</a> - Hands-on cybersecurity labs</li>
+<li><a href="https://overthewire.org/wargames/" style="color: var(--accent-red);">OverTheWire</a> - Security wargames</li>
+</ul>
+</div>
+<button class="complete-btn" onclick="markComplete('resources')">Reviewed Resources</button></div>
+<div class="card">
+<h2 class="card-title">🎓 Course Complete!</h2>
+<p style="margin-bottom: 1rem; font-size: 1.1rem;">Congratulations, cyber defender! You've mastered Python fundamentals. You can now:</p>
+<div class="info-box">
+<ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+<li>✅ Install and configure Python development environments</li>
+<li>✅ Create and execute Python scripts</li>
+<li>✅ Use both VS Code and terminal to run code</li>
+<li>✅ Read and understand error tracebacks</li>
+<li>✅ Debug common Python errors</li>
+<li>✅ Apply Python basics to security scenarios</li>
+</ul>
+</div>
+<div id="completion-certificate" style="display: none; margin-top: 2rem; padding: 2rem; background: var(--secondary-bg); border: 2px solid var(--accent-red); text-align: center;">
+<h3 style="color: var(--accent-red); font-family: 'Orbitron', monospace; font-size: 2rem; margin-bottom: 1rem;">CERTIFICATE OF COMPLETION</h3>
+<p style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 0.5rem;">This certifies that</p>
+<p style="color: var(--accent-red); font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Cyber Defender</p>
+<p style="color: var(--text-primary); margin-bottom: 0.5rem;">has successfully completed</p>
+<p style="color: var(--accent-red); font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem;">Python Fundamentals: Cybersecurity Edition</p>
+<p style="color: var(--text-secondary); font-size: 0.9rem;">Completion Date: <span id="completion-date"></span></p>
+<button class="run-btn" style="margin-top: 1.5rem;" onclick="printCertificate()">Print Certificate</button></div>
+<div class="warning-box">
+<div class="box-title">🚀 Next Steps</div>
+<p style="color: var(--text-secondary); margin-top: 0.5rem;">Continue building your skills with Python data structures, control flow, functions, and more advanced security tool development. The foundation you've built here is critical for everything that follows.</p>
+</div>
+<button class="complete-btn" onclick="markComplete('course-complete')">🏆 Complete Course</button></div>
+</section>
+</div>
+<p><script>
+        // Progress tracking
+        let completedSections = JSON.parse(localStorage.getItem('completedSections')) || [];
+
+        function updateProgress() {
+            const totalSections = 16;
+            const completedCount = completedSections.length;
+            const percentage = (completedCount / totalSections) * 100;
+            
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = 
+                `Progress: ${{completedCount}}/${{totalSections}} Sections Completed`;
+        }
+
+        function markComplete(sectionId) {
+            const btn = event.target;
+            
+            if (!completedSections.includes(sectionId)) {
+                completedSections.push(sectionId);
+                localStorage.setItem('completedSections', JSON.stringify(completedSections));
+            }
+            
+            btn.classList.add('completed');
+            btn.textContent = '✓ Completed';
+            updateProgress();
+
+            // Check if course is complete
+            if (sectionId === 'course-complete') {
+                showCertificate();
+            }
+        }
+
+        function showCertificate() {
+            const cert = document.getElementById('completion-certificate');
+            const dateSpan = document.getElementById('completion-date');
+            const today = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            dateSpan.textContent = today;
+            cert.style.display = 'block';
+            cert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function printCertificate() {
+            window.print();
+        }
+
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active from all tabs
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                
+                // Add active to clicked tab
+                tab.classList.add('active');
+                const sectionId = tab.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+        // Platform selector
+        function selectPlatform(platform) {
+            // Update button states
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide platform content
+            document.querySelectorAll('.platform-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById('platform-' + platform).style.display = 'block';
+        }
+
+        // Copy code functionality
+        function copyCode(codeId) {
+            const codeElement = document.getElementById(codeId);
+            const codeLines = codeElement.querySelectorAll('.code-content');
+            let codeText = '';
+            
+            codeLines.forEach(line => {
+                codeText += line.textContent + '\n';
+            });
+            
+            navigator.clipboard.writeText(codeText).then(() => {
+                event.target.textContent = 'Copied!';
+                setTimeout(() => {
+                    event.target.textContent = 'Copy Code';
+                }, 2000);
+            });
+        }
+
+        // Interactive code execution simulation
+        function runInteractiveCode(textareaId, outputId) {
+            const code = document.getElementById(textareaId).value;
+            const outputDiv = document.getElementById(outputId);
+            
+            // Simple simulation - just extract print statements
+            const printMatches = code.match(/print\((.*?)\)/g);
+            
+            if (printMatches) {
+                let output = '';
+                printMatches.forEach(match => {
+                    // Extract content between quotes
+                    const content = match.match(/["'](.*?)["']/);
+                    if (content) {
+                        output += `<div style="color: var(--terminal-green);">${content[1]}</div>`;
+                    }
+                });
+                outputDiv.innerHTML = output || '<span style="color: var(--text-secondary);">No output</span>';
+            } else {
+                outputDiv.innerHTML = '<span style="color: var(--text-secondary);">No print statements found</span>';
+            }
+        }
+
+        // Debug challenge testing
+        function runDebugChallenge(textareaId, outputId) {
+            const code = document.getElementById(textareaId).value;
+            const outputDiv = document.getElementById(outputId);
+            
+            // Check for common fixes
+            let feedback = '<div style="color: var(--warning-yellow);">Testing your code...</div>';
+            
+            // Challenge 1 checks
+            if (textareaId === 'debug-challenge-1') {
+                let issues = [];
+                
+                if (!code.includes('if len(password) >= 8:')) {
+                    issues.push('Missing colon after if statement on line 7');
+                }
+                if (code.includes('pasword')) {
+                    issues.push('Typo: "pasword" should be "password" on line 11');
+                }
+                if (code.includes('strenght')) {
+                    issues.push('Typo: "strenght" should be "strength" on line 16');
+                }
+                
+                if (issues.length === 0) {
+                    feedback = '<div style="color: var(--success-green);">✓ All bugs fixed! Great job!</div>';
+                } else {
+                    feedback = '<div style="color: var(--accent-red);">❌ Issues remaining:</div>';
+                    issues.forEach(issue => {
+                        feedback += `<div style="color: var(--text-secondary); margin-left: 1rem;">• ${{issue}}</div>`;
+                    });
+                }
+            }
+            
+            // Challenge 2 checks
+            if (textareaId === 'debug-challenge-2') {
+                let issues = [];
+                
+                if (!code.includes('for octet in octets:')) {
+                    issues.push('Missing colon after for statement on line 7');
+                }
+                if (!code.match(/^\s+print\(/m)) {
+                    issues.push('Print statement needs to be indented on line 18');
+                }
+                
+                if (issues.length === 0) {
+                    feedback = '<div style="color: var(--success-green);">✓ All bugs fixed! Excellent work!</div>' +
+                              '<div style="color: var(--text-secondary); margin-top: 0.5rem;">Expected output:</div>' +
+                              '<div style="color: var(--terminal-green); margin-left: 1rem;">192.168.1.1: True</div>' +
+                              '<div style="color: var(--terminal-green); margin-left: 1rem;">256.1.1.1: False</div>' +
+                              '<div style="color: var(--terminal-green); margin-left: 1rem;">10.0.0: False</div>' +
+                              '<div style="color: var(--terminal-green); margin-left: 1rem;">172.16.0.1: True</div>';
+                } else {
+                    feedback = '<div style="color: var(--accent-red);">❌ Issues remaining:</div>';
+                    issues.forEach(issue => {
+                        feedback += `<div style="color: var(--text-secondary); margin-left: 1rem;">• ${{issue}}</div>`;
+                    });
+                }
+            }
+
+            // Challenge 3 checks
+            if (textareaId === 'debug-challenge-3') {
+                let issues = [];
+                
+                if (!code.includes('(target, port)')) {
+                    issues.push('Missing comma between arguments on line 7: should be (target, port)');
+                }
+                if (!code.includes('[22, 80, 443, 8080]')) {
+                    issues.push('Missing closing bracket for list on line 13');
+                }
+                if (!code.includes('if scan_port(target_host, port):')) {
+                    issues.push('Missing colon after if statement on line 16');
+                }
+                
+                if (issues.length === 0) {
+                    feedback = '<div style="color: var(--success-green);">✓ All bugs fixed! Perfect debugging!</div>' +
+                              '<div style="color: var(--text-secondary); margin-top: 0.5rem;">Your port scanner is now functional!</div>';
+                } else {
+                    feedback = '<div style="color: var(--accent-red);">❌ Issues remaining:</div>';
+                    issues.forEach(issue => {
+                        feedback += `<div style="color: var(--text-secondary); margin-left: 1rem;">• ${{issue}}</div>`;
+                    });
+                }
+            }
+
+            // Challenge 4 checks
+            if (textareaId === 'debug-challenge-4') {
+                let issues = [];
+                
+                if (!code.includes('.encode()')) {
+                    issues.push('Line 8: Need to encode text to bytes using text.encode()');
+                }
+                if (!code.includes('for pwd in passwords:')) {
+                    issues.push('Missing colon after for statement on line 15');
+                }
+                if (!code.match(/print\(f"\{pwd\} -> \{hash_value\}"\)/)) {
+                    issues.push('Missing closing parenthesis on line 17');
+                }
+                
+                if (issues.length === 0) {
+                    feedback = '<div style="color: var(--success-green);">✓ All bugs fixed! Outstanding work!</div>' +
+                              '<div style="color: var(--text-secondary); margin-top: 0.5rem;">Expected output:</div>' +
+                              '<div style="color: var(--terminal-green); margin-left: 1rem;">password123 -> 482c811da5d5b4bc6d497ffa98491e38</div>' +
+                              '<div style="color: var(--terminal-green); margin-left: 1rem;">admin -> 21232f297a57a5a743894a0e4a801fc3</div>' +
+                              '<div style="color: var(--terminal-green); margin-left: 1rem;">letmein -> 0d107d09f5bbe40cade3de5c71e9e9b7</div>';
+                } else {
+                    feedback = '<div style="color: var(--accent-red);">❌ Issues remaining:</div>';
+                    issues.forEach(issue => {
+                        feedback += `<div style="color: var(--text-secondary); margin-left: 1rem;">• ${{issue}}</div>`;
+                    });
+                }
+            }
+            
+            outputDiv.innerHTML = feedback;
+        }
+
+        // Toggle hint visibility
+        function toggleHint(hintId) {
+            const hint = document.getElementById(hintId);
+            hint.classList.toggle('show');
+            
+            if (hint.classList.contains('show')) {
+                event.target.textContent = 'Hide Hint';
+            } else {
+                event.target.textContent = 'Show Hint';
+            }
+        }
+
+        // Quiz functionality
+        function checkAnswer(quizId, optionElement, isCorrect) {
+            const quiz = document.getElementById(quizId);
+            const options = quiz.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById(quizId + '-feedback');
+            
+            // Disable all options
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+            
+            // Mark correct/incorrect
+            if (isCorrect) {
+                optionElement.classList.add('correct');
+                feedback.className = 'quiz-feedback show correct';
+                feedback.textContent = '✓ Correct! Great job!';
+            } else {
+                optionElement.classList.add('incorrect');
+                feedback.className = 'quiz-feedback show incorrect';
+                feedback.textContent = '✗ Not quite. Try reviewing the material above.';
+                
+                // Show the correct answer
+                options.forEach(opt => {
+                    if (opt.getAttribute('onclick').includes('true')) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+        }
+
+        // Initialize progress on load
+        updateProgress();
+
+        // Restore completed button states
+        document.querySelectorAll('.complete-btn').forEach(btn => {
+            const onClick = btn.getAttribute('onclick');
+            if (onClick) {
+                const sectionId = onClick.match(/markComplete\('(.+?)'\)/);
+                if (sectionId && completedSections.includes(sectionId[1])) {
+                    btn.classList.add('completed');
+                    btn.textContent = '✓ Completed';
+                }
+            }
+        });
+    </script></p></body></html>
