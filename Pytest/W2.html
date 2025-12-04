@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python for Cybersecurity - Interactive Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-red: #dc143c;
+            --dark-red: #8b0000;
+            --black: #0a0a0a;
+            --dark-grey: #1a1a1a;
+            --med-grey: #2d2d2d;
+            --light-grey: #404040;
+            --text-grey: #b0b0b0;
+            --success-green: #00ff00;
+            --warning-yellow: #ffff00;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--black) 0%, var(--dark-grey) 100%);
+            color: var(--text-grey);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--dark-grey);
+            padding: 30px;
+            border-bottom: 3px solid var(--primary-red);
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: var(--primary-red);
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: var(--text-grey);
+            font-size: 1.1em;
+        }
+
+        .progress-container {
+            margin: 20px 0 0 0;
+        }
+
+        .progress-label {
+            color: var(--text-grey);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-label .status {
+            color: var(--primary-red);
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            background: var(--black);
+            height: 25px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 2px solid var(--primary-red);
+            box-shadow: 0 0 10px rgba(220, 20, 60, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--dark-red) 0%, var(--primary-red) 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85em;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: var(--med-grey);
+            color: var(--text-grey);
+            padding: 12px 24px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: var(--light-grey);
+            color: var(--primary-red);
+        }
+
+        .tab.active {
+            background: var(--dark-red);
+            color: white;
+            border-bottom: 3px solid var(--primary-red);
+        }
+
+        .content-section {
+            display: none;
+            background: var(--dark-grey);
+            padding: 30px;
+            border-radius: 0 5px 5px 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary-red);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--light-grey);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: var(--text-grey);
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .terminal-container {
+            background: #000;
+            border: 2px solid var(--primary-red);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 20px rgba(220, 20, 60, 0.3);
+        }
+
+        .terminal-header {
+            color: var(--primary-red);
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terminal-output {
+            color: var(--success-green);
+            white-space: pre-wrap;
+            min-height: 100px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+        }
+
+        .terminal-input {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .terminal-prompt {
+            color: var(--primary-red);
+            margin-right: 10px;
+        }
+
+        .terminal-input input {
+            background: transparent;
+            border: none;
+            color: var(--success-green);
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            flex: 1;
+            outline: none;
+        }
+
+        .code-block {
+            background: var(--black);
+            border-left: 4px solid var(--primary-red);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: var(--success-green);
+            font-family: 'Courier New', monospace;
+        }
+
+        .example-box {
+            background: var(--med-grey);
+            border: 2px solid var(--light-grey);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .example-title {
+            color: var(--primary-red);
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .exercise {
+            background: var(--med-grey);
+            border: 2px solid var(--primary-red);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .exercise-title {
+            color: var(--primary-red);
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: var(--black);
+            color: var(--success-green);
+            border: 2px solid var(--light-grey);
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            border-radius: 5px;
+            resize: vertical;
+        }
+
+        button {
+            background: var(--primary-red);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px 5px 10px 0;
+        }
+
+        button:hover {
+            background: var(--dark-red);
+            box-shadow: 0 0 15px rgba(220, 20, 60, 0.5);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--light-grey);
+        }
+
+        .btn-secondary:hover {
+            background: var(--med-grey);
+        }
+
+        .output-display {
+            background: var(--black);
+            color: var(--success-green);
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            min-height: 50px;
+            border: 1px solid var(--light-grey);
+        }
+
+        .info-box {
+            background: rgba(220, 20, 60, 0.1);
+            border-left: 4px solid var(--primary-red);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .warning-box {
+            background: rgba(255, 255, 0, 0.1);
+            border-left: 4px solid var(--warning-yellow);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+            color: var(--warning-yellow);
+        }
+
+        .success-box {
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 4px solid var(--success-green);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+            color: var(--success-green);
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+            }
+        }
+
+        .syntax-highlight {
+            color: var(--primary-red);
+            font-weight: bold;
+        }
+
+        .command-list {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .command-list li {
+            background: var(--black);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+            border-left: 3px solid var(--primary-red);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            border: 1px solid var(--light-grey);
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: var(--dark-red);
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: var(--med-grey);
+        }
+
+        .hint {
+            background: var(--med-grey);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-style: italic;
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: var(--dark-red);
+            color: white;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin: 5px 5px 5px 0;
+        }
+
+        .badge.completed {
+            background: var(--success-green);
+            color: var(--black);
+        }
+
+        .interactive-demo {
+            background: var(--black);
+            border: 2px solid var(--success-green);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .demo-title {
+            color: var(--success-green);
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .key-concept {
+            background: rgba(220, 20, 60, 0.15);
+            border-left: 4px solid var(--primary-red);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .key-concept strong {
+            color: var(--primary-red);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted var(--primary-red);
+            cursor: help;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark-grey);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid var(--primary-red);
+            white-space: nowrap;
+            z-index: 1000;
+            font-size: 0.9em;
+        }
+
+        .command-output {
+            color: var(--success-green);
+            margin: 5px 0;
+        }
+
+        .command-error {
+            color: var(--primary-red);
+            margin: 5px 0;
+        }
+
+        .typing-animation {
+            animation: typing 1s steps(40, end);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .resource-link {
+            color: var(--primary-red);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--primary-red);
+            transition: all 0.3s ease;
+        }
+
+        .resource-link:hover {
+            color: white;
+            border-bottom: 1px solid white;
+        }
+    </style>
+</head><body><header>
+<div class="container">
+<h1>🔐 Python for Cybersecurity</h1>
+<p class="tagline">Master Python fundamentals through hands-on security exercises</p>
+<div class="progress-container">
+<div class="progress-label"><span>📊 Course Progress</span> <span class="status" id="progressText">0/7 sections - Ready to Begin!</span></div>
+<div class="progress-bar">
+<div class="progress-fill" id="progressBar"></div>
+</div>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="tabs"><button class="tab active" onclick="showTab(0)">1. Onboarding</button> <button class="tab" onclick="showTab(1)">2. Environment Setup</button> <button class="tab" onclick="showTab(2)">3. Python Runtime</button> <button class="tab" onclick="showTab(3)">4. Terminals &amp; Scripts</button> <button class="tab" onclick="showTab(4)">5. Python History</button> <button class="tab" onclick="showTab(5)">6. Syntax &amp; Structure</button> <button class="tab" onclick="showTab(6)">7. Practice Lab</button></div>
+<!-- Tab 1: Onboarding -->
+<div class="content-section active" id="tab-0">
+<h2>🚀 Welcome to Python for Cybersecurity</h2>
+<div class="info-box"><strong>Learning Objectives:</strong>
+<ul>
+<li>Understand why Python is essential in cybersecurity</li>
+<li>Learn the "See it, Do it" methodology</li>
+<li>Set expectations for hands-on learning</li>
+<li>Understand the threat landscape and Python's role</li>
+</ul>
+</div>
+<h3>Why Python in Cybersecurity?</h3>
+<p>Python has become the de facto standard for cybersecurity professionals. According to the US Cybersecurity Institute, Python holds a 49.29% market share in cybersecurity tooling. In 2024, Python is used in AI-powered threat detection, cloud security automation, and advanced malware analysis.</p>
+<div class="grid-2">
+<div class="example-box">
+<div class="example-title">✅ Python Advantages</div>
+<ul>
+<li><strong>Automation:</strong> Script repetitive security tasks</li>
+<li><strong>Libraries:</strong> Scapy, PyCrypto, Requests, Impacket</li>
+<li><strong>Rapid Development:</strong> Quick prototyping for exploits</li>
+<li><strong>Cross-platform:</strong> Works on Linux, Windows, macOS</li>
+<li><strong>Community:</strong> Massive support network &amp; tools</li>
+<li><strong>AI/ML Integration:</strong> TensorFlow, PyTorch for threat detection</li>
+</ul>
+</div>
+<div class="example-box">
+<div class="example-title">🔧 Common Use Cases</div>
+<ul>
+<li>Network scanning &amp; reconnaissance (Nmap automation)</li>
+<li>Packet manipulation &amp; analysis (Scapy)</li>
+<li>Exploit development (Buffer overflows, RCE)</li>
+<li>Malware analysis (Static &amp; dynamic)</li>
+<li>Penetration testing automation (Metasploit scripts)</li>
+<li>Log analysis &amp; SIEM scripting (Splunk, ELK)</li>
+<li>Cloud security (AWS, Azure automation)</li>
+<li>Threat intelligence gathering (OSINT)</li>
+</ul>
+</div>
+</div>
+<h3>Real-World Impact</h3>
+<div class="key-concept"><strong>Industry Insight:</strong> According to CISA (Cybersecurity and Infrastructure Security Agency), Python is the primary language for federal cybersecurity training programs. Major security frameworks like MITRE ATT&amp;CK use Python for automation and analysis tools.</div>
+<h3>Interactive Learning Approach</h3>
+<p>This course uses the <strong>"See It, Do It"</strong> methodology proven effective in cybersecurity education by organizations like SANS Institute and Offensive Security:</p>
+<div class="example-box">
+<ol>
+<li><strong>SEE IT:</strong> Watch live demonstrations with real code</li>
+<li><strong>DO IT:</strong> Practice in interactive terminals</li>
+<li><strong>APPLY IT:</strong> Complete realistic security exercises</li>
+<li><strong>MASTER IT:</strong> Build production-ready tools</li>
+<li><strong>SHARE IT:</strong> Contribute to open-source security projects</li>
+</ol>
+</div>
+<div class="warning-box"><strong>⚠️ Important Note:</strong> This interactive environment simulates Python execution. For actual penetration testing or security research, always use isolated virtual machines (Kali Linux, Parrot OS, Ubuntu) in controlled lab environments. Never test on systems you don't own or have explicit permission to test.</div>
+<h3>What You'll Build</h3>
+<p>By the end of this course, you'll have created functional security tools:</p>
+<div class="grid-2">
+<div class="example-box">
+<ul>
+<li>✅ Multi-threaded port scanner</li>
+<li>✅ Password strength analyzer with entropy calculation</li>
+<li>✅ Packet capture simulation</li>
+<li>✅ IP address validator with CIDR support</li>
+<li>✅ Hash generator for forensic analysis</li>
+</ul>
+</div>
+<div class="example-box">
+<ul>
+<li>✅ User enumeration detector</li>
+<li>✅ Basic vulnerability scanner</li>
+<li>✅ Network traffic analyzer</li>
+<li>✅ Automated report generator</li>
+<li>✅ API security tester</li>
+</ul>
+</div>
+</div>
+<div class="interactive-demo">
+<div class="demo-title">🎯 Interactive Demo: Your First Security Command</div>
+<p>Try running these commands to see Python in action:</p>
+<div class="terminal-container">
+<div class="terminal-output" id="intro-output">🔐 Cyber Terminal v2.0 - Ready Type 'help' for available commands Type 'start' to begin your Python security journey...</div>
+<div class="terminal-input"><span class="terminal-prompt">cyber@kali:~$</span> <input type="text" id="intro-input" onkeypress="if(event.key==='Enter') runIntroCommand()"></div>
+</div>
+</div>
+<div class="info-box"><strong>📚 Additional Resources:</strong>
+<ul>
+<li>MITRE ATT&amp;CK Framework: <span class="tooltip" data-tooltip="Globally-accessible knowledge base of adversary tactics">Learn attack techniques</span></li>
+<li>OWASP Top 10: Web application security risks</li>
+<li>Python.org Security: Official security guidelines</li>
+<li>Cybrary &amp; TryHackMe: Hands-on practice platforms</li>
+</ul>
+</div>
+<button onclick="showTab(1)">Next: Environment Setup →</button></div>
+<!-- Tab 2: Environment Setup -->
+<div class="content-section" id="tab-1">
+<h2>⚙️ Environment Setup</h2>
+<h3>SEE IT: Python Installation Options</h3>
+<div class="info-box"><strong>For Cybersecurity Work, You Need:</strong>
+<ul>
+<li>Python 3.8+ (most security tools require Python 3)</li>
+<li>Package manager (pip)</li>
+<li>Virtual environments (venv)</li>
+<li>A good text editor or IDE (VS Code, PyCharm, Vim)</li>
+</ul>
+</div>
+<h3>Platform-Specific Installation</h3>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Platform</th>
+<th>Installation Method</th>
+<th>Verification Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kali Linux</strong></td>
+<td>Pre-installed (Python 3)</td>
+<td><code>python3 --version</code></td>
+</tr>
+<tr>
+<td><strong>Ubuntu/Debian</strong></td>
+<td><code>sudo apt install python3 python3-pip</code></td>
+<td><code>which python3</code></td>
+</tr>
+<tr>
+<td><strong>Windows</strong></td>
+<td>Download from python.org or Microsoft Store</td>
+<td><code>python --version</code></td>
+</tr>
+<tr>
+<td><strong>macOS</strong></td>
+<td><code>brew install python3</code></td>
+<td><code>python3 --version</code></td>
+</tr>
+</tbody>
+</table>
+<h3>DO IT: Verify Your Installation</h3>
+<div class="exercise">
+<div class="exercise-title">📝 Exercise 1: Check Python Version</div>
+<p>In a real terminal, you would run commands. Here, simulate checking your Python version:</p>
+<div class="terminal-container">
+<div class="terminal-output" id="version-output">Ready to check Python version...</div>
+<div class="terminal-input"><span class="terminal-prompt">cyber@kali:~$</span> <input type="text" id="version-input" placeholder="Type: python3 --version" onkeypress="if(event.key==='Enter') checkVersion()"></div>
+</div>
+</div>
+<h3>Virtual Environments: Best Practice</h3>
+<div class="example-box">
+<div class="example-title">Why Use Virtual Environments?</div>
+<p>Virtual environments isolate project dependencies, preventing conflicts between different security tools.</p>
+<div class="code-block"><code># Create a virtual environment
+python3 -m venv cybersec_env
+
+# Activate it (Linux/Mac)
+source cybersec_env/bin/activate
+
+# Activate it (Windows)
+cybersec_env\Scripts\activate
+
+# Install packages
+pip install scapy requests
+
+# Deactivate
+deactivate</code></div>
+</div>
+<h3>Essential Security Libraries</h3>
+<div class="grid-2">
+<div class="example-box">
+<div class="example-title">🔒 Core Security Libraries</div>
+<ul class="command-list">
+<li><strong>scapy</strong> - Packet manipulation</li>
+<li><strong>requests</strong> - HTTP library</li>
+<li><strong>pycryptodome</strong> - Cryptography</li>
+<li><strong>python-nmap</strong> - Network scanning</li>
+</ul>
+</div>
+<div class="example-box">
+<div class="example-title">📊 Analysis Libraries</div>
+<ul class="command-list">
+<li><strong>pandas</strong> - Data analysis</li>
+<li><strong>matplotlib</strong> - Visualization</li>
+<li><strong>beautifulsoup4</strong> - Web scraping</li>
+<li><strong>paramiko</strong> - SSH connections</li>
+</ul>
+</div>
+</div>
+<div class="warning-box"><strong>⚠️ Security Reminder:</strong> Always create isolated virtual environments for penetration testing tools. Never install untrusted packages in your system Python installation.</div>
+<button onclick="showTab(2)">Next: Python Runtime →</button></div>
+<!-- Tab 3: Python Runtime -->
+<div class="content-section" id="tab-2">
+<h2>🐍 Python Runtime &amp; Interpreter</h2>
+<h3>SEE IT: How Python Executes Code</h3>
+<div class="info-box"><strong>Python Execution Model:</strong>
+<ol>
+<li>Source code (.py) → Bytecode (.pyc)</li>
+<li>Bytecode → Python Virtual Machine (PVM)</li>
+<li>PVM interprets and executes</li>
+</ol>
+</div>
+<div class="example-box">
+<div class="example-title">Compiled vs Interpreted</div>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Compiled (C/C++)</th>
+<th>Interpreted (Python)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Execution</strong></td>
+<td>Direct machine code</td>
+<td>Through interpreter</td>
+</tr>
+<tr>
+<td><strong>Speed</strong></td>
+<td>Faster runtime</td>
+<td>Slower, but flexible</td>
+</tr>
+<tr>
+<td><strong>Development</strong></td>
+<td>Longer cycle</td>
+<td>Rapid prototyping</td>
+</tr>
+<tr>
+<td><strong>Debugging</strong></td>
+<td>Harder</td>
+<td>Easier (live testing)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Interactive Python Shell (REPL)</h3>
+<p>REPL = Read-Eval-Print Loop. The fastest way to test Python code!</p>
+<div class="terminal-container">
+<div class="terminal-header">🔥 Interactive Python Shell</div>
+<div class="terminal-output" id="repl-output">Python 3.11.7 (main, Nov 22 2024) Type "help", "copyright" or "credits" for more information. &gt;&gt;&gt;</div>
+<div class="terminal-input"><span class="terminal-prompt">&gt;&gt;&gt; </span> <input type="text" id="repl-input" placeholder="Try: 2 + 2" onkeypress="if(event.key==='Enter') runREPL()"></div>
+</div>
+<div class="example-box">
+<div class="example-title">Try These in the REPL Above:</div>
+<ul>
+<li><code>print("Hello Cyber World")</code></li>
+<li><code>2 ** 10</code> (2 to the power of 10)</li>
+<li><code>import sys; sys.version</code></li>
+<li><code>hex(255)</code> (convert to hexadecimal)</li>
+<li><code>"password".encode()</code> (convert to bytes)</li>
+</ul>
+</div>
+<h3>Python Path &amp; Modules</h3>
+<div class="code-block"><code># Check where Python looks for modules
+import sys
+print(sys.path)
+
+# Check Python executable location
+print(sys.executable)
+
+# Check installed modules
+import pip
+pip.main(['list'])</code></div>
+<div class="warning-box"><strong>💡 Cybersecurity Tip:</strong> Understanding the Python runtime helps you analyze malware behavior, debug exploits, and understand how Python-based security tools execute.</div>
+<button onclick="showTab(3)">Next: Terminals &amp; Scripts →</button></div>
+<!-- Tab 4: Terminals & Scripts -->
+<div class="content-section" id="tab-3">
+<h2>💻 Terminals &amp; Running Scripts</h2>
+<h3>SEE IT: Terminal Basics for Security</h3>
+<div class="grid-2">
+<div class="example-box">
+<div class="example-title">🔧 Linux/Mac Terminal Commands</div>
+<div class="code-block"><code># Navigate directories
+cd /opt/tools
+pwd
+
+# List Python scripts
+ls *.py
+
+# Make script executable
+chmod +x scanner.py
+
+# Run Python script
+python3 scanner.py
+
+# Run with sudo
+sudo python3 scanner.py</code></div>
+</div>
+<div class="example-box">
+<div class="example-title">🪟 Windows Commands</div>
+<div class="code-block"><code># Navigate directories
+cd C:\Tools
+dir
+
+# List Python scripts
+dir *.py
+
+# Run Python script
+python scanner.py
+
+# Run as administrator
+# (right-click, "Run as admin")</code></div>
+</div>
+</div>
+<h3>DO IT: Create Your First Security Script</h3>
+<div class="exercise">
+<div class="exercise-title">📝 Exercise 2: IP Address Validator</div>
+<p>Write a Python script that validates whether a string is a valid IP address:</p>
+<textarea id="script-code" placeholder="# Write your IP validator here
+# Hint: Use split() to separate octets
+# Hint: Check if each octet is 0-255">def validate_ip(ip_address):
+    # Your code here
+    pass
+
+# Test it
+test_ip = "192.168.1.1"
+print(validate_ip(test_ip))</textarea> <button onclick="runScript()">▶ Run Script</button> <button class="btn-secondary" onclick="showHint('hint-1')">💡 Show Hint</button> <button class="btn-secondary" onclick="loadSolution('ip-validator')">📋 Show Solution</button>
+<div id="hint-1" class="hint"><strong>Hint:</strong> Split the IP by '.' to get 4 parts. Convert each to an integer and check if it's between 0 and 255. Remember to handle exceptions!</div>
+<div class="output-display" id="script-output">Output will appear here...</div>
+</div>
+<h3>Shebang Line (#!/usr/bin/env python3)</h3>
+<div class="info-box">
+<p>The <strong>shebang</strong> tells the system which interpreter to use:</p>
+<div class="code-block"><code>#!/usr/bin/env python3
+# This script can now run as: ./script.py
+
+import socket
+
+def scan_port(host, port):
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1)
+        result = sock.connect_ex((host, port))
+        if result == 0:
+            print(f"Port {{port}} is OPEN")
+        sock.close()
+    except Exception as e:
+        print(f"Error: {{e}}")
+
+scan_port("127.0.0.1", 80)</code></div>
+</div>
+<h3>Command-Line Arguments</h3>
+<div class="example-box">
+<div class="example-title">Making Scripts Dynamic with sys.argv</div>
+<div class="code-block"><code>#!/usr/bin/env python3
+import sys
+
+# Script: port_scanner.py
+# Usage: python3 port_scanner.py 192.168.1.1 80
+
+if len(sys.argv) &lt; 3:
+    print("Usage: python3 port_scanner.py <host> <port>")
+    sys.exit(1)
+
+host = sys.argv[1]
+port = int(sys.argv[2])
+
+print(f"Scanning {{host}}:{{port}}...")</port></host></code></div>
+</div>
+<div class="exercise">
+<div class="exercise-title">🎯 Challenge: Interactive Port Scanner</div>
+<p>Modify the terminal simulator to accept user input for scanning:</p>
+<div class="terminal-container">
+<div class="terminal-output" id="scanner-output">Port Scanner v1.0 Enter target:</div>
+<div class="terminal-input"><span class="terminal-prompt">scanner$</span> <input type="text" id="scanner-input" placeholder="e.g., 192.168.1.1" onkeypress="if(event.key==='Enter') runScanner()"></div>
+</div>
+</div>
+<button onclick="showTab(4)">Next: Python History →</button></div>
+<!-- Tab 5: Python History -->
+<div class="content-section" id="tab-4">
+<h2>📚 Python History &amp; Evolution</h2>
+<h3>The Journey from Python 1 to Python 3</h3>
+<div class="info-box"><strong>Timeline:</strong>
+<ul>
+<li><strong>1991:</strong> Guido van Rossum releases Python 0.9.0</li>
+<li><strong>1994:</strong> Python 1.0 - First major release</li>
+<li><strong>2000:</strong> Python 2.0 - List comprehensions, garbage collection</li>
+<li><strong>2008:</strong> Python 3.0 - Major overhaul (not backward compatible)</li>
+<li><strong>2020:</strong> Python 2.7 end-of-life</li>
+<li><strong>2024:</strong> Python 3.11+ - Performance improvements, better error messages</li>
+</ul>
+</div>
+<h3>Why Python 2 vs Python 3 Matters in Security</h3>
+<div class="warning-box"><strong>⚠️ Critical for Cybersecurity:</strong> Many legacy exploitation tools and scripts were written for Python 2. You may encounter both in the field!</div>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Feature</th>
+<th>Python 2</th>
+<th>Python 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Print</strong></td>
+<td><code>print "Hello"</code></td>
+<td><code>print("Hello")</code></td>
+</tr>
+<tr>
+<td><strong>Division</strong></td>
+<td><code>5/2 = 2</code></td>
+<td><code>5/2 = 2.5</code></td>
+</tr>
+<tr>
+<td><strong>Unicode</strong></td>
+<td>Difficult</td>
+<td>Default (important for exploits)</td>
+</tr>
+<tr>
+<td><strong>Range</strong></td>
+<td>Returns list</td>
+<td>Returns iterator (memory efficient)</td>
+</tr>
+<tr>
+<td><strong>Input</strong></td>
+<td><code>raw_input()</code></td>
+<td><code>input()</code></td>
+</tr>
+</tbody>
+</table>
+<h3>Python in the Security Tool Ecosystem</h3>
+<div class="grid-2">
+<div class="example-box">
+<div class="example-title">🔨 Famous Python Security Tools</div>
+<ul>
+<li><strong>Metasploit Plugins</strong> - Many written in Python</li>
+<li><strong>Scapy</strong> - Packet manipulation framework</li>
+<li><strong>Impacket</strong> - Network protocols library</li>
+<li><strong>Volatility</strong> - Memory forensics</li>
+<li><strong>sqlmap</strong> - SQL injection automation</li>
+<li><strong>theHarvester</strong> - OSINT gathering</li>
+</ul>
+</div>
+<div class="example-box">
+<div class="example-title">🌟 Why Python Won in Security</div>
+<ul>
+<li>Rapid exploit development</li>
+<li>Easy to modify existing tools</li>
+<li>Excellent for automation</li>
+<li>Cross-platform compatibility</li>
+<li>Rich ecosystem of libraries</li>
+<li>Easy to learn, powerful to use</li>
+</ul>
+</div>
+</div>
+<h3>Modern Python Features for Security</h3>
+<div class="code-block"><code># F-strings (Python 3.6+) - Perfect for logging
+target = "192.168.1.1"
+port = 443
+print(f"Scanning {{target}}:{{port}}")
+
+# Type hints (Python 3.5+) - Better code documentation
+def scan_port(host: str, port: int) -&gt; bool:
+    return True
+
+# Walrus operator (Python 3.8+) - Concise code
+if (match := re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', data)):
+    print(f"Found IP: {match.group()}")
+
+# Pattern matching (Python 3.10+) - Clean conditionals
+match status_code:
+    case 200:
+        print("Success")
+    case 404:
+        print("Not Found")
+    case _:
+        print("Other error")</code></div>
+<div class="exercise">
+<div class="exercise-title">🎓 Knowledge Check</div>
+<p><strong>Question:</strong> Why is Python 3's default Unicode support important for cybersecurity?</p>
+<button onclick="revealAnswer('unicode-answer')">Show Answer</button>
+<div id="unicode-answer" class="hint"><strong>Answer:</strong> Unicode support is crucial for handling international characters in payloads, web attacks, and analyzing malware that uses obfuscation techniques with non-ASCII characters. Python 3 treats strings as Unicode by default, making it easier to work with diverse character sets without explicit encoding/decoding.</div>
+</div>
+<button onclick="showTab(5)">Next: Syntax &amp; Structure →</button></div>
+<!-- Tab 6: Syntax & Structure -->
+<div class="content-section" id="tab-5">
+<h2>📖 Python Syntax &amp; Structure</h2>
+<h3>SEE IT: Basic Syntax Elements</h3>
+<div class="info-box"><strong>Python's Design Philosophy (The Zen of Python):</strong>
+<ul>
+<li>Beautiful is better than ugly</li>
+<li>Explicit is better than implicit</li>
+<li>Simple is better than complex</li>
+<li>Readability counts</li>
+</ul>
+<em>Type <code>import this</code> in Python to see the full list!</em></div>
+<h3>1. Indentation (Not Optional!)</h3>
+<div class="grid-2">
+<div class="example-box">
+<div class="example-title">❌ Wrong (IndentationError)</div>
+<div class="code-block"><code>if password == "admin":
+print("Access granted")
+print("Welcome")  # Error!</code></div>
+</div>
+<div class="example-box">
+<div class="example-title">✅ Correct</div>
+<div class="code-block"><code>if password == "admin":
+    print("Access granted")
+    print("Welcome")  # Good!</code></div>
+</div>
+</div>
+<h3>2. Variables &amp; Data Types</h3>
+<div class="code-block"><code># Variables (no declaration needed)
+target_ip = "192.168.1.1"        # String
+port = 443                        # Integer
+timeout = 2.5                     # Float
+is_vulnerable = True              # Boolean
+ports_list = [80, 443, 8080]     # List
+host_info = {"ip": "10.0.0.1"}   # Dictionary
+
+# Type checking (useful for security validation)
+print(type(port))                 # <class 'int'="">
+print(isinstance(port, int))      # True</class></code></div>
+<h3>3. Comments &amp; Documentation</h3>
+<div class="code-block"><code># Single-line comment for quick notes
+
+"""
+Multi-line comment (actually a string)
+Used for documentation
+"""
+
+def scan_network(subnet):
+    """
+    Scans a subnet for active hosts.
+    
+    Args:
+        subnet (str): Network subnet in CIDR notation
+    
+    Returns:
+        list: List of active IP addresses
+    """
+    pass  # Implementation here</code></div>
+<h3>4. Control Structures</h3>
+<div class="example-box">
+<div class="example-title">Conditionals (if/elif/else)</div>
+<div class="code-block"><code>response_code = 200
+
+if response_code == 200:
+    print("✅ Server responded successfully")
+elif response_code == 403:
+    print("🚫 Access forbidden")
+elif response_code == 404:
+    print("❌ Page not found")
+else:
+    print(f"⚠️ Unknown status: {response_code}")</code></div>
+</div>
+<div class="example-box">
+<div class="example-title">Loops (for and while)</div>
+<div class="code-block"><code># For loop - iterate over ports
+for port in [21, 22, 23, 80, 443]:
+    print(f"Scanning port {{port}}...")
+
+# While loop - keep trying until success
+attempts = 0
+max_attempts = 3
+
+while attempts &lt; max_attempts:
+    if attempt_connection():
+        break
+    attempts += 1
+    print(f"Retry {{attempts}}/{max_attempts}")</code></div>
+</div>
+<h3>5. Functions</h3>
+<div class="code-block"><code>def check_port(host, port, timeout=1):
+    """
+    Check if a port is open on a host.
+    
+    Args:
+        host (str): Target hostname or IP
+        port (int): Port number to check
+        timeout (int): Connection timeout in seconds
+    
+    Returns:
+        bool: True if port is open, False otherwise
+    """
+    import socket
+    
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        result = sock.connect_ex((host, port))
+        sock.close()
+        return result == 0
+    except:
+        return False
+
+# Usage
+if check_port("192.168.1.1", 80):
+    print("Web server is running")</code></div>
+<h3>6. Error Handling</h3>
+<div class="code-block"><code>try:
+    # Attempt risky operation
+    with open("/etc/passwd", "r") as f:
+        data = f.read()
+except PermissionError:
+    print("❌ Permission denied")
+except FileNotFoundError:
+    print("❌ File not found")
+except Exception as e:
+    print(f"⚠️ Unexpected error: {{e}}")
+finally:
+    print("✅ Cleanup complete")</code></div>
+<h3>DO IT: Complete Syntax Exercises</h3>
+<div class="exercise">
+<div class="exercise-title">📝 Exercise 3: Password Strength Checker</div>
+<p>Create a function that checks password strength based on length, uppercase, lowercase, numbers, and special characters:</p>
+<textarea id="password-code" placeholder="def check_password_strength(password):
+    # Your code here
+    # Check: length &gt;= 8, has uppercase, lowercase, digit, special char
+    pass">def check_password_strength(password):
+    # Write your code here
+    pass
+
+# Test cases
+test_passwords = ["weak", "Strong1!", "verystrongP@ssw0rd"]
+for pwd in test_passwords:
+    print(f"{{pwd}}: {check_password_strength(pwd)}")</textarea> <button onclick="runPasswordChecker()">▶ Run Script</button> <button class="btn-secondary" onclick="showHint('hint-password')">💡 Show Hint</button> <button class="btn-secondary" onclick="loadSolution('password-checker')">📋 Show Solution</button>
+<div id="hint-password" class="hint"><strong>Hint:</strong> Use <code>len()</code> for length, <code>any(c.isupper() for c in password)</code> for uppercase, <code>any(c.isdigit() for c in password)</code> for digits, and check if any character is in a string of special characters.</div>
+<div class="output-display" id="password-output">Output will appear here...</div>
+</div>
+<div class="success-box"><strong>🎉 Congratulations!</strong> You now understand Python's core syntax. Ready to practice everything you've learned?</div>
+<button onclick="showTab(6)">Next: Practice Lab →</button></div>
+<!-- Tab 7: Practice Lab -->
+<div class="content-section" id="tab-6">
+<h2>🧪 Practice Lab: Build Real Security Tools</h2>
+<div class="info-box"><strong>Final Challenge:</strong> Apply everything you've learned to create three complete security tools.</div>
+<h3>Project 1: Network Port Scanner</h3>
+<div class="exercise">
+<div class="exercise-title">🎯 Build a Multi-Port Scanner</div>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>Accept a target IP address</li>
+<li>Scan multiple ports (e.g., 21, 22, 23, 80, 443, 3389, 8080)</li>
+<li>Report which ports are open/closed</li>
+<li>Handle errors gracefully</li>
+<li>Display scan duration</li>
+</ul>
+<textarea id="scanner-project" placeholder="import socket
+import time
+
+def port_scanner(target, ports):
+    # Your complete port scanner here
+    pass
+
+# Test it
+target_ip = '127.0.0.1'
+ports_to_scan = [21, 22, 80, 443, 3389, 8080]
+port_scanner(target_ip, ports_to_scan)"></textarea> <button onclick="runProject('scanner')">▶ Run Scanner</button> <button class="btn-secondary" onclick="loadSolution('port-scanner-full')">📋 Show Solution</button>
+<div class="output-display" id="scanner-project-output">Scan results will appear here...</div>
+</div>
+<h3>Project 2: Hash Generator for Forensics</h3>
+<div class="exercise">
+<div class="exercise-title">🔐 Create a File Hash Calculator</div>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>Generate MD5, SHA-1, and SHA-256 hashes</li>
+<li>Handle file input (simulate with string)</li>
+<li>Display all hashes in a formatted output</li>
+<li>Add option to verify hash matches</li>
+</ul>
+<textarea id="hash-project" placeholder="import hashlib
+
+def generate_hashes(data):
+    # Generate MD5, SHA-1, SHA-256 hashes
+    pass
+
+def verify_hash(data, expected_hash, algorithm='sha256'):
+    # Verify if hash matches
+    pass
+
+# Test
+test_data = 'Sensitive evidence file content'
+generate_hashes(test_data)"></textarea> <button onclick="runProject('hash')">▶ Run Hash Generator</button> <button class="btn-secondary" onclick="loadSolution('hash-generator')">📋 Show Solution</button>
+<div class="output-display" id="hash-project-output">Hash results will appear here...</div>
+</div>
+<h3>Project 3: User Enumeration Detector</h3>
+<div class="exercise">
+<div class="exercise-title">🕵️ Build a Username Validator</div>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>Check username against common patterns</li>
+<li>Detect potentially weak usernames</li>
+<li>Suggest security improvements</li>
+<li>Check against common username lists</li>
+</ul>
+<textarea id="enum-project" placeholder="def check_username_security(username):
+    # Check for weak patterns
+    # Compare against common usernames
+    # Provide security score and recommendations
+    pass
+
+# Test
+test_usernames = ['admin', 'john_doe_2024', 'root', 'j.smith']
+for user in test_usernames:
+    check_username_security(user)"></textarea> <button onclick="runProject('enum')">▶ Run Checker</button> <button class="btn-secondary" onclick="loadSolution('username-checker')">📋 Show Solution</button>
+<div class="output-display" id="enum-project-output">Analysis results will appear here...</div>
+</div>
+<h3>🏆 Course Completion</h3>
+<div class="success-box">
+<h3>Congratulations on Completing Python Fundamentals for Cybersecurity!</h3>
+<p><strong>You've learned:</strong></p>
+<ul>
+<li>✅ Python environment setup and configuration</li>
+<li>✅ Python runtime and interpreter mechanics</li>
+<li>✅ Terminal usage and script execution</li>
+<li>✅ Python's history and its role in security</li>
+<li>✅ Core syntax, data structures, and control flow</li>
+<li>✅ Practical security tool development</li>
+</ul>
+</div>
+<div class="info-box"><strong>🚀 Next Steps:</strong>
+<ul>
+<li>Practice with real Kali Linux environment</li>
+<li>Study Python security libraries (Scapy, Impacket)</li>
+<li>Build more complex tools (web scrapers, exploit frameworks)</li>
+<li>Participate in CTF challenges</li>
+<li>Contribute to open-source security tools</li>
+</ul>
+</div>
+<button onclick="resetProgress()">🔄 Restart Course</button></div>
+</div>
+<p><script>
+        let completedSections = new Set();
+
+        function showTab(index) {
+            // Hide all content sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Hide all active tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected section and tab
+            document.getElementById(`tab-${{index}}`).classList.add('active');
+            tabs[index].classList.add('active');
+
+            // Update progress
+            completedSections.add(index);
+            updateProgress();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateProgress() {
+            const total = 7;
+            const completed = completedSections.size;
+            const percentage = Math.round((completed / total) * 100);
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            progressBar.style.width = percentage + '%';
+            
+            // Only show text inside bar if there's enough room (>15%)
+            if (percentage > 15) {
+                progressBar.textContent = percentage + '%';
+            } else {
+                progressBar.textContent = '';
+            }
+            
+            // Update status text with section count
+            const sectionCount = `${{completed}}/7 sections`;
+            
+            if (percentage === 0) {
+                progressText.textContent = `${{sectionCount}} - Ready to Begin!`;
+                progressText.style.color = 'var(--text-grey)';
+            } else if (percentage < 30) {
+                progressText.textContent = `${{sectionCount}} (${{percentage}}%) - Getting Started`;
+                progressText.style.color = 'var(--warning-yellow)';
+            } else if (percentage < 70) {
+                progressText.textContent = `${{sectionCount}} (${{percentage}}%) - Making Progress`;
+                progressText.style.color = 'var(--warning-yellow)';
+            } else if (percentage < 100) {
+                progressText.textContent = `${{sectionCount}} (${{percentage}}%) - Almost There!`;
+                progressText.style.color = 'var(--primary-red)';
+            } else {
+                progressText.textContent = `${{sectionCount}} (${{percentage}}%) - Complete! 🎉`;
+                progressText.style.color = 'var(--success-green)';
+            }
+        }
+
+        function runIntroCommand() {
+            const input = document.getElementById('intro-input');
+            const output = document.getElementById('intro-output');
+            const command = input.value.toLowerCase().trim();
+
+            const responses = {
+                'start': `🔐 Cyber Terminal v2.0
+
+>>> import cybersecurity
+>>> print("Welcome to the world of security automation!")
+Welcome to the world of security automation!
+
+>>> import socket, hashlib, sys
+>>> print("Python version:", sys.version.split()[0])
+Python version: 3.11.7
+
+🎉 Excellent! You just ran your first Python imports.
+Python will be your most powerful tool in cybersecurity.
+
+💡 Try these commands:
+   - 'scan' to see a port scan demo
+   - 'hash' to see hash generation
+   - 'help' for more options`,
+                
+                'help': `🔐 Available Commands:
+   start  - Begin the learning journey
+   scan   - Demonstrate port scanning
+   hash   - Show hash generation
+   encode - Display encoding example
+   recon  - Run reconnaissance demo
+   clear  - Clear terminal`,
+                
+                'scan': `>>> import socket
+>>> def quick_scan(host, port):
+...     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+...     result = sock.connect_ex((host, port))
+...     return "OPEN" if result == 0 else "CLOSED"
+...
+>>> quick_scan("192.168.1.1", 80)
+'OPEN'
+
+✅ Port 80 is accessible!
+This is how we detect running services.`,
+                
+                'hash': `>>> import hashlib
+>>> password = "SecureP@ss123"
+>>> hashlib.sha256(password.encode()).hexdigest()
+'3d5c8f9a2b1e7d6c4a5b3c9e7f1d2a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1'
+
+🔒 Hash generated! This is how passwords are stored securely.`,
+                
+                'encode': `>>> "Attack Vector".encode('utf-8')
+b'Attack Vector'
+>>> "Attack Vector".encode('hex')  # Python 2 style
+'41747461636b20566563746f72'
+
+💾 Encoding is crucial for network protocols and payloads.`,
+                
+                'recon': `>>> import platform, os
+>>> print(f"OS: {platform.system()}")
+OS: Linux
+>>> print(f"Machine: {platform.machine()}")
+Machine: x86_64
+>>> print(f"Python: {platform.python_version()}")
+Python: 3.11.7
+
+🔍 System reconnaissance complete!
+This data helps in exploit development.`,
+                
+                'clear': `🔐 Cyber Terminal v2.0 - Ready
+Type 'help' for available commands`
+            };
+
+            if (responses[command]) {
+                output.textContent = responses[command];
+            } else if (command) {
+                output.textContent = `Command not recognized: ${{command}}
+Type 'help' for available commands.`;
+            }
+            input.value = '';
+        }
+
+        function checkVersion() {
+            const input = document.getElementById('version-input');
+            const output = document.getElementById('version-output');
+            const command = input.value.toLowerCase().trim();
+
+            if (command.includes('python') && command.includes('version')) {
+                output.textContent = `$ ${input.value}
+Python 3.11.7
+
+✅ Perfect! Python 3.11 is installed and ready.
+This version includes significant performance improvements
+and better error messages - crucial for debugging security tools.`;
+            } else {
+                output.textContent = `$ ${input.value}
+Command not found. Try: python3 --version`;
+            }
+            input.value = '';
+        }
+
+        function runREPL() {
+            const input = document.getElementById('repl-input');
+            const output = document.getElementById('repl-output');
+            const command = input.value.trim();
+
+            let result = '';
+            try {
+                // Simulate REPL responses
+                if (command.includes('print')) {
+                    const match = command.match(/print\((.*?)\)/);
+                    if (match) {
+                        result = eval(match[1]);
+                    }
+                } else if (command.includes('import')) {
+                    result = '(Module imported successfully)';
+                } else if (command.includes('hex')) {
+                    result = '0xff';
+                } else if (command.includes('encode')) {
+                    result = "b'password'";
+                } else {
+                    result = eval(command);
+                }
+                
+                output.textContent += `
+>>> ${{command}}
+${{result}}
+>>> `;
+            } catch (e) {
+                output.textContent += `
+>>> ${{command}}
+Error: ${e.message}
+>>> `;
+            }
+
+            input.value = '';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function runScript() {
+            const code = document.getElementById('script-code').value;
+            const output = document.getElementById('script-output');
+
+            // Simulate script execution
+            if (code.includes('def validate_ip') && code.length > 100) {
+                output.innerHTML = `<span style="color: #00ff00">✅ Script executed successfully!</span>
+
+Testing: 192.168.1.1 → Valid
+Testing: 256.1.1.1 → Invalid
+Testing: 192.168.1 → Invalid
+
+Good job! Your IP validator is working correctly.`;
+            } else {
+                output.innerHTML = `<span style="color: #ffff00">⚠️ Script incomplete or has errors</span>
+
+Make sure to:
+1. Define the validate_ip function
+2. Split the IP address by '.'
+3. Check that there are 4 octets
+4. Validate each octet is 0-255`;
+            }
+        }
+
+        function runScanner() {
+            const input = document.getElementById('scanner-input');
+            const output = document.getElementById('scanner-output');
+            const target = input.value.trim();
+
+            if (target) {
+                output.textContent = `Port Scanner v1.0
+Target: ${{target}}
+
+Scanning common ports...
+Port 21 (FTP): CLOSED
+Port 22 (SSH): OPEN ✅
+Port 80 (HTTP): OPEN ✅
+Port 443 (HTTPS): OPEN ✅
+Port 3389 (RDP): CLOSED
+
+Scan complete! Found 3 open ports.`;
+            }
+            input.value = '';
+        }
+
+        function runPasswordChecker() {
+            const code = document.getElementById('password-code').value;
+            const output = document.getElementById('password-output');
+
+            if (code.includes('def check_password_strength') && code.length > 150) {
+                output.innerHTML = `<span style="color: #00ff00">✅ Password checker executed!</span>
+
+weak: WEAK ❌ (too short, missing complexity)
+Strong1!: STRONG ✅ (meets all requirements)
+verystrongP@ssw0rd: VERY STRONG ✅✅ (excellent)
+
+Security tip: Always require minimum 12 characters for sensitive systems!`;
+            } else {
+                output.innerHTML = `<span style="color: #ffff00">⚠️ Function incomplete</span>
+
+Remember to check:
+- Length (at least 8 characters)
+- Uppercase letters
+- Lowercase letters
+- Numbers
+- Special characters`;
+            }
+        }
+
+        function runProject(type) {
+            const outputs = {
+                'scanner': 'scanner-project-output',
+                'hash': 'hash-project-output',
+                'enum': 'enum-project-output'
+            };
+
+            const output = document.getElementById(outputs[type]);
+
+            if (type === 'scanner') {
+                output.innerHTML = `<span style="color: #00ff00">🔍 Port Scan Results</span>
+
+Target: 127.0.0.1
+Started: ${new Date().toLocaleTimeString()}
+
+Port 21 [FTP]: CLOSED
+Port 22 [SSH]: OPEN ✅
+Port 80 [HTTP]: OPEN ✅
+Port 443 [HTTPS]: OPEN ✅
+Port 3389 [RDP]: CLOSED
+Port 8080 [HTTP-ALT]: CLOSED
+
+Scan Duration: 0.245 seconds
+Open Ports: 3/6`;
+            } else if (type === 'hash') {
+                output.innerHTML = `<span style="color: #00ff00">🔐 File Hash Generator</span>
+
+Input: "Sensitive evidence file content"
+
+MD5:    8f14e45fceea167a5a36dedd4bea2543
+SHA-1:  356a192b7913b04c54574d18c28d46e6395428ab
+SHA-256: cd2eb0837c9b4c962c22d2ff8b5441b7b45805887f051d39bf133b583baf6860
+
+✅ All hashes generated successfully
+💾 Use these for forensic evidence integrity verification`;
+            } else if (type === 'enum') {
+                output.innerHTML = `<span style="color: #00ff00">🕵️ Username Security Analysis</span>
+
+Analyzing: admin
+  Risk Level: CRITICAL ⚠️
+  Issues: Default admin account, high-value target
+  Recommendation: Use unique, non-obvious admin usernames
+
+Analyzing: john_doe_2024
+  Risk Level: MEDIUM ⚠️
+  Issues: Contains year, common pattern
+  Recommendation: Add random component, avoid dates
+
+Analyzing: root
+  Risk Level: CRITICAL ⚠️
+  Issues: System admin account, frequently targeted
+  Recommendation: Disable direct root login
+
+Analyzing: j.smith
+  Risk Level: LOW ✅
+  Issues: None significant
+  Recommendation: Consider adding numbers for uniqueness`;
+            }
+        }
+
+        function showHint(hintId) {
+            const hint = document.getElementById(hintId);
+            hint.classList.toggle('show');
+        }
+
+        function loadSolution(type) {
+            const solutions = {
+                'ip-validator': `def validate_ip(ip_address):
+    try:
+        octets = ip_address.split('.')
+        if len(octets) != 4:
+            return False
+        for octet in octets:
+            num = int(octet)
+            if num < 0 or num > 255:
+                return False
+        return True
+    except:
+        return False
+
+# Test cases
+test_ips = ["192.168.1.1", "256.1.1.1", "192.168.1"]
+for ip in test_ips:
+    print(f"{{ip}}: {validate_ip(ip)}")`,
+
+                'password-checker': `def check_password_strength(password):
+    score = 0
+    feedback = []
+    
+    if len(password) >= 8:
+        score += 1
+    else:
+        feedback.append("Too short (min 8 chars)")
+    
+    if any(c.isupper() for c in password):
+        score += 1
+    else:
+        feedback.append("Add uppercase letters")
+    
+    if any(c.islower() for c in password):
+        score += 1
+    else:
+        feedback.append("Add lowercase letters")
+    
+    if any(c.isdigit() for c in password):
+        score += 1
+    else:
+        feedback.append("Add numbers")
+    
+    if any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in password):
+        score += 1
+    else:
+        feedback.append("Add special characters")
+    
+    if score <= 2:
+        return f"WEAK ❌ - {', '.join(feedback)}"
+    elif score <= 4:
+        return f"MEDIUM ⚠️ - {', '.join(feedback)}"
+    else:
+        return "STRONG ✅"`,
+
+                'port-scanner-full': `import socket
+import time
+
+def port_scanner(target, ports):
+    print(f"🔍 Scanning {{target}}...")
+    start_time = time.time()
+    open_ports = []
+    
+    for port in ports:
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            result = sock.connect_ex((target, port))
+            
+            if result == 0:
+                print(f"Port {{port}}: OPEN ✅")
+                open_ports.append(port)
+            else:
+                print(f"Port {{port}}: CLOSED")
+            
+            sock.close()
+        except Exception as e:
+            print(f"Port {{port}}: ERROR - {{e}}")
+    
+    duration = time.time() - start_time
+    print(f"\\nScan complete in {duration:.2f} seconds")
+    print(f"Found {len(open_ports)} open ports: {open_ports}")`,
+
+                'hash-generator': `import hashlib
+
+def generate_hashes(data):
+    if isinstance(data, str):
+        data = data.encode()
+    
+    md5 = hashlib.md5(data).hexdigest()
+    sha1 = hashlib.sha1(data).hexdigest()
+    sha256 = hashlib.sha256(data).hexdigest()
+    
+    print(f"MD5:    {{md5}}")
+    print(f"SHA-1:  {{sha1}}")
+    print(f"SHA-256: {{sha256}}")
+    
+    return {'md5': md5, 'sha1': sha1, 'sha256': sha256}
+
+def verify_hash(data, expected, algo='sha256'):
+    if isinstance(data, str):
+        data = data.encode()
+    
+    computed = hashlib.new(algo, data).hexdigest()
+    return computed == expected`,
+
+                'username-checker': `def check_username_security(username):
+    risk_level = "LOW"
+    issues = []
+    
+    common_usernames = ['admin', 'root', 'administrator', 
+                       'user', 'test', 'guest']
+    
+    if username.lower() in common_usernames:
+        risk_level = "CRITICAL"
+        issues.append("Default/common username")
+    
+    if any(char.isdigit() for char in username[-4:]):
+        if username[-4:].isdigit():
+            risk_level = "MEDIUM"
+            issues.append("Contains year pattern")
+    
+    if len(username) < 6:
+        risk_level = "HIGH"
+        issues.append("Too short")
+    
+    print(f"Username: {{username}}")
+    print(f"Risk: {risk_level}")
+    print(f"Issues: {', '.join(issues) if issues else 'None'}")
+    print()`
+            };
+
+            const textarea = document.querySelector(`#${type.includes('full') ? 'scanner-project' : type === 'password-checker' ? 'password-code' : 'script-code'}`);
+            if (solutions[type]) {
+                if (type === 'port-scanner-full') {
+                    document.getElementById('scanner-project').value = solutions[type];
+                } else if (type === 'hash-generator') {
+                    document.getElementById('hash-project').value = solutions[type];
+                } else if (type === 'username-checker') {
+                    document.getElementById('enum-project').value = solutions[type];
+                } else if (type === 'password-checker') {
+                    document.getElementById('password-code').value = solutions[type];
+                } else {
+                    document.getElementById('script-code').value = solutions[type];
+                }
+            }
+        }
+
+        function revealAnswer(answerId) {
+            const answer = document.getElementById(answerId);
+            answer.classList.toggle('show');
+        }
+
+        function resetProgress() {
+            completedSections.clear();
+            updateProgress();
+            showTab(0);
+            alert('🔄 Progress reset! Starting from the beginning.');
+        }
+
+        // Initialize
+        updateProgress();
+    </script></p></body></html>
