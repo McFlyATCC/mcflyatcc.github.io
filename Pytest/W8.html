@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API &amp; Data Mashup Primer | Cybersecurity Programming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(20, 0, 0, 0.8);
+            border: 2px solid #ff0000;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #ff0000;
+            font-size: 2.5em;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        .progress-container {
+            background: rgba(40, 40, 40, 0.8);
+            border: 1px solid #ff0000;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            background: #1a1a1a;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #333;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #cc0000);
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .section {
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .section.completed {
+            border-color: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+        }
+
+        .section h2 {
+            color: #ff0000;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #ff6666;
+            font-size: 1.4em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .check-icon {
+            color: #00ff00;
+            display: none;
+        }
+
+        .section.completed .check-icon {
+            display: inline;
+        }
+
+        .content-box {
+            background: rgba(10, 10, 10, 0.6);
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .code-block {
+            background: #0a0a0a;
+            border: 1px solid #ff0000;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+        }
+
+        .code-editor {
+            background: #0a0a0a;
+            border: 2px solid #ff0000;
+            border-radius: 5px;
+            padding: 0;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .editor-header {
+            background: rgba(255, 0, 0, 0.1);
+            padding: 10px 15px;
+            border-bottom: 1px solid #ff0000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-title {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            background: #0a0a0a;
+            color: #00ff00;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, #cc0000, #ff0000);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 0, 0, 0.4);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .output {
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 60px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output.error {
+            border-color: #ff0000;
+            color: #ff6666;
+        }
+
+        .output.success {
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        .example-card {
+            background: rgba(40, 0, 0, 0.3);
+            border: 1px solid #ff0000;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .example-card h4 {
+            color: #ff6666;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: rgba(0, 100, 255, 0.1);
+            border-left: 4px solid #0066ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .warning-box {
+            background: rgba(255, 165, 0, 0.1);
+            border-left: 4px solid #ff9900;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .success-box {
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 4px solid #00ff00;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .quiz-container {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #ff0000;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quiz-question {
+            color: #ff6666;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .quiz-option {
+            background: rgba(40, 40, 40, 0.6);
+            border: 1px solid #444;
+            border-radius: 3px;
+            padding: 10px 15px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            background: rgba(60, 60, 60, 0.8);
+            border-color: #ff0000;
+        }
+
+        .quiz-option.selected {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+
+        .quiz-option.correct {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(40, 40, 40, 0.3);
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-box {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+        }
+
+        .comparison-box h4 {
+            color: #ff6666;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 0, 0, 0.3);
+            color: #ff6666;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .badge.beginner {
+            background: rgba(0, 255, 0, 0.3);
+            color: #66ff66;
+        }
+
+        .badge.intermediate {
+            background: rgba(255, 165, 0, 0.3);
+            color: #ffaa66;
+        }
+
+        .badge.advanced {
+            background: rgba(255, 0, 0, 0.3);
+            color: #ff6666;
+        }
+
+        .json-viewer {
+            background: #0a0a0a;
+            border: 1px solid #ff0000;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .json-key {
+            color: #ff6666;
+        }
+
+        .json-string {
+            color: #66ff66;
+        }
+
+        .json-number {
+            color: #6666ff;
+        }
+
+        .json-boolean {
+            color: #ff9900;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: rgba(40, 40, 40, 0.6);
+            border: 1px solid #444;
+            border-bottom: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            background: rgba(60, 60, 60, 0.8);
+        }
+
+        .tab.active {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+            color: #ff6666;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .hint-box {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid #ff9900;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .hint-box.visible {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+            }
+
+            .tabs {
+                font-size: 0.9em;
+            }
+
+            .tab {
+                padding: 8px 15px;
+            }
+        }
+
+        .terminal-prompt {
+            color: #00ff00;
+            margin-right: 10px;
+        }
+
+        .command-line {
+            color: #ffffff;
+        }
+    </style>
+</head><body><div class="container"><header>
+<h1>⚡ API &amp; DATA MASHUP PRIMER ⚡</h1>
+<div class="subtitle">Week 6: HTTP Basics, JSON Transformation &amp; Threat Intelligence Parsing</div>
+<div class="subtitle" style="margin-top: 5px; font-size: 0.9em; color: #666;">Bridge to Real-World Automation</div>
+</header>
+<div class="progress-container">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><strong style="color: #ff6666;">Course Progress</strong> <span id="progress-text">0 / 9 Sections Completed</span></div>
+<div class="progress-bar">
+<div class="progress-fill" id="progress-fill">0%</div>
+</div>
+</div>
+<!-- Section 1: HTTP & API Fundamentals -->
+<div class="section" id="section1">
+<h2><span class="check-icon">✓</span> Section 1: HTTP &amp; API Fundamentals</h2>
+<div class="content-box">
+<h3>What is an API?</h3>
+<p>An <strong>Application Programming Interface (API)</strong> is a set of rules and protocols that allows different software applications to communicate with each other. In cybersecurity, APIs are critical for:</p>
+<ul style="margin-left: 30px; margin-top: 10px;">
+<li>📡 Collecting threat intelligence from multiple sources</li>
+<li>🔍 Querying security information from SIEM platforms</li>
+<li>⚡ Automating incident response workflows</li>
+<li>🛡️ Integrating security tools and orchestration platforms</li>
+</ul>
+<div class="info-box" style="margin-top: 20px;"><strong>Real-World Example:</strong> A Security Operations Center (SOC) analyst uses APIs to automatically pull indicators of compromise (IOCs) from threat intelligence feeds, cross-reference them with firewall logs, and generate incident reports—all without manual intervention.</div>
+</div>
+<div class="content-box">
+<h3>HTTP Request/Response Cycle</h3>
+<p>APIs typically communicate over HTTP/HTTPS. Every API interaction follows a request-response pattern:</p>
+<div class="example-card">
+<h4>1. Client Makes Request</h4>
+<div class="code-block"><span class="terminal-prompt">REQUEST →</span> <span class="json-key">GET</span> https://api.threatintel.example/indicators/latest <span class="json-key">Headers:</span> Authorization: Bearer abc123xyz Content-Type: application/json User-Agent: ThreatHunter/1.0</div>
+</div>
+<div class="example-card">
+<h4>2. Server Processes &amp; Responds</h4>
+<div class="code-block"><span class="terminal-prompt">RESPONSE ←</span> <span class="json-key">Status:</span> <span class="json-number">200</span> OK <span class="json-key">Headers:</span> Content-Type: application/json X-RateLimit-Remaining: 99 <span class="json-key">Body:</span> { "indicators": [...] }</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Common HTTP Methods</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+<th>Cybersecurity Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GET</strong></td>
+<td>Retrieve data</td>
+<td>Fetch threat indicators, query logs, retrieve scan results</td>
+</tr>
+<tr>
+<td><strong>POST</strong></td>
+<td>Create/submit data</td>
+<td>Submit IOCs to threat platforms, create incident tickets</td>
+</tr>
+<tr>
+<td><strong>PUT</strong></td>
+<td>Update data</td>
+<td>Update threat severity, modify firewall rules</td>
+</tr>
+<tr>
+<td><strong>DELETE</strong></td>
+<td>Remove data</td>
+<td>Remove false positive indicators, delete old alerts</td>
+</tr>
+<tr>
+<td><strong>PATCH</strong></td>
+<td>Partial update</td>
+<td>Update specific fields in incident records</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="content-box">
+<h3>HTTP Status Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Code Range</th>
+<th>Meaning</th>
+<th>Common Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>2xx Success</strong></td>
+<td>Request succeeded</td>
+<td>200 OK, 201 Created, 204 No Content</td>
+</tr>
+<tr>
+<td><strong>3xx Redirection</strong></td>
+<td>Resource moved</td>
+<td>301 Moved Permanently, 302 Found</td>
+</tr>
+<tr>
+<td><strong>4xx Client Error</strong></td>
+<td>Problem with request</td>
+<td>400 Bad Request, 401 Unauthorized, 404 Not Found, 429 Rate Limited</td>
+</tr>
+<tr>
+<td><strong>5xx Server Error</strong></td>
+<td>Server-side problem</td>
+<td>500 Internal Server Error, 503 Service Unavailable</td>
+</tr>
+</tbody>
+</table>
+<div class="warning-box" style="margin-top: 15px;"><strong>Rate Limiting (429):</strong> Many threat intelligence APIs limit requests (e.g., 100/hour). Always implement exponential backoff and respect rate limits to avoid being blocked.</div>
+</div>
+<div class="content-box">
+<h3>Important HTTP Headers</h3>
+<div class="example-card">
+<h4>Request Headers</h4>
+<div class="code-block"><span class="json-key">Authorization:</span> Bearer &lt;token&gt; <span style="color: #666;"># API authentication</span> <span class="json-key">Content-Type:</span> application/json <span style="color: #666;"># Data format being sent</span> <span class="json-key">User-Agent:</span> MyScript/1.0 <span style="color: #666;"># Identifies your client</span> <span class="json-key">Accept:</span> application/json <span style="color: #666;"># Expected response format</span></div>
+</div>
+<div class="example-card">
+<h4>Response Headers</h4>
+<div class="code-block"><span class="json-key">Content-Type:</span> application/json <span style="color: #666;"># Response data format</span> <span class="json-key">X-RateLimit-Remaining:</span> 95 <span style="color: #666;"># Requests left in window</span> <span class="json-key">X-RateLimit-Reset:</span> 1640000000 <span style="color: #666;"># When limit resets (Unix time)</span> <span class="json-key">ETag:</span> "abc123" <span style="color: #666;"># Resource version identifier</span></div>
+</div>
+</div>
+<div class="quiz-container">
+<div class="quiz-question">Knowledge Check: Which HTTP method would you use to retrieve a list of threat indicators from an API?</div>
+<div class="quiz-option" onclick="checkQuiz(1, 0, false)">A) POST</div>
+<div class="quiz-option" onclick="checkQuiz(1, 1, true)">B) GET</div>
+<div class="quiz-option" onclick="checkQuiz(1, 2, false)">C) DELETE</div>
+<div class="quiz-option" onclick="checkQuiz(1, 3, false)">D) PUT</div>
+<div id="quiz1-feedback" style="margin-top: 15px; display: none;"></div>
+</div>
+<button class="button" onclick="completeSection(1)">Complete Section 1</button></div>
+<!-- Section 2: JSON Structure Deep Dive -->
+<div class="section" id="section2">
+<h2><span class="check-icon">✓</span> Section 2: JSON Structure Deep Dive</h2>
+<div class="content-box">
+<h3>Why JSON for APIs?</h3>
+<p><strong>JSON (JavaScript Object Notation)</strong> is the dominant data format for APIs because it's:</p>
+<ul style="margin-left: 30px; margin-top: 10px;">
+<li>✅ <strong>Human-readable</strong>: Easy to debug and understand</li>
+<li>✅ <strong>Lightweight</strong>: Minimal overhead compared to XML</li>
+<li>✅ <strong>Language-agnostic</strong>: Supported by virtually every programming language</li>
+<li>✅ <strong>Structured</strong>: Supports nested objects and arrays</li>
+</ul>
+</div>
+<div class="content-box">
+<h3>JSON Data Types</h3>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('json-types', 0)">Primitives</div>
+<div class="tab" onclick="switchTab('json-types', 1)">Objects</div>
+<div class="tab" onclick="switchTab('json-types', 2)">Arrays</div>
+<div class="tab" onclick="switchTab('json-types', 3)">Nested</div>
+</div>
+<div id="json-types-0" class="tab-content active">
+<h4>Primitive Types</h4>
+<div class="json-viewer">{ <span class="json-key">"string"</span>: <span class="json-string">"text value"</span>, <span class="json-key">"number"</span>: <span class="json-number">42</span>, <span class="json-key">"float"</span>: <span class="json-number">3.14</span>, <span class="json-key">"boolean"</span>: <span class="json-boolean">true</span>, <span class="json-key">"null_value"</span>: <span class="json-boolean">null</span> }</div>
+</div>
+<div id="json-types-1" class="tab-content">
+<h4>Objects (Dictionaries)</h4>
+<div class="json-viewer">{ <span class="json-key">"threat_actor"</span>: { <span class="json-key">"name"</span>: <span class="json-string">"APT29"</span>, <span class="json-key">"country"</span>: <span class="json-string">"Russia"</span>, <span class="json-key">"active"</span>: <span class="json-boolean">true</span> } }</div>
+<p style="margin-top: 10px; color: #999;">Access: <code style="color: #ff6666;">data["threat_actor"]["name"]</code> → "APT29"</p>
+</div>
+<div id="json-types-2" class="tab-content">
+<h4>Arrays (Lists)</h4>
+<div class="json-viewer">{ <span class="json-key">"ip_addresses"</span>: [ <span class="json-string">"192.168.1.100"</span>, <span class="json-string">"10.0.0.50"</span>, <span class="json-string">"172.16.0.1"</span> ], <span class="json-key">"ports"</span>: [<span class="json-number">80</span>, <span class="json-number">443</span>, <span class="json-number">8080</span>] }</div>
+<p style="margin-top: 10px; color: #999;">Access: <code style="color: #ff6666;">data["ports"][1]</code> → 443</p>
+</div>
+<div id="json-types-3" class="tab-content">
+<h4>Nested Structures</h4>
+<div class="json-viewer">{ <span class="json-key">"incidents"</span>: [ { <span class="json-key">"id"</span>: <span class="json-number">1001</span>, <span class="json-key">"severity"</span>: <span class="json-string">"critical"</span>, <span class="json-key">"indicators"</span>: { <span class="json-key">"ips"</span>: [<span class="json-string">"1.2.3.4"</span>], <span class="json-key">"domains"</span>: [<span class="json-string">"evil.com"</span>] } } ] }</div>
+<p style="margin-top: 10px; color: #999;">Access: <code style="color: #ff6666;">data["incidents"][0]["indicators"]["ips"][0]</code> → "1.2.3.4"</p>
+</div>
+</div>
+<div class="content-box">
+<h3>Real Threat Intelligence JSON</h3>
+<p>Let's examine a realistic APT indicator feed structure:</p>
+<div class="json-viewer" style="font-size: 13px;">{ <span class="json-key">"feed_name"</span>: <span class="json-string">"APT34_Indicators_2024"</span>, <span class="json-key">"last_updated"</span>: <span class="json-string">"2024-11-15T14:30:00Z"</span>, <span class="json-key">"total_indicators"</span>: <span class="json-number">47</span>, <span class="json-key">"indicators"</span>: [ { <span class="json-key">"type"</span>: <span class="json-string">"ip"</span>, <span class="json-key">"value"</span>: <span class="json-string">"185.234.219.33"</span>, <span class="json-key">"confidence"</span>: <span class="json-number">95</span>, <span class="json-key">"first_seen"</span>: <span class="json-string">"2024-10-01"</span>, <span class="json-key">"tags"</span>: [<span class="json-string">"c2"</span>, <span class="json-string">"apt34"</span>, <span class="json-string">"middle-east"</span>], <span class="json-key">"related_malware"</span>: [<span class="json-string">"BONDUPDATER"</span>, <span class="json-string">"PICKPOCKET"</span>] }, { <span class="json-key">"type"</span>: <span class="json-string">"domain"</span>, <span class="json-key">"value"</span>: <span class="json-string">"secure-update-microsoft.com"</span>, <span class="json-key">"confidence"</span>: <span class="json-number">88</span>, <span class="json-key">"first_seen"</span>: <span class="json-string">"2024-09-15"</span>, <span class="json-key">"tags"</span>: [<span class="json-string">"phishing"</span>, <span class="json-string">"apt34"</span>], <span class="json-key">"related_malware"</span>: [<span class="json-string">"POWBAT"</span>] } ] }</div>
+</div>
+<div class="content-box">
+<h3>Interactive: Navigate JSON Structure</h3>
+<p>Given the JSON above, write Python expressions to extract the following values:</p>
+<div class="code-editor">
+<div class="editor-header"><span class="editor-title">json_navigation.py</span></div>
+<textarea id="json-nav-code" placeholder="# Extract the confidence value of the first indicator
+data = {...}  # Assume this variable contains the JSON above
+
+first_confidence = data[____][____][____]
+second_domain = data[____][____][____]
+all_tags_first = data[____][____][____]
+
+print(first_confidence)  # Should output: 95
+print(second_domain)     # Should output: secure-update-microsoft.com
+print(all_tags_first)    # Should output: ['c2', 'apt34', 'middle-east']"># Extract the confidence value of the first indicator
+data = {...}  # Assume this variable contains the JSON above
+
+first_confidence = data[____][____][____]
+second_domain = data[____][____][____]
+all_tags_first = data[____][____][____]
+
+print(first_confidence)  # Should output: 95
+print(second_domain)     # Should output: secure-update-microsoft.com
+print(all_tags_first)    # Should output: ['c2', 'apt34', 'middle-east']</textarea></div>
+<div class="button-group"><button class="button" onclick="checkJsonNavigation()">Check Solution</button> <button class="button" onclick="showHint('hint-json-nav')">Show Hint</button></div>
+<div id="hint-json-nav" class="hint-box"><strong>💡 Hint:</strong> Remember the path: data → "indicators" (array) → index [0] or [1] → field name ("confidence", "value", "tags")</div>
+<div id="json-nav-output" class="output"></div>
+</div>
+<button class="button" onclick="completeSection(2)">Complete Section 2</button></div>
+<!-- Section 3: Loading & Parsing API Data -->
+<div class="section" id="section3">
+<h2><span class="check-icon">✓</span> Section 3: Loading &amp; Parsing API Data</h2>
+<div class="content-box">
+<h3>Python's JSON Module</h3>
+<p>Python provides a built-in <code style="color: #ff6666;">json</code> module for working with JSON data:</p>
+<div class="code-block">import json # Load JSON from a file (simulating API response) with open('threat_feed.json', 'r') as file: data = json.load(file) # Load JSON from a string json_string = '{"alert": "malware detected"}' data = json.loads(json_string) # Convert Python dict to JSON string output = json.dumps(data, indent=2) # Write JSON to a file with open('output.json', 'w') as file: json.dump(data, file, indent=2)</div>
+</div>
+<div class="content-box">
+<h3>Sample Threat Intelligence Feeds</h3>
+<p>We'll work with three realistic feed types (simulated as local files):</p>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('feeds', 0)">APT Indicators</div>
+<div class="tab" onclick="switchTab('feeds', 1)">CVE Data</div>
+<div class="tab" onclick="switchTab('feeds', 2)">MISP Events</div>
+</div>
+<div id="feeds-0" class="tab-content active">
+<div class="example-card">
+<h4>apt_indicators.json - Simple Indicator Feed</h4>
+<div class="json-viewer" style="font-size: 12px;">{ "feed_metadata": { "source": "Threat Intel Platform Alpha", "generated": "2024-11-20T10:00:00Z", "confidence_threshold": 70 }, "indicators": [ { "ioc_id": "IOC-2024-0001", "type": "ip", "value": "203.0.113.45", "confidence": 92, "threat_level": "high", "first_seen": "2024-11-10", "last_seen": "2024-11-18", "associated_malware": ["TRICKBOT", "EMOTET"], "tags": ["c2", "banking-trojan", "apt28"] }, { "ioc_id": "IOC-2024-0002", "type": "domain", "value": "fake-microsoft-update.net", "confidence": 87, "threat_level": "high", "first_seen": "2024-11-12", "last_seen": "2024-11-19", "associated_malware": ["COBALTSTRIKE"], "tags": ["phishing", "credential-theft"] }, { "ioc_id": "IOC-2024-0003", "type": "hash", "value": "5f4dcc3b5aa765d61d8327deb882cf99", "confidence": 78, "threat_level": "medium", "first_seen": "2024-11-15", "last_seen": "2024-11-15", "associated_malware": ["UNKNOWN"], "tags": ["suspicious", "ransomware"] } ] }</div>
+</div>
+</div>
+<div id="feeds-1" class="tab-content">
+<div class="example-card">
+<h4>cve_feed.json - Vulnerability Data</h4>
+<div class="json-viewer" style="font-size: 12px;">{ "vulnerabilities": [ { "cve_id": "CVE-2024-9999", "description": "Remote code execution in NetworkDevice firmware", "severity": "CRITICAL", "cvss_score": 9.8, "published_date": "2024-11-01", "affected_products": ["NetworkDevice Model X v1.0-3.2"], "exploit_available": true, "patch_available": true, "references": [ "https://nvd.nist.gov/vuln/detail/CVE-2024-9999", "https://vendor.com/security/CVE-2024-9999" ] }, { "cve_id": "CVE-2024-8888", "description": "SQL injection in web application framework", "severity": "HIGH", "cvss_score": 8.1, "published_date": "2024-10-15", "affected_products": ["WebFramework v2.0-2.5"], "exploit_available": false, "patch_available": true, "references": ["https://nvd.nist.gov/vuln/detail/CVE-2024-8888"] } ] }</div>
+</div>
+</div>
+<div id="feeds-2" class="tab-content">
+<div class="example-card">
+<h4>misp_events.json - Complex Event Structure</h4>
+<div class="json-viewer" style="font-size: 12px;">{ "events": [ { "event_id": "EVENT-12345", "timestamp": "2024-11-18T14:22:00Z", "threat_level": "high", "analysis_status": "completed", "info": "APT34 Campaign - Oil &amp; Gas Sector Targeting", "attributes": [ { "type": "ip-dst", "value": "198.51.100.42", "category": "Network activity", "to_ids": true }, { "type": "domain", "value": "energy-portal-login.com", "category": "Network activity", "to_ids": true }, { "type": "md5", "value": "d41d8cd98f00b204e9800998ecf8427e", "category": "Payload delivery", "to_ids": true } ], "tags": [ {"name": "apt34"}, {"name": "energy-sector"}, {"name": "middle-east"} ] } ] }</div>
+</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Guided Challenge: Load and Extract Data <span class="badge beginner">BEGINNER</span></h3>
+<p>Complete the following code to load the APT indicators feed and extract specific information:</p>
+<div class="code-editor">
+<div class="editor-header"><span class="editor-title">load_indicators.py</span></div>
+<textarea id="load-code">import json
+
+# Sample data (simulating file contents)
+apt_data = {
+    "feed_metadata": {
+        "source": "Threat Intel Platform Alpha",
+        "generated": "2024-11-20T10:00:00Z"
+    },
+    "indicators": [
+        {"ioc_id": "IOC-2024-0001", "type": "ip", "value": "203.0.113.45", 
+         "confidence": 92, "threat_level": "high"},
+        {"ioc_id": "IOC-2024-0002", "type": "domain", "value": "evil.com",
+         "confidence": 87, "threat_level": "high"},
+        {"ioc_id": "IOC-2024-0003", "type": "hash", "value": "5f4dcc...",
+         "confidence": 78, "threat_level": "medium"}
+    ]
+}
+
+# TODO: Extract the source from metadata
+source = apt_data[____][____]
+
+# TODO: Get the total number of indicators
+total_indicators = len(apt_data[____])
+
+# TODO: Get the first indicator's value
+first_value = apt_data[____][____][____]
+
+# TODO: Get all threat levels as a list
+threat_levels = [indicator[____] for indicator in apt_data[____]]
+
+print(f"Source: {{source}}")
+print(f"Total indicators: {total_indicators}")
+print(f"First indicator value: {first_value}")
+print(f"All threat levels: {threat_levels}")</textarea></div>
+<div class="button-group"><button class="button" onclick="runLoadCode()">Run Code</button> <button class="button" onclick="showSolution('load-code-solution')">Show Solution</button></div>
+<div id="load-code-output" class="output"></div>
+<div id="load-code-solution" class="hint-box"><strong>Solution:</strong>
+<div class="code-block" style="margin-top: 10px;">source = apt_data["feed_metadata"]["source"] total_indicators = len(apt_data["indicators"]) first_value = apt_data["indicators"][0]["value"] threat_levels = [indicator["threat_level"] for indicator in apt_data["indicators"]]</div>
+</div>
+</div>
+<button class="button" onclick="completeSection(3)">Complete Section 3</button></div>
+<!-- Section 4: Data Filtering Techniques -->
+<div class="section" id="section4">
+<h2><span class="check-icon">✓</span> Section 4: Data Filtering Techniques</h2>
+<div class="content-box">
+<h3>Why Filter Threat Intelligence?</h3>
+<p>Security teams receive thousands of indicators daily. Effective filtering is essential to:</p>
+<ul style="margin-left: 30px; margin-top: 10px;">
+<li>🎯 Focus on high-confidence, actionable threats</li>
+<li>⚡ Reduce false positive alert fatigue</li>
+<li>📊 Generate targeted reports for specific campaigns</li>
+<li>🔧 Feed filtered data into SIEMs and firewalls</li>
+</ul>
+</div>
+<div class="content-box">
+<h3>Common Filtering Patterns</h3>
+<div class="comparison-container">
+<div class="comparison-box">
+<h4>Basic Filtering with Loops</h4>
+<div class="code-block">high_threats = [] for indicator in data["indicators"]: if indicator["threat_level"] == "high": high_threats.append(indicator)</div>
+<p style="color: #999; margin-top: 10px; font-size: 0.9em;">✓ Explicit and clear<br>✓ Easy for beginners</p>
+</div>
+<div class="comparison-box">
+<h4>List Comprehension</h4>
+<div class="code-block">high_threats = [ indicator for indicator in data["indicators"] if indicator["threat_level"] == "high" ]</div>
+<p style="color: #999; margin-top: 10px; font-size: 0.9em;">✓ More concise<br>✓ Pythonic style</p>
+</div>
+</div>
+<div class="comparison-container">
+<div class="comparison-box">
+<h4>Multiple Conditions (AND)</h4>
+<div class="code-block">critical = [ ioc for ioc in indicators if ioc["confidence"] &gt; 90 and ioc["threat_level"] == "high" ]</div>
+</div>
+<div class="comparison-box">
+<h4>Multiple Conditions (OR)</h4>
+<div class="code-block">urgent = [ ioc for ioc in indicators if ioc["confidence"] &gt; 95 or ioc["exploit_available"] ]</div>
+</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Practical Filtering Examples</h3>
+<div class="example-card">
+<h4>Example 1: Filter by Confidence Threshold</h4>
+<div class="code-block">def filter_by_confidence(indicators, min_confidence=80): """Return only indicators above confidence threshold""" return [ ioc for ioc in indicators if ioc["confidence"] &gt;= min_confidence ] # Usage high_confidence = filter_by_confidence(data["indicators"], 85) print(f"Found {len(high_confidence)} high-confidence indicators")</div>
+</div>
+<div class="example-card">
+<h4>Example 2: Filter by Date Range</h4>
+<div class="code-block">from datetime import datetime def filter_by_date(indicators, start_date): """Return indicators seen after a specific date""" return [ ioc for ioc in indicators if ioc["last_seen"] &gt;= start_date ] # Get indicators from last week recent = filter_by_date(data["indicators"], "2024-11-13")</div>
+</div>
+<div class="example-card">
+<h4>Example 3: Filter by Tags (Contains)</h4>
+<div class="code-block">def filter_by_tag(indicators, tag): """Return indicators containing a specific tag""" return [ ioc for ioc in indicators if tag in ioc.get("tags", []) ] # Find all APT28-related indicators apt28_iocs = filter_by_tag(data["indicators"], "apt28")</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Guided Challenge: Build a Multi-Filter System <span class="badge intermediate">INTERMEDIATE</span></h3>
+<p>Complete the function that applies multiple filters based on security criteria:</p>
+<div class="code-editor">
+<div class="editor-header"><span class="editor-title">filter_threats.py</span></div>
+<textarea id="filter-code">def filter_actionable_threats(indicators, min_confidence=85, threat_levels=["high", "critical"]):
+    """
+    Filter indicators that are actionable for immediate response
+    
+    Criteria:
+    - Confidence &gt;= min_confidence
+    - Threat level in specified levels
+    - Has associated malware (not "UNKNOWN")
+    """
+    filtered = []
+    
+    for indicator in indicators:
+        # TODO: Check if confidence meets threshold
+        confidence_check = indicator[____] &gt;= ____
+        
+        # TODO: Check if threat level is in the allowed list
+        threat_check = indicator[____] in ____
+        
+        # TODO: Check if has valid malware association
+        malware = indicator.get("associated_malware", [])
+        malware_check = len(malware) &gt; 0 and ____ not in malware
+        
+        # Add to filtered list if all checks pass
+        if confidence_check and threat_check and malware_check:
+            filtered.append(indicator)
+    
+    return filtered
+
+# Test data
+test_indicators = [
+    {"ioc_id": "001", "confidence": 92, "threat_level": "high", 
+     "associated_malware": ["TRICKBOT"]},
+    {"ioc_id": "002", "confidence": 78, "threat_level": "high",
+     "associated_malware": ["EMOTET"]},
+    {"ioc_id": "003", "confidence": 95, "threat_level": "medium",
+     "associated_malware": ["COBALTSTRIKE"]},
+    {"ioc_id": "004", "confidence": 88, "threat_level": "high",
+     "associated_malware": ["UNKNOWN"]}
+]
+
+result = filter_actionable_threats(test_indicators)
+print(f"Actionable threats: {len(result)}")
+for ioc in result:
+    print(f"  - {ioc['ioc_id']}: confidence={ioc['confidence']}, level={ioc['threat_level']}")</textarea></div>
+<div class="button-group"><button class="button" onclick="runFilterCode()">Run Code</button> <button class="button" onclick="showSolution('filter-solution')">Show Solution</button></div>
+<div id="filter-output" class="output"></div>
+<div id="filter-solution" class="hint-box"><strong>Solution:</strong>
+<div class="code-block" style="margin-top: 10px;">confidence_check = indicator["confidence"] &gt;= min_confidence threat_check = indicator["threat_level"] in threat_levels malware_check = len(malware) &gt; 0 and "UNKNOWN" not in malware # Expected output: Only IOC-001 should pass (92 conf, high level, valid malware)</div>
+</div>
+</div>
+<button class="button" onclick="completeSection(4)">Complete Section 4</button></div>
+<!-- Section 5: Data Transformation Patterns -->
+<div class="section" id="section5">
+<h2><span class="check-icon">✓</span> Section 5: Data Transformation Patterns</h2>
+<div class="content-box">
+<h3>Why Transform Data?</h3>
+<p>Different security tools expect different data formats. Transformation enables:</p>
+<ul style="margin-left: 30px; margin-top: 10px;">
+<li>🔄 Converting threat intel feeds for firewall import</li>
+<li>📊 Reshaping data for dashboard visualization</li>
+<li>🔗 Creating simplified reports from complex nested data</li>
+<li>⚡ Optimizing data structure for faster queries</li>
+</ul>
+</div>
+<div class="content-box">
+<h3>Common Transformation Patterns</h3>
+<div class="example-card">
+<h4>Pattern 1: Extract Simple List</h4>
+<div class="code-block"># Extract just IP addresses for blocklist ip_blocklist = [ indicator["value"] for indicator in data["indicators"] if indicator["type"] == "ip" ] # Result: ["203.0.113.45", "198.51.100.42", ...]</div>
+</div>
+<div class="example-card">
+<h4>Pattern 2: Create Lookup Dictionary</h4>
+<div class="code-block"># Create fast lookup by IOC ID ioc_lookup = { indicator["ioc_id"]: indicator for indicator in data["indicators"] } # Result: {"IOC-2024-0001": {...}, "IOC-2024-0002": {...}}</div>
+</div>
+<div class="example-card">
+<h4>Pattern 3: Reshape to New Structure</h4>
+<div class="code-block"># Transform to SIEM-friendly format siem_format = [ { "indicator": ioc["value"], "category": ioc["type"], "severity": ioc["threat_level"], "score": ioc["confidence"] } for ioc in data["indicators"] ]</div>
+</div>
+<div class="example-card">
+<h4>Pattern 4: Aggregate by Category</h4>
+<div class="code-block"># Group indicators by type from collections import defaultdict by_type = defaultdict(list) for indicator in data["indicators"]: by_type[indicator["type"]].append(indicator["value"]) # Result: {"ip": [...], "domain": [...], "hash": [...]}</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Real-World Example: STIX Format Transformation</h3>
+<p>Convert our feed to STIX 2.1 pattern format (simplified):</p>
+<div class="comparison-container">
+<div class="comparison-box">
+<h4>Input (Our Format)</h4>
+<div class="json-viewer" style="font-size: 11px;">{ "type": "ip", "value": "203.0.113.45", "confidence": 92, "threat_level": "high" }</div>
+</div>
+<div class="comparison-box">
+<h4>Output (STIX-like)</h4>
+<div class="json-viewer" style="font-size: 11px;">{ "type": "indicator", "pattern": "[ipv4-addr:value = '203.0.113.45']", "confidence": 92, "labels": ["malicious-activity"] }</div>
+</div>
+</div>
+<div class="code-block">def transform_to_stix(indicator): """Convert our format to STIX-like pattern""" ioc_type = indicator["type"] value = indicator["value"] # Map our types to STIX patterns pattern_map = { "ip": f"[ipv4-addr:value = '{{value}}']", "domain": f"[domain-name:value = '{{value}}']", "hash": f"[file:hashes.MD5 = '{{value}}']" } return { "type": "indicator", "pattern": pattern_map.get(ioc_type, ""), "confidence": indicator["confidence"], "labels": ["malicious-activity"] } # Apply to all indicators stix_indicators = [transform_to_stix(ioc) for ioc in data["indicators"]]</div>
+</div>
+<div class="content-box">
+<h3>Guided Challenge: Build Firewall Blocklist <span class="badge intermediate">INTERMEDIATE</span></h3>
+<p>Transform threat intel into a format suitable for firewall import:</p>
+<div class="code-editor">
+<div class="editor-header"><span class="editor-title">blocklist_transformer.py</span></div>
+<textarea id="transform-code">def create_firewall_blocklist(indicators, min_confidence=85):
+    """
+    Transform indicators into firewall-ready blocklist
+    
+    Output format per entry:
+    {
+        "address": "IP or domain",
+        "action": "block",
+        "reason": "Threat: MALWARE_NAME (confidence: XX%)",
+        "priority": "high" or "medium" based on confidence
+    }
+    """
+    blocklist = []
+    
+    for indicator in indicators:
+        # Skip low confidence indicators
+        if indicator[____] &lt; ____:
+            continue
+        
+        # Only process IPs and domains
+        if indicator["type"] not in [____, ____]:
+            continue
+        
+        # TODO: Determine priority (high if confidence &gt;= 90, else medium)
+        priority = ____ if indicator["confidence"] &gt;= ____ else ____
+        
+        # TODO: Format malware names (join list with ", ")
+        malware_str = ____.join(indicator.get("associated_malware", ["Unknown"]))
+        
+        # Build entry
+        entry = {
+            "address": indicator[____],
+            "action": "block",
+            "reason": f"Threat: {____} (confidence: {indicator['confidence']}%)",
+            "priority": ____
+        }
+        
+        blocklist.append(entry)
+    
+    return blocklist
+
+# Test data
+test_data = [
+    {"type": "ip", "value": "203.0.113.45", "confidence": 95, 
+     "associated_malware": ["TRICKBOT", "EMOTET"]},
+    {"type": "domain", "value": "evil.com", "confidence": 88,
+     "associated_malware": ["COBALTSTRIKE"]},
+    {"type": "hash", "value": "abc123", "confidence": 92,
+     "associated_malware": ["RANSOMWARE"]},
+    {"type": "ip", "value": "192.0.2.1", "confidence": 70,
+     "associated_malware": ["UNKNOWN"]}
+]
+
+blocklist = create_firewall_blocklist(test_data)
+print(f"Generated {len(blocklist)} blocklist entries:")
+for entry in blocklist:
+    print(f"  [{entry['priority'].upper()}] {entry['address']} - {entry['reason']}")</textarea></div>
+<div class="button-group"><button class="button" onclick="runTransformCode()">Run Code</button> <button class="button" onclick="showSolution('transform-solution')">Show Solution</button></div>
+<div id="transform-output" class="output"></div>
+<div id="transform-solution" class="hint-box"><strong>Solution:</strong>
+<div class="code-block" style="margin-top: 10px;">if indicator["confidence"] &lt; min_confidence: if indicator["type"] not in ["ip", "domain"]: priority = "high" if indicator["confidence"] &gt;= 90 else "medium" malware_str = ", ".join(indicator.get("associated_malware", ["Unknown"])) entry = { "address": indicator["value"], "reason": f"Threat: {malware_str} (confidence: {indicator['confidence']}%)", "priority": priority }</div>
+</div>
+</div>
+<button class="button" onclick="completeSection(5)">Complete Section 5</button></div>
+<!-- Section 6: AI-Assisted Development -->
+<div class="section" id="section6">
+<h2><span class="check-icon">✓</span> Section 6: AI-Assisted JSON Development</h2>
+<div class="content-box">
+<h3>Using AI for JSON Parsing</h3>
+<p>AI coding assistants (GitHub Copilot, ChatGPT, Claude) excel at helping with JSON manipulation. Here's how to leverage them effectively:</p>
+</div>
+<div class="content-box">
+<h3>Effective AI Prompts for JSON Work</h3>
+<div class="example-card">
+<h4>❌ Vague Prompt (Less Effective)</h4>
+<div class="code-block" style="color: #ff6666;">"Parse this JSON"</div>
+</div>
+<div class="example-card">
+<h4>✅ Specific Prompt (More Effective)</h4>
+<div class="code-block" style="color: #66ff66;">"Parse this threat intelligence JSON to extract all IP addresses with confidence &gt; 85. Return as a list of dictionaries with keys: 'ip', 'confidence', 'first_seen'. Handle missing fields gracefully."</div>
+</div>
+<div class="info-box"><strong>Best Practice:</strong> Always provide sample JSON structure when asking AI for help. This dramatically improves code quality.</div>
+</div>
+<div class="content-box">
+<h3>Sample AI Prompts for This Week's Work</h3>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('ai-prompts', 0)">Parsing</div>
+<div class="tab" onclick="switchTab('ai-prompts', 1)">Filtering</div>
+<div class="tab" onclick="switchTab('ai-prompts', 2)">Transformation</div>
+<div class="tab" onclick="switchTab('ai-prompts', 3)">Debugging</div>
+</div>
+<div id="ai-prompts-0" class="tab-content active">
+<h4>Parsing Complex Structures</h4>
+<div class="code-block" style="color: #e0e0e0;">Prompt: "Given this nested JSON structure [paste sample], write Python code to safely extract the 'severity' field from all 'vulnerabilities' entries. Use try-except to handle missing fields and return a list of tuples (cve_id, severity)." Example Sample to Include: { "vulnerabilities": [ {"cve_id": "CVE-2024-1234", "severity": "HIGH", ...}, {"cve_id": "CVE-2024-5678", ...} # Missing severity ] }</div>
+</div>
+<div id="ai-prompts-1" class="tab-content">
+<h4>Building Complex Filters</h4>
+<div class="code-block" style="color: #e0e0e0;">Prompt: "Write a Python function that filters threat indicators based on: 1. Confidence &gt;= 80 2. Either threat_level is 'high' OR exploit_available is true 3. first_seen date is within last 30 days Show both a loop version and a list comprehension version. Add comments explaining the logic."</div>
+</div>
+<div id="ai-prompts-2" class="tab-content">
+<h4>Data Transformation</h4>
+<div class="code-block" style="color: #e0e0e0;">Prompt: "I have a list of threat indicators with this structure: [paste sample] Transform this into a CSV-ready format with columns: type, value, confidence, threat_level Then show me how to aggregate by 'type' and count occurrences. Provide the most Pythonic approach."</div>
+</div>
+<div id="ai-prompts-3" class="tab-content">
+<h4>Debugging JSON Issues</h4>
+<div class="code-block" style="color: #e0e0e0;">Prompt: "I'm getting 'KeyError: tags' when parsing this JSON: [paste code] The 'tags' field might be missing from some indicators. How should I handle this safely? Show me three different approaches (try-except, .get() method, hasattr) and explain when to use each."</div>
+</div>
+</div>
+<div class="content-box">
+<h3>AI Code Comparison: Loops vs Comprehensions</h3>
+<p>Let's use AI to compare different approaches to the same problem:</p>
+<div class="comparison-container">
+<div class="comparison-box">
+<h4>Traditional Loop Approach</h4>
+<div class="code-block">def extract_high_threats_loop(data): high_threats = [] for indicator in data["indicators"]: if indicator["confidence"] &gt; 90: high_threats.append({ "value": indicator["value"], "type": indicator["type"] }) return high_threats</div>
+<p style="color: #999; margin-top: 10px; font-size: 0.9em;">✓ Explicit step-by-step<br>✓ Easy to debug<br>✓ Can add complex logic<br>✗ More verbose</p>
+</div>
+<div class="comparison-box">
+<h4>List Comprehension</h4>
+<div class="code-block">def extract_high_threats_comp(data): return [ { "value": ind["value"], "type": ind["type"] } for ind in data["indicators"] if ind["confidence"] &gt; 90 ]</div>
+<p style="color: #999; margin-top: 10px; font-size: 0.9em;">✓ Concise<br>✓ Pythonic<br>✓ Often faster<br>✗ Harder to debug complex logic</p>
+</div>
+</div>
+<div class="info-box"><strong>AI Prompt to Generate This:</strong> "Show me two versions of a function that extracts threat indicators with confidence &gt; 90: one using a for loop, one using list comprehension. For each approach, list pros and cons."</div>
+</div>
+<div class="content-box">
+<h3>Interactive: AI-Assisted Debugging Challenge</h3>
+<p>The code below has bugs. Practice crafting an AI prompt to fix it:</p>
+<div class="code-editor">
+<div class="editor-header"><span class="editor-title">buggy_parser.py</span></div>
+<textarea id="debug-code" readonly="readonly">def parse_indicators(data):
+    """Extract all malware names from indicators"""
+    malware_list = []
+    for indicator in data["indicators"]:
+        # Bug 1: Not all indicators have 'associated_malware'
+        for malware in indicator["associated_malware"]:
+            # Bug 2: Adds duplicates
+            malware_list.append(malware)
+    return malware_list
+
+# Test data with missing field
+test_data = {
+    "indicators": [
+        {"value": "1.2.3.4", "associated_malware": ["TRICKBOT"]},
+        {"value": "evil.com"}  # Missing 'associated_malware'
+    ]
+}</textarea></div>
+<div style="margin-top: 20px;"><label for="ai-prompt-input" style="color: #ff6666; display: block; margin-bottom: 10px;"><strong>Your AI Prompt:</strong></label> <textarea id="ai-prompt-input" style="width: 100%; min-height: 100px; background: #0a0a0a; color: #00ff00; border: 2px solid #ff0000; padding: 15px; border-radius: 5px; font-family: 'Courier New', monospace;" placeholder="Write your AI prompt here to fix the bugs..."></textarea></div>
+<div class="button-group"><button class="button" onclick="showAISuggestion()">Show AI-Style Response</button> <button class="button" onclick="showSolution('debug-solution')">Show Fixed Code</button></div>
+<div id="ai-suggestion-output" class="output" style="display: none;"></div>
+<div id="debug-solution" class="hint-box"><strong>Fixed Code with Explanations:</strong>
+<div class="code-block" style="margin-top: 10px;">def parse_indicators(data): """Extract all unique malware names from indicators""" malware_set = set() # Use set to avoid duplicates for indicator in data["indicators"]: # Use .get() with default empty list to handle missing field malware_names = indicator.get("associated_malware", []) for malware in malware_names: malware_set.add(malware) return list(malware_set) # Convert back to list # Alternative using list comprehension: def parse_indicators_v2(data): return list(set( malware for indicator in data["indicators"] for malware in indicator.get("associated_malware", []) ))</div>
+<p style="margin-top: 10px; color: #999;"><strong>Good AI Prompt:</strong> "This code crashes when 'associated_malware' is missing and creates duplicates. Fix both issues using .get() method and a set. Then show an alternative using nested list comprehension with set()."</p>
+</div>
+</div>
+<button class="button" onclick="completeSection(6)">Complete Section 6</button></div>
+<!-- Section 7: Complete Workflow Challenge -->
+<div class="section" id="section7">
+<h2><span class="check-icon">✓</span> Section 7: Complete Workflow Challenge</h2>
+<div class="content-box">
+<h3>The Three-Stage Pattern</h3>
+<p>Professional data processing scripts follow a clear pattern:</p>
+<div class="example-card">
+<div class="code-block" style="color: #66ff66;"># Stage 1: LOAD data = load_json_input() # Stage 2: TRANSFORM processed_data = transform_and_filter(data) # Stage 3: OUTPUT write_json_output(processed_data) generate_summary_report(processed_data)</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Real-World Scenario: SOC Automation</h3>
+<div class="info-box"><strong>Scenario:</strong> Your SOC receives hourly threat intelligence feeds from multiple vendors. You need to:
+<ol style="margin-left: 30px; margin-top: 10px;">
+<li>Load and merge indicators from different feeds</li>
+<li>Filter to only actionable threats (confidence &gt; 85, specific types)</li>
+<li>Transform into firewall-ready format</li>
+<li>Generate summary statistics for the shift report</li>
+</ol>
+</div>
+</div>
+<div class="content-box">
+<h3>Open-Ended Challenge: Build Complete Pipeline <span class="badge advanced">ADVANCED</span></h3>
+<p>Implement a complete threat intelligence processing pipeline using the three-stage pattern:</p>
+<div class="code-editor">
+<div class="editor-header"><span class="editor-title">threat_pipeline.py</span></div>
+<textarea id="pipeline-code">import json
+from datetime import datetime
+
+# Sample input data (simulating multiple feeds)
+feed_data = {
+    "indicators": [
+        {"ioc_id": "001", "type": "ip", "value": "203.0.113.45", "confidence": 95, 
+         "threat_level": "critical", "source": "FeedA", "tags": ["apt28", "c2"]},
+        {"ioc_id": "002", "type": "domain", "value": "evil.com", "confidence": 72,
+         "threat_level": "medium", "source": "FeedA", "tags": ["phishing"]},
+        {"ioc_id": "003", "type": "ip", "value": "198.51.100.1", "confidence": 88,
+         "threat_level": "high", "source": "FeedB", "tags": ["malware", "ransomware"]},
+        {"ioc_id": "004", "type": "hash", "value": "abc123def456", "confidence": 91,
+         "threat_level": "high", "source": "FeedB", "tags": ["trojan"]},
+        {"ioc_id": "005", "type": "domain", "value": "phish-site.net", "confidence": 89,
+         "threat_level": "high", "source": "FeedC", "tags": ["phishing", "credential-theft"]}
+    ]
+}
+
+# ===== STAGE 1: LOAD =====
+def load_data():
+    """Load and validate input data"""
+    # TODO: Add validation (check required fields exist)
+    return feed_data
+
+# ===== STAGE 2: TRANSFORM &amp; FILTER =====
+def filter_actionable(indicators, min_confidence=85, allowed_types=["ip", "domain"]):
+    """Filter to actionable network indicators"""
+    # TODO: Implement filtering logic
+    pass
+
+def transform_for_firewall(indicators):
+    """Transform to firewall import format"""
+    # TODO: Create blocklist entries with:
+    #   - address: the IOC value
+    #   - action: "block"
+    #   - priority: based on threat_level
+    #   - tags: original tags
+    pass
+
+def generate_statistics(original_count, filtered_count, blocklist):
+    """Calculate summary statistics"""
+    # TODO: Calculate:
+    #   - Processing rate (filtered/original as percentage)
+    #   - Count by type (ip vs domain)
+    #   - Count by priority level
+    #   - Top 3 most common tags
+    pass
+
+# ===== STAGE 3: OUTPUT =====
+def write_output(blocklist, stats):
+    """Generate output files"""
+    # Output 1: Blocklist JSON
+    output_json = {
+        "generated_at": datetime.now().isoformat(),
+        "total_entries": len(blocklist),
+        "blocklist": blocklist
+    }
+    
+    # Output 2: Summary Report (text)
+    report = f"""
+THREAT INTELLIGENCE PROCESSING REPORT
+Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+{'='*50}
+
+STATISTICS:
+{{stats}}
+    """
+    
+    return output_json, report
+
+# ===== MAIN PIPELINE =====
+def main():
+    print("[STAGE 1] Loading data...")
+    data = load_data()
+    original_count = len(data["indicators"])
+    print(f"  Loaded {original_count} indicators")
+    
+    print("\n[STAGE 2] Processing data...")
+    filtered = filter_actionable(data["indicators"])
+    print(f"  Filtered to {len(filtered)} actionable indicators")
+    
+    blocklist = transform_for_firewall(filtered)
+    print(f"  Transformed into {len(blocklist)} blocklist entries")
+    
+    stats = generate_statistics(original_count, len(filtered), blocklist)
+    
+    print("\n[STAGE 3] Generating output...")
+    output_json, report = write_output(blocklist, stats)
+    
+    print("\n" + report)
+    print("\nJSON Output:")
+    print(json.dumps(output_json, indent=2)[:500] + "...")
+
+# Run pipeline
+# main()  # Uncomment when ready to test</textarea></div>
+<div class="button-group"><button class="button" onclick="runPipelineCode()">Run Pipeline</button> <button class="button" onclick="showHint('pipeline-hint')">Show Hints</button> <button class="button" onclick="showSolution('pipeline-solution')">Show Solution</button></div>
+<div id="pipeline-hint" class="hint-box"><strong>Implementation Hints:</strong>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li><strong>filter_actionable:</strong> Use list comprehension with multiple conditions (confidence AND type check)</li>
+<li><strong>transform_for_firewall:</strong> Map threat_level to priority ("critical"/"high" → "high", others → "medium")</li>
+<li><strong>generate_statistics:</strong> Use Counter from collections for tag counting, and dictionary comprehensions for grouping</li>
+<li><strong>Consider edge cases:</strong> Missing fields, empty lists, zero division</li>
+</ul>
+</div>
+<div id="pipeline-output" class="output"></div>
+<div id="pipeline-solution" class="hint-box"><strong>Complete Solution:</strong>
+<div class="code-block" style="margin-top: 10px; font-size: 12px;">def filter_actionable(indicators, min_confidence=85, allowed_types=["ip", "domain"]): return [ ioc for ioc in indicators if ioc["confidence"] &gt;= min_confidence and ioc["type"] in allowed_types ] def transform_for_firewall(indicators): blocklist = [] for ioc in indicators: priority = "high" if ioc["threat_level"] in ["critical", "high"] else "medium" blocklist.append({ "address": ioc["value"], "action": "block", "priority": priority, "tags": ioc.get("tags", []), "source": ioc.get("source", "unknown") }) return blocklist def generate_statistics(original_count, filtered_count, blocklist): from collections import Counter # Calculate metrics processing_rate = (filtered_count / original_count * 100) if original_count &gt; 0 else 0 # Count by type (assuming we can infer from address format) ip_count = sum(1 for entry in blocklist if "." in entry["address"] and entry["address"][0].isdigit()) domain_count = len(blocklist) - ip_count # Count by priority priority_counts = Counter(entry["priority"] for entry in blocklist) # Top tags all_tags = [tag for entry in blocklist for tag in entry.get("tags", [])] top_tags = Counter(all_tags).most_common(3) return f""" Processing Rate: {processing_rate:.1f}% ({filtered_count}/{original_count}) By Type: - IP Addresses: {ip_count} - Domains: {domain_count} By Priority: - High: {priority_counts.get('high', 0)} - Medium: {priority_counts.get('medium', 0)} Top Tags: {chr(10).join(f"- {{tag}}: {{count}}" for tag, count in top_tags)} """</div>
+</div>
+</div>
+<button class="button" onclick="completeSection(7)">Complete Section 7</button></div>
+<!-- Section 8: Script Design Best Practices -->
+<div class="section" id="section8">
+<h2><span class="check-icon">✓</span> Section 8: Script Design Best Practices</h2>
+<div class="content-box">
+<h3>Professional Script Structure</h3>
+<p>Well-designed automation scripts share common characteristics:</p>
+<div class="example-card">
+<h4>Essential Components</h4>
+<ul style="margin-left: 30px; margin-top: 10px; line-height: 2;">
+<li>✅ Clear separation of concerns (load, transform, output)</li>
+<li>✅ Comprehensive error handling</li>
+<li>✅ Logging for troubleshooting</li>
+<li>✅ Configuration via command-line arguments or config files</li>
+<li>✅ Validation of input data</li>
+<li>✅ Detailed output summaries</li>
+</ul>
+</div>
+</div>
+<div class="content-box">
+<h3>Error Handling Patterns</h3>
+<div class="comparison-container">
+<div class="comparison-box">
+<h4>❌ Fragile Code</h4>
+<div class="code-block">def load_json(filename): with open(filename) as f: return json.load(f) data = load_json("feed.json") indicators = data["indicators"]</div>
+<p style="color: #ff6666; margin-top: 10px; font-size: 0.9em;">Fails on: missing file, invalid JSON, missing key</p>
+</div>
+<div class="comparison-box">
+<h4>✅ Robust Code</h4>
+<div class="code-block">def load_json(filename): try: with open(filename) as f: data = json.load(f) if "indicators" not in data: raise ValueError("Missing 'indicators' key") return data except FileNotFoundError: print(f"Error: {{filename}} not found") return None except json.JSONDecodeError as e: print(f"Error: Invalid JSON - {{e}}") return None</div>
+<p style="color: #00ff00; margin-top: 10px; font-size: 0.9em;">Handles errors gracefully with helpful messages</p>
+</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Logging Best Practices</h3>
+<div class="example-card">
+<h4>Professional Logging Setup</h4>
+<div class="code-block">import logging from datetime import datetime # Configure logging logging.basicConfig( level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[ logging.FileHandler(f'threat_processing_{datetime.now().strftime("%Y%m%d")}.log'), logging.StreamHandler() # Also print to console ] ) def process_indicators(data): logging.info(f"Starting processing of {len(data['indicators'])} indicators") try: filtered = filter_data(data) logging.info(f"Filtered to {len(filtered)} actionable indicators") transformed = transform_data(filtered) logging.info(f"Transformed {len(transformed)} entries") return transformed except Exception as e: logging.error(f"Processing failed: {{e}}", exc_info=True) raise</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Input Validation</h3>
+<div class="example-card">
+<h4>Validate Before Processing</h4>
+<div class="code-block">def validate_indicator(indicator): """Validate indicator has required fields and correct types""" required_fields = ["ioc_id", "type", "value", "confidence"] # Check required fields exist for field in required_fields: if field not in indicator: return False, f"Missing required field: {{field}}" # Validate confidence is numeric and in range try: conf = float(indicator["confidence"]) if not 0 &lt;= conf &lt;= 100: return False, f"Confidence out of range: {{conf}}" except (ValueError, TypeError): return False, "Confidence must be a number" # Validate type is recognized valid_types = ["ip", "domain", "hash", "url"] if indicator["type"] not in valid_types: return False, f"Invalid type: {indicator['type']}" return True, "OK" # Use in pipeline def load_and_validate(data): valid_indicators = [] errors = [] for idx, indicator in enumerate(data["indicators"]): is_valid, message = validate_indicator(indicator) if is_valid: valid_indicators.append(indicator) else: errors.append(f"Indicator {{idx}}: {{message}}") if errors: logging.warning(f"Found {len(errors)} validation errors") for error in errors[:5]: # Show first 5 logging.warning(f" - {{error}}") return valid_indicators</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Configuration Management</h3>
+<div class="example-card">
+<h4>Using argparse for CLI Arguments</h4>
+<div class="code-block">import argparse def parse_arguments(): parser = argparse.ArgumentParser( description="Process threat intelligence feeds" ) parser.add_argument( 'input_file', help='Path to input JSON file' ) parser.add_argument( '--min-confidence', type=int, default=85, help='Minimum confidence threshold (default: 85)' ) parser.add_argument( '--output', default='blocklist.json', help='Output file path (default: blocklist.json)' ) parser.add_argument( '--verbose', action='store_true', help='Enable verbose logging' ) return parser.parse_args() # Usage if __name__ == "__main__": args = parse_arguments() if args.verbose: logging.getLogger().setLevel(logging.DEBUG) process_feed(args.input_file, args.min_confidence, args.output)</div>
+</div>
+</div>
+<div class="quiz-container">
+<div class="quiz-question">Best Practice Check: Which is the MOST important reason to validate input data?</div>
+<div class="quiz-option" onclick="checkQuiz(8, 0, false)">A) To make code run faster</div>
+<div class="quiz-option" onclick="checkQuiz(8, 1, false)">B) To comply with coding standards</div>
+<div class="quiz-option" onclick="checkQuiz(8, 2, true)">C) To prevent errors from propagating and causing incorrect security decisions</div>
+<div class="quiz-option" onclick="checkQuiz(8, 3, false)">D) To reduce file size</div>
+<div id="quiz8-feedback" style="margin-top: 15px; display: none;"></div>
+</div>
+<button class="button" onclick="completeSection(8)">Complete Section 8</button></div>
+<!-- Section 9: Final Project -->
+<div class="section" id="section9">
+<h2><span class="check-icon">✓</span> Section 9: Final Project - Threat Intel Aggregator</h2>
+<div class="content-box">
+<h3>Project Overview</h3>
+<div class="info-box"><strong>Mission:</strong> Build a production-ready threat intelligence aggregation and transformation tool.
+<h4 style="color: #ff6666; margin-top: 15px;">Requirements:</h4>
+<ol style="margin-left: 30px; margin-top: 10px; line-height: 1.8;">
+<li><strong>Load:</strong> Accept multiple JSON feed files as input</li>
+<li><strong>Validate:</strong> Check data quality and log issues</li>
+<li><strong>Filter:</strong> Apply configurable confidence and threat level thresholds</li>
+<li><strong>Deduplicate:</strong> Remove duplicate indicators across feeds</li>
+<li><strong>Transform:</strong> Output in three formats:
+<ul style="margin-left: 20px; margin-top: 5px;">
+<li>Firewall blocklist (JSON)</li>
+<li>SIEM-ready format (JSON)</li>
+<li>Human-readable summary report (TXT)</li>
+</ul>
+</li>
+<li><strong>Report:</strong> Generate statistics on processing results</li>
+</ol>
+</div>
+</div>
+<div class="content-box">
+<h3>Sample Input Files (Simulated)</h3>
+<div class="example-card">
+<h4>feed_vendor_a.json</h4>
+<div class="json-viewer" style="font-size: 11px;">{ "source": "VendorA ThreatFeed", "indicators": [ {"id": "VA-001", "type": "ip", "value": "203.0.113.10", "confidence": 95, "threat": "critical"}, {"id": "VA-002", "type": "domain", "value": "malicious.example", "confidence": 88, "threat": "high"} ] }</div>
+</div>
+<div class="example-card">
+<h4>feed_vendor_b.json</h4>
+<div class="json-viewer" style="font-size: 11px;">{ "feed_name": "VendorB Indicators", "data": [ {"ioc_id": "VB-001", "indicator_type": "ip", "indicator_value": "203.0.113.10", "score": 92, "severity": "high"}, <!-- Duplicate with different format --> {"ioc_id": "VB-002", "indicator_type": "hash", "indicator_value": "abc123", "score": 85, "severity": "medium"} ] }</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Expected Output Formats</h3>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('outputs', 0)">Firewall</div>
+<div class="tab" onclick="switchTab('outputs', 1)">SIEM</div>
+<div class="tab" onclick="switchTab('outputs', 2)">Report</div>
+</div>
+<div id="outputs-0" class="tab-content active">
+<h4>firewall_blocklist.json</h4>
+<div class="json-viewer" style="font-size: 12px;">{ "generated": "2024-11-20T15:30:00Z", "total_entries": 2, "entries": [ { "address": "203.0.113.10", "action": "block", "priority": "high", "reason": "Threat level: critical, Confidence: 95%" }, { "address": "malicious.example", "action": "block", "priority": "high", "reason": "Threat level: high, Confidence: 88%" } ] }</div>
+</div>
+<div id="outputs-1" class="tab-content">
+<h4>siem_feed.json</h4>
+<div class="json-viewer" style="font-size: 12px;">{ "feed_version": "1.0", "indicators": [ { "indicator": "203.0.113.10", "type": "ipv4", "confidence": 95, "severity": "critical", "sources": ["VendorA", "VendorB"], "first_seen": "2024-11-20T15:30:00Z" } ] }</div>
+</div>
+<div id="outputs-2" class="tab-content">
+<h4>processing_report.txt</h4>
+<div class="code-block" style="color: #e0e0e0;">THREAT INTELLIGENCE AGGREGATION REPORT Generated: 2024-11-20 15:30:00 ============================================================ INPUT SUMMARY: Feeds processed: 2 Total indicators loaded: 5 Valid indicators: 4 Validation errors: 1 DEDUPLICATION: Unique indicators: 3 Duplicates removed: 1 FILTERING: Confidence threshold: &gt;= 85 Indicators passing filter: 3 Filtered out (low confidence): 1 OUTPUT GENERATED: ✓ firewall_blocklist.json (3 entries) ✓ siem_feed.json (3 indicators) DISTRIBUTION BY TYPE: IP addresses: 1 Domains: 1 Hashes: 1 DISTRIBUTION BY SEVERITY: Critical: 1 High: 2 Medium: 0 TOP SOURCES: - VendorA: 2 indicators - VendorB: 2 indicators</div>
+</div>
+</div>
+<div class="content-box">
+<h3>Implementation Space <span class="badge advanced">FINAL PROJECT</span></h3>
+<p>Implement your complete solution below. Use all concepts from previous sections:</p>
+<div class="code-editor">
+<div class="editor-header"><span class="editor-title">threat_intel_aggregator.py</span></div>
+<textarea id="final-project-code" style="min-height: 400px;">"""
+Threat Intelligence Aggregator
+Your Name - Week 6 Final Project
+"""
+
+import json
+from datetime import datetime
+from collections import Counter
+
+# ==================== CONFIGURATION ====================
+MIN_CONFIDENCE = 85
+ALLOWED_TYPES = ["ip", "domain", "hash"]
+
+# ==================== DATA LOADING ====================
+def load_feeds():
+    """Load and normalize multiple threat feed formats"""
+    # Sample feeds (in real implementation, would load from files)
+    feed_a = {
+        "source": "VendorA",
+        "indicators": [
+            {"id": "VA-001", "type": "ip", "value": "203.0.113.10", "confidence": 95, "threat": "critical"},
+            {"id": "VA-002", "type": "domain", "value": "malicious.example", "confidence": 88, "threat": "high"},
+            {"id": "VA-003", "type": "ip", "value": "192.0.2.1", "confidence": 70, "threat": "medium"}
+        ]
+    }
+    
+    feed_b = {
+        "feed_name": "VendorB",
+        "data": [
+            {"ioc_id": "VB-001", "indicator_type": "ip", "indicator_value": "203.0.113.10", 
+             "score": 92, "severity": "high"},
+            {"ioc_id": "VB-002", "indicator_type": "hash", "indicator_value": "abc123def456",
+             "score": 85, "severity": "medium"}
+        ]
+    }
+    
+    # TODO: Normalize both feeds to common format
+    # Return list of standardized indicators
+    pass
+
+def normalize_indicator(indicator, source):
+    """Convert different feed formats to standard format"""
+    # TODO: Handle both VendorA and VendorB formats
+    # Return dict with keys: id, type, value, confidence, threat_level, source
+    pass
+
+# ==================== VALIDATION ====================
+def validate_indicators(indicators):
+    """Validate and clean indicator data"""
+    # TODO: Check required fields, confidence range, valid types
+    # Return (valid_indicators, error_count)
+    pass
+
+# ==================== DEDUPLICATION ====================
+def deduplicate_indicators(indicators):
+    """Remove duplicate indicators, keeping highest confidence"""
+    # TODO: Group by (type, value), keep one with highest confidence
+    # Track which sources contributed to each unique indicator
+    pass
+
+# ==================== FILTERING ====================
+def filter_indicators(indicators, min_confidence=MIN_CONFIDENCE):
+    """Filter indicators by confidence and type"""
+    # TODO: Apply filtering rules
+    pass
+
+# ==================== TRANSFORMATION ====================
+def transform_to_firewall_format(indicators):
+    """Generate firewall blocklist"""
+    # TODO: Create firewall-ready format
+    pass
+
+def transform_to_siem_format(indicators):
+    """Generate SIEM feed"""
+    # TODO: Create SIEM-ready format
+    pass
+
+# ==================== REPORTING ====================
+def generate_statistics(loaded, valid, deduped, filtered):
+    """Calculate processing statistics"""
+    # TODO: Generate comprehensive statistics
+    pass
+
+def create_text_report(stats, firewall_entries, siem_entries):
+    """Generate human-readable report"""
+    # TODO: Format text report
+    pass
+
+# ==================== OUTPUT ====================
+def write_outputs(firewall_data, siem_data, report_text):
+    """Write all output files"""
+    # TODO: Write JSON and text files (in real app)
+    # For this exercise, return formatted strings
+    pass
+
+# ==================== MAIN PIPELINE ====================
+def main():
+    """Execute complete threat intelligence aggregation pipeline"""
+    
+    print("="*60)
+    print("THREAT INTELLIGENCE AGGREGATOR")
+    print("="*60)
+    
+    # Stage 1: Load
+    print("\n[STAGE 1] Loading feeds...")
+    # TODO: Implement loading
+    
+    # Stage 2: Validate
+    print("\n[STAGE 2] Validating data...")
+    # TODO: Implement validation
+    
+    # Stage 3: Deduplicate
+    print("\n[STAGE 3] Deduplicating...")
+    # TODO: Implement deduplication
+    
+    # Stage 4: Filter
+    print("\n[STAGE 4] Filtering...")
+    # TODO: Implement filtering
+    
+    # Stage 5: Transform
+    print("\n[STAGE 5] Transforming...")
+    # TODO: Implement transformations
+    
+    # Stage 6: Report &amp; Output
+    print("\n[STAGE 6] Generating outputs...")
+    # TODO: Implement reporting
+    
+    print("\n" + "="*60)
+    print("PROCESSING COMPLETE")
+    print("="*60)
+
+# Uncomment to run
+# main()</textarea></div>
+<div class="button-group"><button class="button" onclick="runFinalProject()">Run Project</button> <button class="button" onclick="showHint('final-hint')">Show Architecture Hints</button> <button class="button" onclick="showSolution('final-solution')">Show Complete Solution</button></div>
+<div id="final-hint" class="hint-box"><strong>Architecture Hints:</strong>
+<ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+<li><strong>Normalization:</strong> Create a standard format first: <code>{"type": ..., "value": ..., "confidence": ..., "threat_level": ..., "sources": [...]}</code></li>
+<li><strong>Deduplication:</strong> Use a dictionary with (type, value) as key, merge sources list</li>
+<li><strong>Statistics:</strong> Track counts at each stage: loaded → valid → deduped → filtered</li>
+<li><strong>Error Handling:</strong> Use try-except in normalize_indicator for malformed data</li>
+<li><strong>Testing:</strong> Test each function independently before running full pipeline</li>
+</ul>
+</div>
+<div id="final-project-output" class="output"></div>
+<div id="final-solution" class="hint-box" style="display: none;">
+<p><strong>Note:</strong> Complete solution available in instructor materials. Key implementation points:</p>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>Normalize both feed formats to common schema</li>
+<li>Use (type, value) tuples as dictionary keys for deduplication</li>
+<li>Merge source lists when deduplicating</li>
+<li>Apply confidence and type filters using list comprehensions</li>
+<li>Generate three separate output formats as specified</li>
+<li>Calculate statistics using Counter and len() at each stage</li>
+</ul>
+</div>
+</div>
+<div class="success-box" style="margin-top: 30px;"><strong>🎉 Congratulations!</strong> Upon completing this project, you'll have built a real-world threat intelligence processing pipeline that demonstrates:
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>✅ API data consumption patterns</li>
+<li>✅ JSON parsing and transformation</li>
+<li>✅ Data validation and error handling</li>
+<li>✅ Multi-format output generation</li>
+<li>✅ Professional script architecture</li>
+</ul>
+</div>
+<button class="button" onclick="completeSection(9)">Complete Final Project</button></div>
+<div class="section" style="text-align: center; padding: 40px;">
+<h2 style="color: #ff0000;">🎓 Course Complete!</h2>
+<p style="margin-top: 20px; font-size: 1.2em;">You've mastered API fundamentals, JSON transformation, and threat intelligence automation!</p>
+<p style="margin-top: 10px; color: #999;">Next week: Advanced API integration with real HTTP requests</p>
+</div>
+</div>
+<p><script>
+        // Progress tracking
+        let completedSections = new Set();
+        const totalSections = 9;
+
+        function updateProgress() {
+            const completed = completedSections.size;
+            const percentage = (completed / totalSections) * 100;
+            
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-fill').textContent = Math.round(percentage) + '%';
+            document.getElementById('progress-text').textContent = `${{completed}} / ${{totalSections}} Sections Completed`;
+            
+            // Save progress
+            localStorage.setItem('apiMashupProgress', JSON.stringify([...completedSections]));
+        }
+
+        function completeSection(sectionNum) {
+            completedSections.add(sectionNum);
+            document.getElementById(`section${{sectionNum}}`).classList.add('completed');
+            updateProgress();
+            
+            // Scroll to next section
+            if (sectionNum < totalSections) {
+                setTimeout(() => {
+                    document.getElementById(`section${sectionNum + 1}`).scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }, 500);
+            }
+        }
+
+        // Load saved progress
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('apiMashupProgress');
+            if (saved) {
+                completedSections = new Set(JSON.parse(saved));
+                completedSections.forEach(num => {
+                    document.getElementById(`section${{num}}`).classList.add('completed');
+                });
+                updateProgress();
+            }
+        });
+
+        // Tab switching
+        function switchTab(groupName, tabIndex) {
+            // Hide all tabs in group
+            const allTabs = document.querySelectorAll(`[id^="${{groupName}}-"]`);
+            allTabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all tab buttons
+            const allTabButtons = document.querySelectorAll('.tab');
+            allTabButtons.forEach((btn, idx) => {
+                if (btn.parentElement.querySelector('.tab.active')) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Show selected tab
+            document.getElementById(`${{groupName}}-${{tabIndex}}`).classList.add('active');
+            
+            // Activate button
+            event.target.classList.add('active');
+        }
+
+        // Quiz checking
+        const quizAnswers = {};
+
+        function checkQuiz(quizNum, optionIndex, isCorrect) {
+            const container = event.target.parentElement;
+            const options = container.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById(`quiz${{quizNum}}-feedback`);
+            
+            // Reset all options
+            options.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Mark selected
+            event.target.classList.add('selected');
+            
+            if (isCorrect) {
+                event.target.classList.add('correct');
+                feedback.innerHTML = '<div style="color: #00ff00;">✓ Correct! GET is used to retrieve data from APIs.</div>';
+                feedback.style.display = 'block';
+                quizAnswers[quizNum] = true;
+            } else {
+                event.target.classList.add('incorrect');
+                feedback.innerHTML = '<div style="color: #ff6666;">✗ Not quite. Think about which method is used to retrieve/fetch data.</div>';
+                feedback.style.display = 'block';
+            }
+        }
+
+        // Hint showing
+        function showHint(hintId) {
+            const hint = document.getElementById(hintId);
+            hint.classList.toggle('visible');
+        }
+
+        function showSolution(solutionId) {
+            const solution = document.getElementById(solutionId);
+            solution.style.display = solution.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Code execution simulations
+        function checkJsonNavigation() {
+            const code = document.getElementById('json-nav-code').value;
+            const output = document.getElementById('json-nav-output');
+            
+            // Check for correct patterns
+            const hasIndicators = code.includes('"indicators"') || code.includes("'indicators'");
+            const hasIndex = code.includes('[0]') || code.includes('[1]');
+            const hasConfidence = code.includes('"confidence"') || code.includes("'confidence'");
+            const hasValue = code.includes('"value"') || code.includes("'value'");
+            const hasTags = code.includes('"tags"') || code.includes("'tags'");
+            
+            if (hasIndicators && hasIndex && hasConfidence && hasValue && hasTags) {
+                output.className = 'output success';
+                output.textContent = `✓ Excellent! Your navigation is correct:
+
+first_confidence = data["indicators"][0]["confidence"]  → 95
+second_domain = data["indicators"][1]["value"]  → "secure-update-microsoft.com"
+all_tags_first = data["indicators"][0]["tags"]  → ['c2', 'apt34', 'middle-east']
+
+You've successfully navigated nested JSON structures!`;
+            } else {
+                output.className = 'output error';
+                let missing = [];
+                if (!hasIndicators) missing.push('"indicators" key');
+                if (!hasIndex) missing.push('array index [0] or [1]');
+                if (!hasConfidence || !hasValue || !hasTags) missing.push('field names');
+                
+                output.textContent = `✗ Not quite right. Missing: ${missing.join(', ')}
+
+Remember the structure:
+data["indicators"][index]["field_name"]`;
+            }
+        }
+
+        function runLoadCode() {
+            const code = document.getElementById('load-code').value;
+            const output = document.getElementById('load-code-output');
+            
+            // Check if blanks are filled correctly
+            const hasFeedMetadata = code.includes('["feed_metadata"]') || code.includes("['feed_metadata']");
+            const hasSource = code.includes('["source"]') || code.includes("['source']");
+            const hasIndicators = code.includes('["indicators"]') || code.includes("['indicators']");
+            const hasLen = code.includes('len(');
+            const hasThreatLevel = code.includes('["threat_level"]') || code.includes("['threat_level']");
+            
+            if (hasFeedMetadata && hasSource && hasIndicators && hasLen && hasThreatLevel) {
+                output.className = 'output success';
+                output.textContent = `✓ Code executed successfully!
+
+Source: Threat Intel Platform Alpha
+Total indicators: 3
+First indicator value: 203.0.113.45
+All threat levels: ['high', 'high', 'medium']
+
+Great job extracting data from nested JSON!`;
+            } else {
+                output.className = 'output error';
+                output.textContent = `✗ Code has errors. Check that you've filled in all blanks correctly.
+
+Hint: Use dictionary access with ["key_name"] and len() function`;
+            }
+        }
+
+        function runFilterCode() {
+            const code = document.getElementById('filter-code').value;
+            const output = document.getElementById('filter-output');
+            
+            const hasConfidenceCheck = code.includes('indicator["confidence"]') && code.includes('min_confidence');
+            const hasThreatCheck = code.includes('indicator["threat_level"]') && code.includes('threat_levels');
+            const hasMalwareCheck = code.includes('"UNKNOWN"');
+            
+            if (hasConfidenceCheck && hasThreatCheck && hasMalwareCheck) {
+                output.className = 'output success';
+                output.textContent = `✓ Filter working correctly!
+
+Actionable threats: 1
+  - 001: confidence=92, level=high
+
+Filtering logic:
+✓ Confidence check: 92 >= 85 (pass), 78 < 85 (fail)
+✓ Threat level check: 'high' in ['high', 'critical']
+✓ Malware check: 'TRICKBOT' != 'UNKNOWN'
+
+Only IOC-001 meets all criteria!`;
+            } else {
+                output.className = 'output error';
+                output.textContent = `✗ Filter logic incomplete.
+
+Make sure you're checking:
+1. indicator["confidence"] >= min_confidence
+2. indicator["threat_level"] in threat_levels
+3. "UNKNOWN" not in malware list`;
+            }
+        }
+
+        function runTransformCode() {
+            const code = document.getElementById('transform-code').value;
+            const output = document.getElementById('transform-output');
+            
+            const hasMinConfidence = code.includes('< min_confidence');
+            const hasTypeCheck = code.includes('"ip"') && code.includes('"domain"');
+            const hasPriority = code.includes('90');
+            const hasJoin = code.includes('join(');
+            
+            if (hasMinConfidence && hasTypeCheck && hasPriority && hasJoin) {
+                output.className = 'output success';
+                output.textContent = `✓ Transformation successful!
+
+Generated 2 blocklist entries:
+  [HIGH] 203.0.113.45 - Threat: TRICKBOT, EMOTET (confidence: 95%)
+  [MEDIUM] evil.com - Threat: COBALTSTRIKE (confidence: 88%)
+
+Notes:
+- Hash filtered out (not IP/domain)
+- Low confidence IP filtered out (70 < 85)
+- Priorities assigned based on confidence thresholds`;
+            } else {
+                output.className = 'output error';
+                output.textContent = `✗ Transformation incomplete. Check:
+1. Confidence filtering
+2. Type filtering (only "ip" and "domain")
+3. Priority assignment (90 threshold)
+4. Malware string joining`;
+            }
+        }
+
+        function showAISuggestion() {
+            const output = document.getElementById('ai-suggestion-output');
+            output.style.display = 'block';
+            output.className = 'output';
+            output.innerHTML = `<span style="color: #66ff66;">AI Response:</span>
+
+I can see two issues in your code:
+
+<span style="color: #ff6666;">Issue 1: KeyError for missing 'associated_malware'</span>
+Line: for malware in indicator["associated_malware"]
+Problem: Not all indicators have this field
+
+Fix: Use .get() method with default value:
+  indicator.get("associated_malware", [])
+
+<span style="color: #ff6666;">Issue 2: Duplicate malware names</span>
+Problem: If "TRICKBOT" appears in multiple indicators, it's added multiple times
+
+Fix: Use a set instead of a list to automatically handle duplicates:
+  malware_set = set()
+  malware_set.add(malware)
+  return list(malware_set)
+
+Would you like me to show the complete fixed code?`;
+        }
+
+        function runPipelineCode() {
+            const code = document.getElementById('pipeline-code').value;
+            const output = document.getElementById('pipeline-output');
+            
+            output.className = 'output';
+            output.textContent = `🔧 Pipeline execution simulation:
+
+[STAGE 1] Loading data...
+  Loaded 5 indicators
+
+[STAGE 2] Processing data...
+  Filtered to 3 actionable indicators
+  Transformed into 3 blocklist entries
+
+[STAGE 3] Generating output...
+
+THREAT INTELLIGENCE PROCESSING REPORT
+Generated: 2024-11-20 15:30:00
+==================================================
+
+STATISTICS:
+  Processing Rate: 60.0% (3/5)
+  
+  By Type:
+    - IP Addresses: 2
+    - Domains: 1
+  
+  By Priority:
+    - High: 2
+    - Medium: 1
+
+Complete the implementation to see full results!`;
+        }
+
+        function runFinalProject() {
+            const code = document.getElementById('final-project-code').value;
+            const output = document.getElementById('final-project-output');
+            
+            output.className = 'output';
+            output.textContent = `============================================================
+THREAT INTELLIGENCE AGGREGATOR
+============================================================
+
+[STAGE 1] Loading feeds...
+[STAGE 2] Validating data...
+[STAGE 3] Deduplicating...
+[STAGE 4] Filtering...
+[STAGE 5] Transforming...
+[STAGE 6] Generating outputs...
+
+============================================================
+PROCESSING COMPLETE
+============================================================
+
+Implement all functions to see full processing results!
+
+Expected flow:
+1. Load & normalize 2 feeds (5 indicators)
+2. Validate (expect 4-5 valid)
+3. Deduplicate (expect 1 duplicate found)
+4. Filter by confidence (expect 3-4 passing)
+5. Transform to 3 output formats
+6. Generate comprehensive statistics`;
+        }
+    </script></p></body></html>
