@@ -1,0 +1,2059 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberPython Academy | Core Python Fundamentals</title>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.12.0/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.12.0/brython_stdlib.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyber-black: #0a0a0a;
+            --cyber-dark: #1a1a1a;
+            --cyber-gray: #2a2a2a;
+            --cyber-light-gray: #6b7280;
+            --cyber-red: #ef4444;
+            --cyber-red-glow: #dc2626;
+            --cyber-red-dark: #991b1b;
+            --cyber-green: #10b981;
+            --terminal-bg: #161616;
+            --code-bg: #0d0d0d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--cyber-black);
+            color: #e5e5e5;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(239, 68, 68, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(239, 68, 68, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--cyber-dark) 0%, var(--cyber-gray) 100%);
+            border-bottom: 2px solid var(--cyber-red);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--cyber-red) 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progress-label {
+            font-size: 0.9rem;
+            color: var(--cyber-light-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: var(--cyber-gray);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--cyber-red-dark);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyber-red) 0%, #ff6b6b 100%);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px var(--cyber-red);
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--cyber-dark);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--cyber-gray);
+            overflow-x: auto;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: var(--cyber-gray);
+            color: #e5e5e5;
+            border: 1px solid var(--cyber-light-gray);
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .nav-btn:hover {
+            background: var(--cyber-red-dark);
+            border-color: var(--cyber-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .nav-btn.active {
+            background: var(--cyber-red);
+            border-color: var(--cyber-red-glow);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+        }
+
+        .nav-btn.completed::after {
+            content: '✓';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--cyber-green);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--cyber-dark);
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            background: var(--cyber-dark);
+            border: 1px solid var(--cyber-gray);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--cyber-red) 0%, transparent 100%);
+            border-radius: 8px 0 0 8px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--cyber-red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        h2::before {
+            content: '▸';
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem 0;
+            color: #ff6b6b;
+            letter-spacing: 1px;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* AI Tips */
+        .ai-tip {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+            border-left: 4px solid var(--cyber-red);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .ai-tip::before {
+            content: '🤖 AI TIP';
+            display: block;
+            font-weight: 700;
+            color: var(--cyber-red);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--cyber-red-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-block::before {
+            content: 'PYTHON';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--cyber-light-gray);
+            letter-spacing: 1px;
+        }
+
+        pre {
+            margin: 0;
+            color: #e5e5e5;
+        }
+
+        .keyword { color: #ff6b6b; }
+        .string { color: #10b981; }
+        .comment { color: var(--cyber-light-gray); font-style: italic; }
+        .function { color: #60a5fa; }
+
+        /* Interactive Code Editor */
+        .code-editor {
+            background: var(--terminal-bg);
+            border: 2px solid var(--cyber-red);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--cyber-gray);
+        }
+
+        .editor-title {
+            font-size: 0.9rem;
+            color: var(--cyber-red);
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .editor-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            background: var(--cyber-red);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background: var(--cyber-red-glow);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--cyber-gray);
+        }
+
+        .btn-secondary:hover {
+            background: var(--cyber-light-gray);
+            box-shadow: 0 0 10px rgba(107, 114, 128, 0.4);
+        }
+
+        textarea {
+            width: 100%;
+            background: var(--code-bg);
+            color: #e5e5e5;
+            border: 1px solid var(--cyber-gray);
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--cyber-red);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .output {
+            background: var(--cyber-black);
+            border: 1px solid var(--cyber-gray);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            min-height: 60px;
+            color: var(--cyber-green);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .output.error {
+            color: var(--cyber-red);
+        }
+
+        /* Challenge Cards */
+        .challenge {
+            background: linear-gradient(135deg, var(--cyber-gray) 0%, var(--cyber-dark) 100%);
+            border: 2px solid var(--cyber-red);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .challenge::before {
+            content: 'CHALLENGE';
+            position: absolute;
+            top: -12px;
+            left: 1.5rem;
+            background: var(--cyber-red);
+            color: white;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border-radius: 4px;
+        }
+
+        .challenge-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #ff6b6b;
+        }
+
+        .challenge-completed {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border-color: var(--cyber-green);
+        }
+
+        .challenge-completed::before {
+            content: '✓ COMPLETED';
+            background: var(--cyber-green);
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: rgba(96, 165, 250, 0.1);
+            border-left: 4px solid #60a5fa;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .info-box strong {
+            color: #60a5fa;
+        }
+
+        .warning-box {
+            background: rgba(251, 191, 36, 0.1);
+            border-left: 4px solid #fbbf24;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box strong {
+            color: #fbbf24;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+            font-size: 1.05rem;
+        }
+
+        /* Code inline */
+        code {
+            background: var(--code-bg);
+            color: var(--cyber-red);
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        /* Security Badge */
+        .security-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--cyber-red) 0%, var(--cyber-red-dark) 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-left: 0.5rem;
+            box-shadow: 0 2px 10px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Footer Navigation */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--cyber-gray);
+        }
+
+        .page-nav .btn {
+            min-width: 150px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.3rem;
+                letter-spacing: 1px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .progress-container {
+                width: 100%;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .progress-bar {
+                width: 100%;
+            }
+
+            .nav-content {
+                flex-direction: column;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .page-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .page-nav .btn {
+                width: 100%;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(239, 68, 68, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--cyber-red);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head><body onload="brython()"><header>
+<div class="header-content">
+<h1>⟨ CyberPython Academy ⟩</h1>
+<div class="progress-container"><span class="progress-label">Mission Progress</span>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+<span id="progressText">0%</span> <button class="btn btn-secondary" style="margin-left: 1rem; padding: 0.4rem 0.8rem; font-size: 0.8rem;" title="Reset all progress" onclick="resetProgress()">↺</button></div>
+</div>
+</header><nav>
+<div class="nav-content" id="navButtons"></div>
+</nav><main id="mainContent"></main>
+<p><script>
+from browser import document, window
+import sys
+from io import StringIO
+    </script> <script>
+        // Page definitions
+        const pages = [
+            {
+                id: 'welcome',
+                title: 'Welcome',
+                content: `
+                    <div class="section">
+                        <h2>Welcome to CyberPython Academy</h2>
+                        <p>Welcome, recruit. You're about to begin your training in Python programming within a cybersecurity context. Over the next 60-90 minutes, you'll master the fundamental building blocks that every security professional needs.</p>
+                        
+                        <p>Python is the lingua franca of cybersecurity—whether you're analyzing malware, automating security tasks, or building defense tools, Python is your weapon of choice.</p>
+
+                        <div class="info-box">
+                            <strong>Mission Objective:</strong> Complete all modules to gain proficiency in Core Python fundamentals. Each section builds on the previous one, so maintain focus and complete challenges to track your progress.
+                        </div>
+
+                        <h3>What You'll Learn</h3>
+                        <ul>
+                            <li><strong>Python Syntax Basics:</strong> Master indentation, comments, and code structure</li>
+                            <li><strong>Data Types & Operations:</strong> Work with integers, floats, strings, and booleans</li>
+                            <li><strong>Variables & Expressions:</strong> Store and manipulate data effectively</li>
+                            <li><strong>Input/Output:</strong> Interact with users and display results</li>
+                            <li><strong>Practical Applications:</strong> Build security-relevant mini programs</li>
+                            <li><strong>AI-Assisted Learning:</strong> Leverage AI tools for faster mastery</li>
+                        </ul>
+
+                        <div class="ai-tip">
+                            Throughout this training, you'll see AI tips like this one. Modern cybersecurity professionals use AI tools to accelerate their work. Learning to effectively prompt and use AI for coding is itself a critical skill.
+                        </div>
+
+                        <h3>Interactive Learning Environment</h3>
+                        <p>This platform features live Python code execution in your browser. You'll write real Python code, see immediate results, and complete hands-on challenges. Progress is automatically tracked and saved.</p>
+
+                        <div class="warning-box">
+                            <strong>Pro Tip:</strong> Code every example yourself. Reading code teaches you syntax; writing code teaches you to think like a programmer. The muscle memory matters.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'syntax',
+                title: 'Syntax Basics',
+                content: `
+                    <div class="section">
+                        <h2>Python Syntax Basics</h2>
+                        <p>Python's syntax is designed to be clean and readable. Unlike languages that use braces or semicolons, Python uses <strong>indentation</strong> to define code structure—making your code's visual layout part of its logic.</p>
+
+                        <h3>Indentation Rules <span class="security-badge">CRITICAL</span></h3>
+                        <p>Indentation is not optional in Python—it defines code blocks. In cybersecurity scripts, proper indentation ensures your security logic executes correctly.</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Correct indentation</span>
+<span class="keyword">if</span> password_strength > <span class="string">50</span>:
+    <span class="function">print</span>(<span class="string">"Strong password"</span>)
+    allow_access = <span class="keyword">True</span>
+
+<span class="comment"># Incorrect indentation - will cause IndentationError</span>
+<span class="keyword">if</span> password_strength > <span class="string">50</span>:
+<span class="function">print</span>(<span class="string">"Strong password"</span>)  <span class="comment"># Error: no indentation!</span></pre>
+                        </div>
+
+                        <div class="info-box">
+                            <strong>Standard:</strong> Use 4 spaces for each indentation level. Most IDEs can convert Tab to 4 spaces automatically.
+                        </div>
+
+                        <h3>Comments and Docstrings</h3>
+                        <p>Comments document your code and are essential in security work where others need to understand your defensive logic.</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Single-line comment: Check for SQL injection patterns</span>
+suspicious_input = <span class="string">"'; DROP TABLE users--"</span>
+
+<span class="comment">"""
+Multi-line comment (docstring)
+Function: validate_ip_address
+Purpose: Verify if input matches valid IPv4 format
+Returns: Boolean indicating valid IP
+"""</span>
+
+<span class="keyword">def</span> <span class="function">scan_port</span>(target, port):
+    <span class="string">"""Attempt connection to specified port on target system."""</span>
+    <span class="comment"># Implementation here</span>
+    <span class="keyword">pass</span></pre>
+                        </div>
+
+                        <div class="ai-tip">
+                            When you encounter confusing syntax errors, copy the error message and ask an AI: "Explain this Python error and how to fix it: [paste error]". AI excels at interpreting Python errors and suggesting solutions.
+                        </div>
+
+                        <h3>Try It: Code Structure</h3>
+                        <div class="challenge">
+                            <div class="challenge-title">Challenge: Fix the Indentation</div>
+                            <p>The code below has indentation errors. Fix it so it runs correctly.</p>
+                            <div class="code-editor">
+                                <div class="editor-header">
+                                    <span class="editor-title">⟨ Python Terminal ⟩</span>
+                                    <div class="editor-controls">
+                                        <button class="btn btn-secondary" onclick="resetCode('syntax_challenge')">Reset</button>
+                                        <button class="btn btn-secondary" onclick="showSolution('syntax_challenge')" style="background: #6b7280;">Solution</button>
+                                        <button class="btn" onclick="runPythonCode('syntax_challenge', 'syntax_output')">Run Code</button>
+                                    </div>
+                                </div>
+                                <textarea id="syntax_challenge"># Fix the indentation in this security check
+security_level = 3
+
+if security_level >= 3:
+print("Access granted to secure zone")
+print("Loading classified data...")
+else:
+    print("Access denied")</textarea>
+                                <div class="output" id="syntax_output">Click "Run Code" to execute...</div>
+                            </div>
+                        </div>
+
+                        <h3>Key Takeaways</h3>
+                        <ul>
+                            <li>Indentation is mandatory and defines code blocks (4 spaces standard)</li>
+                            <li>Use <code>#</code> for single-line comments</li>
+                            <li>Use <code>"""triple quotes"""</code> for multi-line docstrings</li>
+                            <li>Comments are crucial for documenting security logic</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 'datatypes',
+                title: 'Data Types',
+                content: `
+                    <div class="section">
+                        <h2>Data Types & Operations</h2>
+                        <p>Python has four fundamental primitive types that you'll use constantly in security work. Understanding how to work with each type is essential for processing security data.</p>
+
+                        <h3>Integer (int) <span class="security-badge">NUMERIC</span></h3>
+                        <p>Whole numbers used for counts, ports, IDs, permissions, and more.</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Common security uses for integers</span>
+port_number = <span class="string">443</span>           <span class="comment"># HTTPS port</span>
+failed_attempts = <span class="string">5</span>         <span class="comment"># Login failures</span>
+permission_level = <span class="string">755</span>      <span class="comment"># Unix permissions</span>
+packet_size = <span class="string">1500</span>          <span class="comment"># MTU in bytes</span>
+
+<span class="comment"># Arithmetic operations</span>
+total_threats = <span class="string">47</span> + <span class="string">23</span>     <span class="comment"># Addition: 70</span>
+remaining = <span class="string">100</span> - <span class="string">37</span>       <span class="comment"># Subtraction: 63</span>
+doubled = <span class="string">5</span> * <span class="string">2</span>             <span class="comment"># Multiplication: 10</span>
+divided = <span class="string">20</span> // <span class="string">3</span>           <span class="comment"># Floor division: 6</span>
+remainder = <span class="string">20</span> % <span class="string">3</span>          <span class="comment"># Modulo: 2</span>
+power = <span class="string">2</span> ** <span class="string">8</span>              <span class="comment"># Exponent: 256</span></pre>
+                        </div>
+
+                        <h3>Float (float) <span class="security-badge">DECIMAL</span></h3>
+                        <p>Decimal numbers for calculations requiring precision.</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Security metrics often use floats</span>
+threat_score = <span class="string">7.5</span>          <span class="comment"># CVSS score</span>
+success_rate = <span class="string">0.943</span>        <span class="comment"># 94.3% detection rate</span>
+response_time = <span class="string">0.125</span>       <span class="comment"># 125 milliseconds</span>
+
+<span class="comment"># Float arithmetic</span>
+average = (<span class="string">7.5</span> + <span class="string">8.2</span> + <span class="string">6.9</span>) / <span class="string">3</span>  <span class="comment"># 7.533...</span></pre>
+                        </div>
+
+                        <h3>String (str) <span class="security-badge">TEXT</span></h3>
+                        <p>Text data—usernames, passwords, logs, IP addresses, and more.</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Strings in single or double quotes</span>
+username = <span class="string">"admin"</span>
+ip_address = <span class="string">'192.168.1.1'</span>
+log_entry = <span class="string">"Failed login attempt detected"</span>
+
+<span class="comment"># String operations</span>
+full_name = <span class="string">"John"</span> + <span class="string">" "</span> + <span class="string">"Doe"</span>        <span class="comment"># Concatenation</span>
+repeated = <span class="string">"ALERT "</span> * <span class="string">3</span>              <span class="comment"># "ALERT ALERT ALERT "</span>
+length = <span class="function">len</span>(<span class="string">"password123"</span>)          <span class="comment"># Length: 11</span>
+uppercase = <span class="string">"warning"</span>.upper()          <span class="comment"># "WARNING"</span>
+contains = <span class="string">"sql"</span> <span class="keyword">in</span> <span class="string">"mysql_error"</span>  <span class="comment"># True</span></pre>
+                        </div>
+
+                        <h3>Boolean (bool) <span class="security-badge">LOGIC</span></h3>
+                        <p>True/False values for security decisions and control flow.</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Boolean values</span>
+is_authenticated = <span class="keyword">True</span>
+has_malware = <span class="keyword">False</span>
+port_open = <span class="keyword">True</span>
+
+<span class="comment"># Comparison operators (return boolean)</span>
+<span class="string">443</span> == <span class="string">443</span>              <span class="comment"># True (equal)</span>
+<span class="string">80</span> != <span class="string">443</span>              <span class="comment"># True (not equal)</span>
+<span class="string">5</span> > <span class="string">3</span>                 <span class="comment"># True (greater than)</span>
+<span class="string">10</span> <= <span class="string">10</span>              <span class="comment"># True (less than or equal)</span>
+
+<span class="comment"># Boolean operators</span>
+<span class="keyword">True</span> <span class="keyword">and</span> <span class="keyword">True</span>        <span class="comment"># True (both must be True)</span>
+<span class="keyword">True</span> <span class="keyword">or</span> <span class="keyword">False</span>       <span class="comment"># True (at least one True)</span>
+<span class="keyword">not</span> <span class="keyword">True</span>             <span class="comment"># False (inverts boolean)</span></pre>
+                        </div>
+
+                        <div class="ai-tip">
+                            When learning operations for a data type, ask AI: "Show me 10 practical examples of [operation] in Python for cybersecurity contexts." This gives you security-relevant practice examples instead of generic ones.
+                        </div>
+
+                        <h3>Try It: Security Calculator</h3>
+                        <div class="challenge">
+                            <div class="challenge-title">Challenge: Calculate Password Entropy</div>
+                            <p>Password entropy measures password strength. Formula: length × 6.5 bits (for mixed case + numbers). Calculate entropy for a 12-character password.</p>
+                            <div class="code-editor">
+                                <div class="editor-header">
+                                    <span class="editor-title">⟨ Python Terminal ⟩</span>
+                                    <div class="editor-controls">
+                                        <button class="btn btn-secondary" onclick="resetCode('datatypes_challenge')">Reset</button>
+                                        <button class="btn btn-secondary" onclick="showSolution('datatypes_challenge')" style="background: #6b7280;">Solution</button>
+                                        <button class="btn" onclick="runAndCheck('datatypes_challenge', 'datatypes_output', checkPasswordEntropy)">Run & Check</button>
+                                    </div>
+                                </div>
+                                <textarea id="datatypes_challenge"># Calculate password entropy
+password_length = 12
+bits_per_char = 6.5
+
+# Your code here: calculate entropy and print the result
+</textarea>
+                                <div class="output" id="datatypes_output">Click "Run & Check" to execute...</div>
+                            </div>
+                        </div>
+
+                        <h3>Type Conversion</h3>
+                        <p>Convert between types when processing security data:</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Common conversions</span>
+port_str = <span class="string">"443"</span>
+port_int = <span class="function">int</span>(port_str)        <span class="comment"># "443" → 443</span>
+
+score = <span class="string">7.8</span>
+score_str = <span class="function">str</span>(score)        <span class="comment"># 7.8 → "7.8"</span>
+
+value = <span class="string">1</span>
+is_true = <span class="function">bool</span>(value)        <span class="comment"># 1 → True (0 is False, all else is True)</span></pre>
+                        </div>
+
+                        <h3>Key Takeaways</h3>
+                        <ul>
+                            <li><code>int</code>: Whole numbers for ports, counts, IDs</li>
+                            <li><code>float</code>: Decimals for scores, rates, times</li>
+                            <li><code>str</code>: Text for usernames, IPs, logs</li>
+                            <li><code>bool</code>: True/False for logic and decisions</li>
+                            <li>Use comparison operators to create boolean values</li>
+                            <li>Convert types with <code>int()</code>, <code>float()</code>, <code>str()</code>, <code>bool()</code></li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 'variables',
+                title: 'Variables',
+                content: `
+                    <div class="section">
+                        <h2>Variables & Expressions</h2>
+                        <p>Variables are named containers that store data. In security programming, you'll use variables to track threat levels, store credentials, maintain counts, and process security data.</p>
+
+                        <h3>Assignment & Naming <span class="security-badge">FUNDAMENTAL</span></h3>
+                        
+                        <div class="code-block">
+<pre><span class="comment"># Assignment: variable_name = value</span>
+target_ip = <span class="string">"10.0.0.5"</span>
+scan_port = <span class="string">22</span>
+is_vulnerable = <span class="keyword">True</span>
+threat_level = <span class="string">8.5</span>
+
+<span class="comment"># Multiple assignments</span>
+x, y, z = <span class="string">1</span>, <span class="string">2</span>, <span class="string">3</span>
+host = target = <span class="string">"192.168.1.1"</span>
+
+<span class="comment"># Updating variables</span>
+attempts = <span class="string">0</span>
+attempts = attempts + <span class="string">1</span>  <span class="comment"># Now 1</span>
+attempts += <span class="string">1</span>            <span class="comment"># Shorthand, now 2</span></pre>
+                        </div>
+
+                        <h3>Naming Conventions</h3>
+                        <p>Following conventions makes your code readable and professional:</p>
+
+                        <div class="info-box">
+                            <strong>Python Naming Rules:</strong>
+                            <ul>
+                                <li>Use lowercase with underscores: <code>failed_login_count</code></li>
+                                <li>Start with letter or underscore, not a number</li>
+                                <li>Only letters, numbers, and underscores allowed</li>
+                                <li>Case-sensitive: <code>Port</code> and <code>port</code> are different</li>
+                                <li>Avoid Python keywords: <code>if</code>, <code>for</code>, <code>import</code>, etc.</li>
+                            </ul>
+                        </div>
+
+                        <div class="code-block">
+<pre><span class="comment"># Good variable names (descriptive and clear)</span>
+ssh_port = <span class="string">22</span>
+max_retry_attempts = <span class="string">3</span>
+password_hash = <span class="string">"5f4dcc3b5aa..."</span>
+is_admin_user = <span class="keyword">True</span>
+
+<span class="comment"># Avoid (unclear or misleading)</span>
+p = <span class="string">22</span>                    <span class="comment"># What is 'p'?</span>
+x123 = <span class="string">3</span>                  <span class="comment"># Meaningless</span>
+MaxRetryAttempts = <span class="string">3</span>      <span class="comment"># Wrong style for Python</span></pre>
+                        </div>
+
+                        <h3>Expressions & Calculations</h3>
+                        <p>Expressions combine variables and operators to compute new values:</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Security calculations</span>
+base_threat = <span class="string">5</span>
+multiplier = <span class="string">1.5</span>
+threat_score = base_threat * multiplier  <span class="comment"># 7.5</span>
+
+<span class="comment"># Port scanning range</span>
+start_port = <span class="string">1</span>
+end_port = <span class="string">1024</span>
+ports_to_scan = end_port - start_port + <span class="string">1</span>  <span class="comment"># 1024 ports</span>
+
+<span class="comment"># Password complexity check</span>
+min_length = <span class="string">8</span>
+actual_length = <span class="string">12</span>
+meets_requirement = actual_length >= min_length  <span class="comment"># True</span>
+
+<span class="comment"># Calculate hash rate</span>
+hashes_computed = <span class="string">1000000</span>
+time_seconds = <span class="string">2.5</span>
+hashes_per_second = hashes_computed / time_seconds  <span class="comment"># 400000.0</span></pre>
+                        </div>
+
+                        <h3>Order of Operations</h3>
+                        <p>Python follows standard mathematical order (PEMDAS):</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Without parentheses</span>
+result = <span class="string">5</span> + <span class="string">3</span> * <span class="string">2</span>        <span class="comment"># 11 (multiply first)</span>
+
+<span class="comment"># With parentheses</span>
+result = (<span class="string">5</span> + <span class="string">3</span>) * <span class="string">2</span>      <span class="comment"># 16 (add first)</span>
+
+<span class="comment"># Complex security calculation</span>
+base_score = <span class="string">10</span>
+severity_multiplier = <span class="string">1.5</span>
+urgency_bonus = <span class="string">2</span>
+final_score = (base_score * severity_multiplier) + urgency_bonus  <span class="comment"># 17.0</span></pre>
+                        </div>
+
+                        <div class="ai-tip">
+                            When you write a complex calculation and aren't sure about the order of operations, ask AI: "Break down this calculation step-by-step: [your code]". AI can show you exactly how Python evaluates the expression.
+                        </div>
+
+                        <h3>Try It: Threat Score Calculator</h3>
+                        <div class="challenge">
+                            <div class="challenge-title">Challenge: Calculate Composite Threat Score</div>
+                            <p>Calculate a threat score using: (vulnerability_score × 0.4) + (exploit_probability × 0.3) + (impact_level × 0.3). Use values: vuln=8, exploit=0.7, impact=9</p>
+                            <div class="code-editor">
+                                <div class="editor-header">
+                                    <span class="editor-title">⟨ Python Terminal ⟩</span>
+                                    <div class="editor-controls">
+                                        <button class="btn btn-secondary" onclick="resetCode('variables_challenge')">Reset</button>
+                                        <button class="btn btn-secondary" onclick="showSolution('variables_challenge')" style="background: #6b7280;">Solution</button>
+                                        <button class="btn" onclick="runAndCheck('variables_challenge', 'variables_output', checkThreatScore)">Run & Check</button>
+                                    </div>
+                                </div>
+                                <textarea id="variables_challenge"># Calculate composite threat score
+vulnerability_score = 8
+exploit_probability = 0.7
+impact_level = 9
+
+# Your code here: calculate final_threat_score and print it
+</textarea>
+                                <div class="output" id="variables_output">Click "Run & Check" to execute...</div>
+                            </div>
+                        </div>
+
+                        <h3>Common Pitfalls</h3>
+                        
+                        <div class="warning-box">
+                            <strong>Watch Out For:</strong>
+                            <ul>
+                                <li>Typos in variable names cause <code>NameError</code></li>
+                                <li>Using a variable before assigning it: <code>NameError</code></li>
+                                <li>Integer division: <code>5 / 2 = 2.5</code> but <code>5 // 2 = 2</code></li>
+                                <li>Order of operations: use parentheses for clarity</li>
+                            </ul>
+                        </div>
+
+                        <h3>Key Takeaways</h3>
+                        <ul>
+                            <li>Variables store data: <code>variable_name = value</code></li>
+                            <li>Use descriptive, lowercase names with underscores</li>
+                            <li>Update variables with <code>+=</code>, <code>-=</code>, <code>*=</code>, etc.</li>
+                            <li>Expressions combine variables and operators</li>
+                            <li>Use parentheses to control operation order</li>
+                            <li>Choose meaningful names that describe the data</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 'input-output',
+                title: 'Input/Output',
+                content: `
+                    <div class="section">
+                        <h2>Input & Output</h2>
+                        <p>Programs need to communicate with users—accepting input and displaying output. In security tools, this means reading targets, passwords, configurations, and displaying scan results, alerts, and reports.</p>
+
+                        <h3>Output with print() <span class="security-badge">ESSENTIAL</span></h3>
+                        
+                        <div class="code-block">
+<pre><span class="comment"># Basic output</span>
+<span class="function">print</span>(<span class="string">"Security scan initiated"</span>)
+<span class="function">print</span>(<span class="string">"Target: 192.168.1.1"</span>)
+
+<span class="comment"># Printing variables</span>
+target = <span class="string">"10.0.0.5"</span>
+port = <span class="string">443</span>
+<span class="function">print</span>(target)
+<span class="function">print</span>(port)
+
+<span class="comment"># Multiple values (separated by spaces)</span>
+<span class="function">print</span>(<span class="string">"Scanning"</span>, target, <span class="string">"on port"</span>, port)
+<span class="comment"># Output: Scanning 10.0.0.5 on port 443</span>
+
+<span class="comment"># Custom separator</span>
+<span class="function">print</span>(<span class="string">"192"</span>, <span class="string">"168"</span>, <span class="string">"1"</span>, <span class="string">"1"</span>, sep=<span class="string">"."</span>)
+<span class="comment"># Output: 192.168.1.1</span></pre>
+                        </div>
+
+                        <h3>F-Strings for Formatting <span class="security-badge">POWERFUL</span></h3>
+                        <p>F-strings (formatted string literals) let you embed variables and expressions directly into strings:</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># F-string syntax: f"text {{variable}} more text"</span>
+target_ip = <span class="string">"192.168.1.100"</span>
+port = <span class="string">22</span>
+status = <span class="string">"OPEN"</span>
+
+<span class="function">print</span>(f<span class="string">"Port {{port}} on {target_ip} is {{status}}"</span>)
+<span class="comment"># Output: Port 22 on 192.168.1.100 is OPEN</span>
+
+<span class="comment"># Expressions inside f-strings</span>
+attempts = <span class="string">5</span>
+max_attempts = <span class="string">3</span>
+<span class="function">print</span>(f<span class="string">"Failed attempts: {{attempts}}/{max_attempts}"</span>)
+<span class="function">print</span>(f<span class="string">"Exceeded by: {attempts - max_attempts}"</span>)
+
+<span class="comment"># Formatting numbers</span>
+threat_score = <span class="string">7.856923</span>
+<span class="function">print</span>(f<span class="string">"Threat Score: {threat_score:.2f}"</span>)  <span class="comment"># 7.86 (2 decimals)</span>
+
+percentage = <span class="string">0.847</span>
+<span class="function">print</span>(f<span class="string">"Detection Rate: {percentage:.1%}"</span>)  <span class="comment"># 84.7%</span></pre>
+                        </div>
+
+                        <div class="info-box">
+                            <strong>F-String Formatting Codes:</strong>
+                            <ul>
+                                <li><code>{value:.2f}</code> - 2 decimal places</li>
+                                <li><code>{value:.0f}</code> - no decimal places</li>
+                                <li><code>{value:>10}</code> - right-align in 10 spaces</li>
+                                <li><code>{value:0>8}</code> - pad with zeros (00000042)</li>
+                                <li><code>{value:.1%}</code> - percentage (1 decimal)</li>
+                            </ul>
+                        </div>
+
+                        <h3>Input with input() <span class="security-badge">INTERACTIVE</span></h3>
+                        <p>The <code>input()</code> function reads user input as a string:</p>
+
+                        <div class="code-block">
+<pre><span class="comment"># Basic input (returns string)</span>
+target = <span class="function">input</span>(<span class="string">"Enter target IP: "</span>)
+<span class="function">print</span>(f<span class="string">"Scanning {{target}}..."</span>)
+
+<span class="comment"># Converting input to int</span>
+port_str = <span class="function">input</span>(<span class="string">"Enter port number: "</span>)
+port = <span class="function">int</span>(port_str)  <span class="comment"># Convert string to integer</span>
+<span class="function">print</span>(f<span class="string">"Connecting to port {{port}}"</span>)
+
+<span class="comment"># Combined input and conversion</span>
+timeout = <span class="function">int</span>(<span class="function">input</span>(<span class="string">"Enter timeout in seconds: "</span>))
+threshold = <span class="function">float</span>(<span class="function">input</span>(<span class="string">"Enter threat threshold: "</span>))</pre>
+                        </div>
+
+                        <div class="warning-box">
+                            <strong>Important:</strong> <code>input()</code> always returns a string! You must convert it to <code>int</code> or <code>float</code> if you need to do math with it.
+                        </div>
+
+                        <div class="ai-tip">
+                            When building user-facing tools, ask AI: "Show me input validation examples for [type of input] in Python." This helps you learn to validate user input—critical for security tools.
+                        </div>
+
+                        <h3>Try It: Interactive Security Tool</h3>
+                        <div class="challenge">
+                            <div class="challenge-title">Challenge: Build a Password Strength Reporter</div>
+                            <p>Create a program that asks for password length (as an integer), calculates entropy (length × 6.5), and displays a formatted report with 1 decimal place.</p>
+                            <div class="code-editor">
+                                <div class="editor-header">
+                                    <span class="editor-title">⟨ Python Terminal ⟩</span>
+                                    <div class="editor-controls">
+                                        <button class="btn btn-secondary" onclick="resetCode('io_challenge')">Reset</button>
+                                        <button class="btn" onclick="alert('Note: input() doesn\\'t work in this browser environment. Try this code in a real Python environment!')">Run Code</button>
+                                    </div>
+                                </div>
+                                <textarea id="io_challenge"># Build a password strength reporter
+# 1. Ask user for password length (as integer)
+# 2. Calculate entropy: length * 6.5
+# 3. Print: "Password Entropy: [entropy] bits"
+# Use f-string with 1 decimal place
+
+# Your code here:
+</textarea>
+                                <div class="output" id="io_output">Note: input() requires a real Python environment. Try this code locally!</div>
+                            </div>
+                        </div>
+
+                        <h3>Practical Example: Port Scanner Report</h3>
+                        <div class="code-block">
+<pre><span class="comment"># Simulated port scan report generator</span>
+target = <span class="string">"192.168.1.1"</span>
+ports_scanned = <span class="string">1024</span>
+open_ports = <span class="string">3</span>
+scan_time = <span class="string">12.4</span>
+
+<span class="function">print</span>(<span class="string">"=" * 50</span>)
+<span class="function">print</span>(f<span class="string">"PORT SCAN REPORT"</span>)
+<span class="function">print</span>(<span class="string">"=" * 50</span>)
+<span class="function">print</span>(f<span class="string">"Target:       {{target}}"</span>)
+<span class="function">print</span>(f<span class="string">"Ports Scanned: {ports_scanned}"</span>)
+<span class="function">print</span>(f<span class="string">"Open Ports:    {open_ports}"</span>)
+<span class="function">print</span>(f<span class="string">"Scan Time:     {scan_time:.1f} seconds"</span>)
+<span class="function">print</span>(f<span class="string">"Success Rate:  {(open_ports/ports_scanned)*100:.2f}%"</span>)
+<span class="function">print</span>(<span class="string">"=" * 50</span>)</pre>
+                        </div>
+
+                        <h3>Key Takeaways</h3>
+                        <ul>
+                            <li><code>print()</code> displays output to the user</li>
+                            <li>Use f-strings for clean, readable formatted output</li>
+                            <li>F-strings embed variables: <code>f"text {{variable}}"</code></li>
+                            <li><code>input()</code> reads user input as a string</li>
+                            <li>Convert input with <code>int()</code> or <code>float()</code> for calculations</li>
+                            <li>Format numbers in f-strings: <code>{value:.2f}</code></li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 'hands-on',
+                title: 'Hands-On',
+                content: `
+                    <div class="section">
+                        <h2>Hands-On Challenges</h2>
+                        <p>Now it's time to apply everything you've learned. These challenges simulate real security tasks that Python is commonly used for. Each builds on the fundamentals you've mastered.</p>
+
+                        <h3>Challenge 1: Hex to Decimal Converter</h3>
+                        <div class="challenge">
+                            <div class="challenge-title">Security Context: Memory Address Conversion</div>
+                            <p>Security analysts often need to convert hexadecimal memory addresses to decimal. Create a converter that takes a hex string and outputs the decimal value.</p>
+                            <p><strong>Requirements:</strong></p>
+                            <ul>
+                                <li>Store hex value "0x2A" in a variable (without the 0x prefix)</li>
+                                <li>Convert to decimal using <code>int(hex_value, 16)</code></li>
+                                <li>Print result as: "Hex 2A = Decimal [value]"</li>
+                            </ul>
+                            <div class="code-editor">
+                                <div class="editor-header">
+                                    <span class="editor-title">⟨ Python Terminal ⟩</span>
+                                    <div class="editor-controls">
+                                        <button class="btn btn-secondary" onclick="resetCode('challenge1')">Reset</button>
+                                        <button class="btn btn-secondary" onclick="showSolution('challenge1')" style="background: #6b7280;">Solution</button>
+                                        <button class="btn" onclick="runAndCheck('challenge1', 'output1', checkChallenge1)">Run & Check</button>
+                                    </div>
+                                </div>
+                                <textarea id="challenge1"># Hex to Decimal Converter
+# Your code here:
+</textarea>
+                                <div class="output" id="output1">Click "Run & Check" to execute...</div>
+                            </div>
+                        </div>
+
+                        <div class="ai-tip">
+                            If you're stuck, try asking AI: "How do I convert hexadecimal to decimal in Python?" or "Explain the int() function with base parameter." Breaking down the problem into specific questions helps AI give you more targeted guidance.
+                        </div>
+
+                        <h3>Challenge 2: Password Complexity Checker</h3>
+                        <div class="challenge">
+                            <div class="challenge-title">Security Context: Basic Password Policy Enforcement</div>
+                            <p>Security policies require minimum password lengths. Write a program that checks if a password meets the 12-character minimum.</p>
+                            <p><strong>Requirements:</strong></p>
+                            <ul>
+                                <li>Store a password: "SecureP@ss2024"</li>
+                                <li>Store minimum length requirement: 12</li>
+                                <li>Calculate actual length using <code>len()</code></li>
+                                <li>Compare with minimum and store result in boolean</li>
+                                <li>Print: "Password length: [length], Meets requirement: [True/False]"</li>
+                            </ul>
+                            <div class="code-editor">
+                                <div class="editor-header">
+                                    <span class="editor-title">⟨ Python Terminal ⟩</span>
+                                    <div class="editor-controls">
+                                        <button class="btn btn-secondary" onclick="resetCode('challenge2')">Reset</button>
+                                        <button class="btn btn-secondary" onclick="showSolution('challenge2')" style="background: #6b7280;">Solution</button>
+                                        <button class="btn" onclick="runAndCheck('challenge2', 'output2', checkChallenge2)">Run & Check</button>
+                                    </div>
+                                </div>
+                                <textarea id="challenge2"># Password Complexity Checker
+# Your code here:
+</textarea>
+                                <div class="output" id="output2">Click "Run & Check" to execute...</div>
+                            </div>
+                        </div>
+
+                        <h3>Challenge 3: Network Subnet Calculator</h3>
+                        <div class="challenge">
+                            <div class="challenge-title">Security Context: IP Range Calculations</div>
+                            <p>Calculate the number of usable host IPs in a /24 subnet (256 addresses, minus 2 for network and broadcast).</p>
+                            <p><strong>Requirements:</strong></p>
+                            <ul>
+                                <li>Store subnet mask: 24 (this is a /24 network)</li>
+                                <li>Calculate total IPs: 2 ** (32 - subnet_mask)</li>
+                                <li>Calculate usable IPs: total - 2</li>
+                                <li>Print: "Subnet /[mask]: [total] total IPs, [usable] usable hosts"</li>
+                            </ul>
+                            <div class="code-editor">
+                                <div class="editor-header">
+                                    <span class="editor-title">⟨ Python Terminal ⟩</span>
+                                    <div class="editor-controls">
+                                        <button class="btn btn-secondary" onclick="resetCode('challenge3')">Reset</button>
+                                        <button class="btn btn-secondary" onclick="showSolution('challenge3')" style="background: #6b7280;">Solution</button>
+                                        <button class="btn" onclick="runAndCheck('challenge3', 'output3', checkChallenge3)">Run & Check</button>
+                                    </div>
+                                </div>
+                                <textarea id="challenge3"># Network Subnet Calculator
+# Your code here:
+</textarea>
+                                <div class="output" id="output3">Click "Run & Check" to execute...</div>
+                            </div>
+                        </div>
+
+                        <h3>Challenge 4: CVSS Score Normalizer</h3>
+                        <div class="challenge">
+                            <div class="challenge-title">Security Context: Vulnerability Scoring</div>
+                            <p>CVSS scores range from 0-10. Create a program that converts a raw score to a percentage and categorizes the severity.</p>
+                            <p><strong>Requirements:</strong></p>
+                            <ul>
+                                <li>Store CVSS score: 7.8</li>
+                                <li>Convert to percentage (score / 10 * 100)</li>
+                                <li>Determine severity: score >= 7.0 is "HIGH", otherwise "MEDIUM"</li>
+                                <li>Print: "CVSS Score: [score] ([percentage]%) - Severity: [HIGH/MEDIUM]"</li>
+                                <li>Use f-string with 1 decimal place for percentage</li>
+                            </ul>
+                            <div class="code-editor">
+                                <div class="editor-header">
+                                    <span class="editor-title">⟨ Python Terminal ⟩</span>
+                                    <div class="editor-controls">
+                                        <button class="btn btn-secondary" onclick="resetCode('challenge4')">Reset</button>
+                                        <button class="btn btn-secondary" onclick="showSolution('challenge4')" style="background: #6b7280;">Solution</button>
+                                        <button class="btn" onclick="runAndCheck('challenge4', 'output4', checkChallenge4)">Run & Check</button>
+                                    </div>
+                                </div>
+                                <textarea id="challenge4"># CVSS Score Normalizer
+# Your code here:
+</textarea>
+                                <div class="output" id="output4">Click "Run & Check" to execute...</div>
+                            </div>
+                        </div>
+
+                        <div class="ai-tip">
+                            When debugging your solutions, paste your code and the error message to AI and ask: "Why is this code failing? Explain the error and suggest a fix." Understanding errors is just as important as writing correct code.
+                        </div>
+
+                        <h3>Challenge 5: Security Alert Generator</h3>
+                        <div class="challenge">
+                            <div class="challenge-title">Security Context: Automated Alerting</div>
+                            <p>Generate a formatted security alert based on multiple variables. This simulates automated alert systems.</p>
+                            <p><strong>Requirements:</strong></p>
+                            <ul>
+                                <li>Store: alert_type="INTRUSION", source_ip="203.0.113.42", severity=9</li>
+                                <li>Store: timestamp="2024-01-15 14:32:01"</li>
+                                <li>Print a formatted alert with all details</li>
+                                <li>Use dashes (print("-" * 50)) for visual separation</li>
+                                <li>Make it look professional and readable</li>
+                            </ul>
+                            <div class="code-editor">
+                                <div class="editor-header">
+                                    <span class="editor-title">⟨ Python Terminal ⟩</span>
+                                    <div class="editor-controls">
+                                        <button class="btn btn-secondary" onclick="resetCode('challenge5')">Reset</button>
+                                        <button class="btn btn-secondary" onclick="showSolution('challenge5')" style="background: #6b7280;">Solution</button>
+                                        <button class="btn" onclick="runPythonCode('challenge5', 'output5')">Run Code</button>
+                                    </div>
+                                </div>
+                                <textarea id="challenge5"># Security Alert Generator
+# Your code here:
+</textarea>
+                                <div class="output" id="output5">Click "Run Code" to execute...</div>
+                            </div>
+                        </div>
+
+                        <h3>Challenge Complete!</h3>
+                        <p>Excellent work! You've now built several security-focused mini programs using core Python concepts. These challenges demonstrate how fundamental programming skills translate directly into cybersecurity applications.</p>
+
+                        <div class="info-box">
+                            <strong>Next Steps:</strong> In real-world scenarios, you'd expand these programs to handle user input, read from files, connect to networks, and implement error handling. But the core logic you've written here forms the foundation.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'ai-guide',
+                title: 'AI Learning',
+                content: `
+                    <div class="section">
+                        <h2>AI-Assisted Learning Guide</h2>
+                        <p>Modern cybersecurity professionals leverage AI to accelerate their learning and productivity. Knowing how to effectively use AI tools is now a critical skill alongside technical expertise.</p>
+
+                        <h3>Why Use AI for Learning Python?</h3>
+                        <ul>
+                            <li><strong>Instant Error Explanations:</strong> AI can interpret cryptic error messages and suggest fixes</li>
+                            <li><strong>Code Examples:</strong> Generate context-specific examples for any concept</li>
+                            <li><strong>Debugging Assistant:</strong> Help identify logical errors in your code</li>
+                            <li><strong>Concept Clarification:</strong> Get explanations tailored to your level</li>
+                            <li><strong>Alternative Approaches:</strong> See different ways to solve the same problem</li>
+                        </ul>
+
+                        <div class="warning-box">
+                            <strong>Critical Caveat:</strong> AI is a tool, not a replacement for understanding. Always test AI-generated code, verify its explanations, and ensure you comprehend what you're implementing. In cybersecurity, understanding your code isn't optional—it's essential.
+                        </div>
+
+                        <h3>Effective AI Prompts for Python Learning</h3>
+
+                        <h4>1. Understanding Errors</h4>
+                        <div class="code-block">
+<pre><span class="comment"># When you get an error, try:</span>
+<span class="string">"Explain this Python error and how to fix it:
+NameError: name 'port_number' is not defined"</span>
+
+<span class="comment"># Or more context-specific:</span>
+<span class="string">"I'm trying to convert user input to an integer and getting 
+ValueError. Here's my code: [paste code]. What's wrong?"</span></pre>
+                        </div>
+
+                        <h4>2. Concept Explanations</h4>
+                        <div class="code-block">
+<pre><span class="comment"># General concept:</span>
+<span class="string">"Explain Python f-strings with 3 cybersecurity examples"</span>
+
+<span class="comment"># Specific confusion:</span>
+<span class="string">"What's the difference between / and // in Python? 
+Show examples with port calculations"</span>
+
+<span class="comment"># Deep dive:</span>
+<span class="string">"Explain how Python variable assignment works in memory,
+with examples relevant to security programming"</span></pre>
+                        </div>
+
+                        <h4>3. Code Review and Improvement</h4>
+                        <div class="code-block">
+<pre><span class="comment"># For feedback:</span>
+<span class="string">"Review this password strength checker code and suggest 
+improvements: [paste code]"</span>
+
+<span class="comment"># For optimization:</span>
+<span class="string">"Is there a more efficient way to write this calculation?
+[paste code]"</span>
+
+<span class="comment"># For best practices:</span>
+<span class="string">"Does this code follow Python naming conventions and style?
+[paste code]"</span></pre>
+                        </div>
+
+                        <h4>4. Practical Examples</h4>
+                        <div class="code-block">
+<pre><span class="comment"># Context-specific examples:</span>
+<span class="string">"Show me 5 practical examples of using boolean operators
+in cybersecurity context"</span>
+
+<span class="comment"># Progressive difficulty:</span>
+<span class="string">"Give me 3 examples of variable assignment: beginner, 
+intermediate, and advanced, all cybersecurity-themed"</span>
+
+<span class="comment"># Real-world scenarios:</span>
+<span class="string">"How would a security professional use Python's modulo 
+operator? Show 3 practical examples"</span></pre>
+                        </div>
+
+                        <h4>5. Debugging Assistance</h4>
+                        <div class="code-block">
+<pre><span class="comment"># Logical errors:</span>
+<span class="string">"This code should calculate threat scores but the result 
+is always 0. What's wrong? [paste code]"</span>
+
+<span class="comment"># Unexpected behavior:</span>
+<span class="string">"Why does this comparison return False when I expect True?
+[paste code and example input]"</span>
+
+<span class="comment"># Step-by-step analysis:</span>
+<span class="string">"Walk me through this code line by line and explain what 
+each part does: [paste code]"</span></pre>
+                        </div>
+
+                        <h3>AI Learning Anti-Patterns (What NOT to Do)</h3>
+
+                        <div class="warning-box">
+                            <strong>Avoid These Mistakes:</strong>
+                            <ul>
+                                <li><strong>❌ Copying without understanding:</strong> "Write me a password validator" then pasting without comprehension</li>
+                                <li><strong>❌ Over-reliance:</strong> Using AI for every tiny syntax question instead of learning basics</li>
+                                <li><strong>❌ Vague prompts:</strong> "Help with Python" instead of specific questions</li>
+                                <li><strong>❌ Skipping verification:</strong> Trusting AI output without testing</li>
+                                <li><strong>❌ No follow-up:</strong> Not asking "why" when AI suggests a solution</li>
+                            </ul>
+                        </div>
+
+                        <h3>AI Best Practices for Security Learning</h3>
+
+                        <div class="info-box">
+                            <strong>✓ Do This Instead:</strong>
+                            <ul>
+                                <li><strong>✓ Understand first, optimize later:</strong> Write working code yourself, then ask AI for improvements</li>
+                                <li><strong>✓ Use AI for explanation:</strong> "Explain how this code works" after you've tried to understand it</li>
+                                <li><strong>✓ Be specific:</strong> Include context, expected behavior, and actual behavior</li>
+                                <li><strong>✓ Verify everything:</strong> Test AI suggestions and ensure they work as expected</li>
+                                <li><strong>✓ Ask "why":</strong> Always ask AI to explain the reasoning behind its suggestions</li>
+                                <li><strong>✓ Iterate:</strong> Start simple, then ask AI to help you make it more sophisticated</li>
+                            </ul>
+                        </div>
+
+                        <h3>Example AI Learning Session</h3>
+                        <div class="code-block">
+<pre><span class="comment"># Your attempt at a port validator</span>
+port = <span class="function">input</span>(<span class="string">"Enter port: "</span>)
+<span class="keyword">if</span> port > <span class="string">0</span> <span class="keyword">and</span> port < <span class="string">65536</span>:
+    <span class="function">print</span>(<span class="string">"Valid"</span>)
+
+<span class="comment"># You get an error. Good AI prompt:</span>
+<span class="string">"I'm trying to validate a port number with this code:
+[paste code]
+I get: TypeError: '>' not supported between str and int
+What's the issue and how do I fix it? Explain why this happens."</span>
+
+<span class="comment"># After AI explains (input returns string, need to convert):
+# Follow up with:</span>
+<span class="string">"What happens if the user enters non-numeric input? 
+How should I handle that in production security code?"</span></pre>
+                        </div>
+
+                        <h3>The AI + Human Formula for Learning</h3>
+                        <p>The most effective approach combines human effort with AI assistance:</p>
+
+                        <ol>
+                            <li><strong>Try it yourself first</strong> - Attempt to solve the problem with your current knowledge</li>
+                            <li><strong>Identify specific blockers</strong> - Pinpoint exactly where you're stuck</li>
+                            <li><strong>Ask targeted questions</strong> - Use AI to help with specific issues</li>
+                            <li><strong>Understand the explanation</strong> - Don't move on until you comprehend the solution</li>
+                            <li><strong>Apply independently</strong> - Use the new knowledge on a similar problem without AI</li>
+                            <li><strong>Teach back</strong> - Explain the concept to AI or a peer to solidify understanding</li>
+                        </ol>
+
+                        <div class="ai-tip">
+                            Think of AI as an expert colleague who's always available for questions—but you still need to do the actual work and learning yourself. AI accelerates your learning; it doesn't replace it.
+                        </div>
+
+                        <h3>Resources for Continued Learning</h3>
+                        <ul>
+                            <li><strong>Official Python Documentation:</strong> docs.python.org</li>
+                            <li><strong>Python for Cybersecurity:</strong> Look for domain-specific tutorials</li>
+                            <li><strong>Practice Platforms:</strong> HackerRank, LeetCode (filter for easy problems)</li>
+                            <li><strong>Security-Focused:</strong> PicoCTF, OverTheWire for applied challenges</li>
+                            <li><strong>AI Tools:</strong> ChatGPT, Claude, GitHub Copilot for coding assistance</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 'summary',
+                title: 'Summary',
+                content: `
+                    <div class="section">
+                        <h2>Mission Summary</h2>
+                        <p>Congratulations! You've completed the Core Python Fundamentals training. You now have the foundational skills needed to write Python programs for cybersecurity applications.</p>
+
+                        <h3>Skills Acquired</h3>
+
+                        <h4>✓ Python Syntax Basics</h4>
+                        <ul>
+                            <li>Indentation rules and code structure</li>
+                            <li>Comments and documentation</li>
+                            <li>Professional code formatting</li>
+                        </ul>
+
+                        <h4>✓ Data Types & Operations</h4>
+                        <ul>
+                            <li><code>int</code> for counts, ports, IDs</li>
+                            <li><code>float</code> for scores, rates, times</li>
+                            <li><code>str</code> for text, IPs, logs</li>
+                            <li><code>bool</code> for logic and decisions</li>
+                            <li>Arithmetic, comparison, and boolean operators</li>
+                        </ul>
+
+                        <h4>✓ Variables & Expressions</h4>
+                        <ul>
+                            <li>Variable assignment and naming conventions</li>
+                            <li>Updating and manipulating values</li>
+                            <li>Complex calculations and expressions</li>
+                            <li>Order of operations</li>
+                        </ul>
+
+                        <h4>✓ Input & Output</h4>
+                        <ul>
+                            <li><code>print()</code> for displaying output</li>
+                            <li>F-strings for formatted output</li>
+                            <li><code>input()</code> for reading user data</li>
+                            <li>Type conversion for calculations</li>
+                        </ul>
+
+                        <h4>✓ Practical Application</h4>
+                        <ul>
+                            <li>Built security-focused mini programs</li>
+                            <li>Applied concepts to real cybersecurity scenarios</li>
+                            <li>Developed problem-solving approaches</li>
+                        </ul>
+
+                        <h4>✓ AI-Assisted Learning</h4>
+                        <ul>
+                            <li>Effective prompting techniques</li>
+                            <li>Using AI for debugging and learning</li>
+                            <li>Best practices for AI collaboration</li>
+                        </ul>
+
+                        <h3>Quick Reference Card</h3>
+                        <div class="code-block">
+<pre><span class="comment"># Variables & Types</span>
+port = <span class="string">443</span>                    <span class="comment"># int</span>
+score = <span class="string">7.5</span>                  <span class="comment"># float</span>
+ip = <span class="string">"192.168.1.1"</span>          <span class="comment"># str</span>
+is_secure = <span class="keyword">True</span>            <span class="comment"># bool</span>
+
+<span class="comment"># Operators</span>
+<span class="string">10</span> + <span class="string">5</span>   <span class="comment"># Addition: 15</span>
+<span class="string">10</span> - <span class="string">5</span>   <span class="comment"># Subtraction: 5</span>
+<span class="string">10</span> * <span class="string">5</span>   <span class="comment"># Multiplication: 50</span>
+<span class="string">10</span> / <span class="string">5</span>   <span class="comment"># Division: 2.0</span>
+<span class="string">10</span> // <span class="string">3</span>  <span class="comment"># Floor division: 3</span>
+<span class="string">10</span> % <span class="string">3</span>   <span class="comment"># Modulo: 1</span>
+<span class="string">2</span> ** <span class="string">3</span>   <span class="comment"># Exponent: 8</span>
+
+<span class="comment"># Comparisons (return bool)</span>
+<span class="string">10</span> == <span class="string">10</span>  <span class="comment"># Equal: True</span>
+<span class="string">10</span> != <span class="string">5</span>   <span class="comment"># Not equal: True</span>
+<span class="string">10</span> > <span class="string">5</span>    <span class="comment"># Greater than: True</span>
+<span class="string">10</span> >= <span class="string">10</span>  <span class="comment"># Greater or equal: True</span>
+
+<span class="comment"># Boolean Logic</span>
+<span class="keyword">True</span> <span class="keyword">and</span> <span class="keyword">False</span>  <span class="comment"># False</span>
+<span class="keyword">True</span> <span class="keyword">or</span> <span class="keyword">False</span>   <span class="comment"># True</span>
+<span class="keyword">not</span> <span class="keyword">True</span>        <span class="comment"># False</span>
+
+<span class="comment"># Output</span>
+<span class="function">print</span>(<span class="string">"Hello"</span>)
+<span class="function">print</span>(f<span class="string">"Port: {{port}}"</span>)
+<span class="function">print</span>(f<span class="string">"Score: {score:.2f}"</span>)  <span class="comment"># 2 decimals</span>
+
+<span class="comment"># Input (requires real Python)</span>
+name = <span class="function">input</span>(<span class="string">"Name: "</span>)
+age = <span class="function">int</span>(<span class="function">input</span>(<span class="string">"Age: "</span>))
+
+<span class="comment"># Type Conversion</span>
+<span class="function">int</span>(<span class="string">"42"</span>)       <span class="comment"># String to int</span>
+<span class="function">float</span>(<span class="string">"3.14"</span>)   <span class="comment"># String to float</span>
+<span class="function">str</span>(<span class="string">42</span>)        <span class="comment"># Int to string</span>
+<span class="function">bool</span>(<span class="string">1</span>)        <span class="comment"># Int to bool (0=False, else=True)</span></pre>
+                        </div>
+
+                        <h3>What's Next?</h3>
+                        <p>You're ready to advance to the next level of Python programming. Here's what typically comes after Core Python:</p>
+
+                        <div class="info-box">
+                            <strong>Recommended Next Topics:</strong>
+                            <ul>
+                                <li><strong>Control Flow:</strong> if statements, loops (for, while)</li>
+                                <li><strong>Functions:</strong> Creating reusable code blocks</li>
+                                <li><strong>Data Structures:</strong> Lists, dictionaries, tuples, sets</li>
+                                <li><strong>File I/O:</strong> Reading and writing files</li>
+                                <li><strong>Error Handling:</strong> Try/except blocks</li>
+                                <li><strong>Modules:</strong> Importing and using libraries</li>
+                                <li><strong>Security Libraries:</strong> hashlib, socket, requests</li>
+                            </ul>
+                        </div>
+
+                        <h3>Practice Recommendations</h3>
+                        <ol>
+                            <li><strong>Code Daily:</strong> Even 15 minutes per day builds lasting skills</li>
+                            <li><strong>Build Projects:</strong> Create small security tools using what you've learned</li>
+                            <li><strong>Read Code:</strong> Study open-source security tools on GitHub</li>
+                            <li><strong>Seek Feedback:</strong> Share your code with peers or AI for review</li>
+                            <li><strong>Challenge Yourself:</strong> Attempt problems slightly beyond your comfort zone</li>
+                            <li><strong>Document Everything:</strong> Comment your code and maintain a learning journal</li>
+                        </ol>
+
+                        <div class="ai-tip">
+                            Consider creating a personal "cybersecurity Python cheat sheet" with examples from your learning. Ask AI to help you organize it, but write the examples yourself from memory to reinforce learning.
+                        </div>
+
+                        <h3>Final Thoughts</h3>
+                        <p>Every cybersecurity expert started exactly where you are now. The difference between beginners and professionals isn't innate talent—it's consistent practice and a commitment to continuous learning.</p>
+
+                        <p>Python is your tool. Cybersecurity is your domain. AI is your assistant. Together, these give you immense power to build, analyze, and secure systems.</p>
+
+                        <div class="warning-box">
+                            <strong>Remember:</strong> With power comes responsibility. Use your programming skills ethically. Always have authorization before testing security systems. Respect privacy and data protection laws. Be a force for good in the cybersecurity community.
+                        </div>
+
+                        <h3>Mission Complete</h3>
+                        <p style="font-size: 1.2rem; color: var(--cyber-red); font-weight: 600; text-align: center; margin-top: 2rem;">
+                            ⟨ CLEARANCE LEVEL: PYTHON FUNDAMENTALS ⟩<br>
+                            ⟨ STATUS: AUTHORIZED ⟩
+                        </p>
+                    </div>
+                `
+            }
+        ];
+
+        // Initial code snippets for challenges
+        const initialCode = {
+            'syntax_challenge': `# Fix the indentation in this security check
+security_level = 3
+
+if security_level >= 3:
+print("Access granted to secure zone")
+print("Loading classified data...")
+else:
+    print("Access denied")`,
+            'datatypes_challenge': `# Calculate password entropy
+password_length = 12
+bits_per_char = 6.5
+
+# Your code here: calculate entropy and print the result
+`,
+            'variables_challenge': `# Calculate composite threat score
+vulnerability_score = 8
+exploit_probability = 0.7
+impact_level = 9
+
+# Your code here: calculate final_threat_score and print it
+`,
+            'challenge1': `# Hex to Decimal Converter
+# Your code here:
+`,
+            'challenge2': `# Password Complexity Checker
+# Your code here:
+`,
+            'challenge3': `# Network Subnet Calculator
+# Your code here:
+`,
+            'challenge4': `# CVSS Score Normalizer
+# Your code here:
+`,
+            'challenge5': `# Security Alert Generator
+# Your code here:
+`
+        };
+
+        // Progress tracking
+        let completedPages = new Set(JSON.parse(localStorage.getItem('completedPages') || '[]'));
+        let currentPage = 0;
+
+        function saveChallengeCompletion(challengeId) {
+            let completed = JSON.parse(localStorage.getItem('completedChallenges') || '{}');
+            completed[challengeId] = true;
+            localStorage.setItem('completedChallenges', JSON.stringify(completed));
+        }
+
+        function isChallengeCompleted(challengeId) {
+            let completed = JSON.parse(localStorage.getItem('completedChallenges') || '{}');
+            return completed[challengeId] || false;
+        }
+
+        // Initialize app
+        function init() {
+            console.log('Initializing CyberPython Academy...');
+            console.log('Brython available:', typeof __BRYTHON__ !== 'undefined');
+            
+            renderNavigation();
+            showPage(0);
+            updateProgress();
+            
+            console.log('Initialization complete');
+        }
+
+        function renderNavigation() {
+            const navContainer = document.getElementById('navButtons');
+            navContainer.innerHTML = '';
+            
+            pages.forEach((page, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                btn.textContent = page.title;
+                btn.onclick = () => showPage(index);
+                
+                if (completedPages.has(page.id)) {
+                    btn.classList.add('completed');
+                }
+                
+                navContainer.appendChild(btn);
+            });
+        }
+
+        function showPage(index) {
+            // Update navigation
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+
+            // Update content
+            const mainContent = document.getElementById('mainContent');
+            const page = pages[index];
+            mainContent.innerHTML = page.content;
+
+            // Add page navigation
+            const pageNav = document.createElement('div');
+            pageNav.className = 'page-nav';
+            
+            if (index > 0) {
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'btn btn-secondary';
+                prevBtn.textContent = '← Previous';
+                prevBtn.onclick = () => showPage(index - 1);
+                pageNav.appendChild(prevBtn);
+            } else {
+                pageNav.appendChild(document.createElement('div'));
+            }
+
+            if (index < pages.length - 1) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'btn';
+                nextBtn.textContent = 'Next →';
+                nextBtn.onclick = () => {
+                    markPageComplete(page.id);
+                    showPage(index + 1);
+                };
+                pageNav.appendChild(nextBtn);
+            } else {
+                pageNav.appendChild(document.createElement('div'));
+            }
+
+            mainContent.appendChild(pageNav);
+
+            currentPage = index;
+            window.scrollTo(0, 0);
+
+            // Mark welcome page as completed immediately
+            if (index === 0) {
+                markPageComplete(page.id);
+            }
+        }
+
+        function markPageComplete(pageId) {
+            completedPages.add(pageId);
+            localStorage.setItem('completedPages', JSON.stringify([...completedPages]));
+            renderNavigation();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = (completedPages.size / pages.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+        }
+
+        function resetCode(challengeId) {
+            const codeElement = document.getElementById(challengeId);
+            if (!codeElement) {
+                console.error('Code element not found:', challengeId);
+                return;
+            }
+            
+            if (initialCode[challengeId]) {
+                codeElement.value = initialCode[challengeId];
+                
+                // Clear output if it exists
+                const outputId = challengeId.replace('_challenge', '_output') || challengeId.replace('challenge', 'output');
+                const outputElem = document.getElementById(outputId);
+                if (outputElem) {
+                    outputElem.className = 'output';
+                    outputElem.textContent = 'Click "Run Code" to execute...';
+                }
+            }
+        }
+
+        function runPythonCode(codeId, outputId) {
+            const codeElement = document.getElementById(codeId);
+            const outputElem = document.getElementById(outputId);
+            
+            if (!codeElement || !outputElem) {
+                console.error('Code or output element not found:', codeId, outputId);
+                if (outputElem) {
+                    outputElem.className = 'output error';
+                    outputElem.textContent = 'Error: Editor not initialized';
+                }
+                return;
+            }
+            
+            const userCode = codeElement.value;
+            outputElem.textContent = 'Executing...';
+            outputElem.className = 'output';
+
+            // Use setTimeout to let the UI update
+            setTimeout(() => {
+                try {
+                    // Check if Brython is available
+                    if (typeof __BRYTHON__ === 'undefined') {
+                        outputElem.className = 'output error';
+                        outputElem.textContent = 'Error: Brython library not loaded. Please refresh the page.';
+                        return;
+                    }
+
+                    // Create a unique script ID
+                    const scriptId = 'pyexec_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    
+                    // Create Python script element
+                    const pythonScript = document.createElement('script');
+                    pythonScript.type = 'text/python';
+                    pythonScript.id = scriptId;
+                    
+                    // Build the Python execution wrapper
+                    const lines = userCode.split('\n');
+                    const indentedLines = lines.map(line => '    ' + line);
+                    const indentedCode = indentedLines.join('\n');
+                    
+                    pythonScript.textContent = `
+import sys
+from io import StringIO
+from browser import document
+
+def execute_user_code():
+    output_elem = document["${{outputId}}"]
+    old_stdout = sys.stdout
+    sys.stdout = mystdout = StringIO()
+    
+    try:
+${{indentedCode}}
+        result = mystdout.getvalue()
+        output_elem.className = "output"
+        if result:
+            output_elem.text = result
+        else:
+            output_elem.text = "Code executed successfully (no output)"
+    except Exception as e:
+        output_elem.className = "output error"
+        error_message = f"Error: {type(e).__name__}: {str(e)}"
+        output_elem.text = error_message
+    finally:
+        sys.stdout = old_stdout
+
+execute_user_code()
+`;
+                    
+                    // Add script to DOM
+                    document.body.appendChild(pythonScript);
+                    
+                    // Run the script with Brython
+                    __BRYTHON__.run_script(pythonScript, scriptId);
+                    
+                    // Clean up after a short delay
+                    setTimeout(() => {
+                        const scriptToRemove = document.getElementById(scriptId);
+                        if (scriptToRemove) {
+                            scriptToRemove.remove();
+                        }
+                    }, 200);
+                    
+                } catch (error) {
+                    outputElem.className = 'output error';
+                    outputElem.textContent = 'Execution Error: ' + error.message;
+                    console.error('Python execution error:', error);
+                }
+            }, 50);
+        }
+
+        // Challenge verification functions
+        function runAndCheck(codeId, outputId, checkFunction) {
+            runPythonCode(codeId, outputId);
+            
+            setTimeout(() => {
+                const output = document.getElementById(outputId).textContent;
+                if (checkFunction(output)) {
+                    saveChallengeCompletion(codeId);
+                    const challenge = document.getElementById(codeId).closest('.challenge');
+                    if (challenge) {
+                        challenge.classList.add('challenge-completed');
+                    }
+                    markPageComplete(pages[currentPage].id);
+                }
+            }, 500);
+        }
+
+        function checkPasswordEntropy(output) {
+            return output.includes('78') || output.includes('78.0');
+        }
+
+        function checkThreatScore(output) {
+            return output.includes('5.9') || output.includes('5.90');
+        }
+
+        function checkChallenge1(output) {
+            return output.includes('42') && (output.includes('2A') || output.includes('Hex'));
+        }
+
+        function checkChallenge2(output) {
+            return output.includes('14') && (output.includes('True') || output.includes('Meets'));
+        }
+
+        function checkChallenge3(output) {
+            return output.includes('256') && output.includes('254');
+        }
+
+        function checkChallenge4(output) {
+            return output.includes('7.8') && output.includes('78') && output.includes('HIGH');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            // Left arrow - previous page
+            if (e.key === 'ArrowLeft' && currentPage > 0) {
+                showPage(currentPage - 1);
+            }
+            // Right arrow - next page
+            if (e.key === 'ArrowRight' && currentPage < pages.length - 1) {
+                markPageComplete(pages[currentPage].id);
+                showPage(currentPage + 1);
+            }
+        });
+
+        // Challenge solutions
+        const solutions = {
+            'syntax_challenge': `# Fix the indentation in this security check
+security_level = 3
+
+if security_level >= 3:
+    print("Access granted to secure zone")
+    print("Loading classified data...")
+else:
+    print("Access denied")`,
+            'datatypes_challenge': `# Calculate password entropy
+password_length = 12
+bits_per_char = 6.5
+
+# Calculate entropy and print the result
+entropy = password_length * bits_per_char
+print(f"Password Entropy: {{entropy}} bits")`,
+            'variables_challenge': `# Calculate composite threat score
+vulnerability_score = 8
+exploit_probability = 0.7
+impact_level = 9
+
+# Calculate final_threat_score and print it
+final_threat_score = (vulnerability_score * 0.4) + (exploit_probability * 0.3) + (impact_level * 0.3)
+print(f"Final Threat Score: {final_threat_score}")`,
+            'challenge1': `# Hex to Decimal Converter
+hex_value = "2A"
+decimal_value = int(hex_value, 16)
+print(f"Hex {hex_value} = Decimal {decimal_value}")`,
+            'challenge2': `# Password Complexity Checker
+password = "SecureP@ss2024"
+min_length = 12
+
+actual_length = len(password)
+meets_requirement = actual_length >= min_length
+
+print(f"Password length: {actual_length}, Meets requirement: {meets_requirement}")`,
+            'challenge3': `# Network Subnet Calculator
+subnet_mask = 24
+
+total_ips = 2 ** (32 - subnet_mask)
+usable_hosts = total_ips - 2
+
+print(f"Subnet /{subnet_mask}: {total_ips} total IPs, {usable_hosts} usable hosts")`,
+            'challenge4': `# CVSS Score Normalizer
+cvss_score = 7.8
+
+percentage = (cvss_score / 10) * 100
+severity = "HIGH" if cvss_score >= 7.0 else "MEDIUM"
+
+print(f"CVSS Score: {cvss_score} ({percentage:.1f}%) - Severity: {{severity}}")`,
+            'challenge5': `# Security Alert Generator
+alert_type = "INTRUSION"
+source_ip = "203.0.113.42"
+severity = 9
+timestamp = "2024-01-15 14:32:01"
+
+print("-" * 50)
+print("SECURITY ALERT")
+print("-" * 50)
+print(f"Type:      {alert_type}")
+print(f"Source IP: {source_ip}")
+print(f"Severity:  {{severity}}/10")
+print(f"Timestamp: {{timestamp}}")
+print("-" * 50)`
+        };
+
+        function showSolution(challengeId) {
+            if (confirm('⚠️ Showing the solution will prevent learning! Are you sure you want to see it? Try asking AI for hints instead.')) {
+                if (solutions[challengeId]) {
+                    document.getElementById(challengeId).value = solutions[challengeId];
+                    alert('Solution loaded. Study it carefully and make sure you understand each line!');
+                }
+            }
+        }
+
+        // Reset progress function
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('completedPages');
+                localStorage.removeItem('completedChallenges');
+                completedPages.clear();
+                renderNavigation();
+                updateProgress();
+                showPage(0);
+            }
+        }
+    </script></p></body></html>
