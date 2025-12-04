@@ -1,0 +1,2916 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 15: Testing, Hardening &amp; Documentation | Cybersecurity Programming</title>
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-medium: #1a1a1a;
+            --bg-light: #2a2a2a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-red: #dc3545;
+            --accent-red-dark: #a71d2a;
+            --accent-red-glow: rgba(220, 53, 69, 0.3);
+            --success-green: #28a745;
+            --warning-yellow: #ffc107;
+            --info-blue: #17a2b8;
+            --border-color: #333;
+            --code-bg: #0d1117;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-medium) 0%, var(--bg-dark) 100%);
+            border-bottom: 2px solid var(--accent-red);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--accent-red);
+            text-shadow: 0 0 20px var(--accent-red-glow);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .logo-text span {
+            font-size: 0.9rem;
+            color: var(--accent-red);
+            font-family: 'Courier New', monospace;
+        }
+
+        .week-badge {
+            background: var(--accent-red);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 0 15px var(--accent-red-glow);
+        }
+
+        /* Navigation */
+        .nav-container {
+            background: var(--bg-medium);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+            overflow-x: auto;
+        }
+
+        .nav-tabs {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.25rem;
+            padding: 0.5rem 0;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: var(--bg-dark);
+            color: var(--accent-red);
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .nav-tab .tab-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header h2 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+        }
+
+        .section-icon {
+            font-size: 2rem;
+            color: var(--accent-red);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-medium);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header h3 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .card-icon {
+            color: var(--accent-red);
+            font-size: 1.5rem;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-light);
+            padding: 0.5rem 1rem;
+            border-radius: 6px 6px 0 0;
+            margin: -1rem -1rem 1rem -1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-lang {
+            color: var(--accent-red);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .copy-btn {
+            background: var(--bg-medium);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        /* Syntax Highlighting */
+        .keyword { color: #ff79c6; }
+        .string { color: #f1fa8c; }
+        .function { color: #50fa7b; }
+        .comment { color: #6272a4; font-style: italic; }
+        .decorator { color: #ff79c6; }
+        .class-name { color: #8be9fd; }
+        .number { color: #bd93f9; }
+        .operator { color: #ff79c6; }
+        .builtin { color: #8be9fd; }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-red-dark);
+            box-shadow: 0 0 20px var(--accent-red-glow);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-medium);
+            border-color: var(--accent-red);
+        }
+
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Progress Indicators */
+        .progress-bar {
+            background: var(--bg-light);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--accent-red), var(--success-green));
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Interactive Elements */
+        .interactive-editor {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .editor-header {
+            background: var(--bg-light);
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .editor-title {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        textarea.code-editor {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            background: var(--code-bg);
+            color: var(--text-primary);
+            border: none;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        textarea.code-editor:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px var(--accent-red-glow);
+        }
+
+        .output-area {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .output-success { color: var(--success-green); }
+        .output-error { color: var(--accent-red); }
+        .output-warning { color: var(--warning-yellow); }
+        .output-info { color: var(--info-blue); }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-light);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg-medium);
+            border-left: 3px solid var(--accent-red);
+        }
+
+        .checklist-item.checked {
+            background: rgba(40, 167, 69, 0.1);
+            border-left: 3px solid var(--success-green);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-red);
+            cursor: pointer;
+        }
+
+        .checklist-text {
+            flex: 1;
+        }
+
+        .checklist-text strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .checklist-text span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px var(--accent-red-glow);
+        }
+
+        .form-hint {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .alert-info {
+            background: rgba(23, 162, 184, 0.1);
+            border: 1px solid var(--info-blue);
+            color: var(--info-blue);
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--warning-yellow);
+            color: var(--warning-yellow);
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-light);
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: var(--bg-light);
+        }
+
+        /* Tabs within Cards */
+        .inner-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .inner-tab {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .inner-tab:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .inner-tab.active {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .inner-content {
+            display: none;
+        }
+
+        .inner-content.active {
+            display: block;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-red {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .badge-green {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .badge-yellow {
+            background: var(--warning-yellow);
+            color: var(--bg-dark);
+        }
+
+        .badge-gray {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        /* Expandable Sections */
+        .expandable {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .expandable-header {
+            background: var(--bg-light);
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .expandable-header:hover {
+            background: var(--bg-medium);
+        }
+
+        .expandable-header h4 {
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .expandable-arrow {
+            color: var(--accent-red);
+            transition: transform 0.3s ease;
+        }
+
+        .expandable.open .expandable-arrow {
+            transform: rotate(180deg);
+        }
+
+        .expandable-content {
+            display: none;
+            padding: 1rem;
+            background: var(--bg-medium);
+        }
+
+        .expandable.open .expandable-content {
+            display: block;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-medium);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-red);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* README Preview */
+        .readme-preview {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 2rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        }
+
+        .readme-preview h1 {
+            font-size: 2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .readme-preview h2 {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .readme-preview h3 {
+            font-size: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .readme-preview code {
+            background: var(--bg-light);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .readme-preview pre code {
+            display: block;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        /* Stats Counter */
+        .stats-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .stat-box {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            text-align: center;
+            min-width: 150px;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-red);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Terminal Simulation */
+        .terminal {
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: var(--bg-light);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27c93f; }
+
+        .terminal-body {
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.25rem;
+        }
+
+        .terminal-prompt {
+            color: var(--success-green);
+        }
+
+        .terminal-command {
+            color: var(--text-primary);
+        }
+
+        .terminal-output {
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .nav-tabs {
+                justify-content: flex-start;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-row {
+                flex-direction: column;
+            }
+        }
+
+        /* AI Log Entry */
+        .ai-log-entry {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-red);
+            border-radius: 0 6px 6px 0;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .ai-log-category {
+            font-weight: 500;
+            color: var(--accent-red);
+        }
+
+        .ai-log-timestamp {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .ai-log-prompt {
+            background: var(--code-bg);
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .ai-log-outcome {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .ai-log-outcome strong {
+            color: var(--text-primary);
+        }
+
+        /* Test Result Display */
+        .test-result {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .test-result.pass {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid var(--success-green);
+        }
+
+        .test-result.fail {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid var(--accent-red);
+        }
+
+        .test-result-icon {
+            font-size: 1.25rem;
+        }
+
+        .test-result.pass .test-result-icon { color: var(--success-green); }
+        .test-result.fail .test-result-icon { color: var(--accent-red); }
+
+        .test-result-name {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+        }
+
+        .test-result-time {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+    </style>
+</head><body><header class="header">
+<div class="header-content">
+<div class="logo"><span class="logo-icon">🛡️<span>Testing, Hardening &amp; Documentation</span><br></span>
+<div class="logo-text"><span>// CVNP2646</span></div>
+</div>
+<div class="week-badge">WEEK 15</div>
+</div>
+</header><!-- Navigation --><nav class="nav-container">
+<div class="nav-tabs"><button class="nav-tab active" data-tab="overview"> <span class="tab-icon">📋</span> Overview </button> <button class="nav-tab" data-tab="testing"> <span class="tab-icon">🧪</span> Testing Lab </button> <button class="nav-tab" data-tab="hardening"> <span class="tab-icon">🔒</span> Hardening </button> <button class="nav-tab" data-tab="documentation"> <span class="tab-icon">📝</span> Documentation </button> <button class="nav-tab" data-tab="readme-builder"> <span class="tab-icon">🔧</span> README Builder </button> <button class="nav-tab" data-tab="ai-tracker"> <span class="tab-icon">🤖</span> AI Usage Log </button> <button class="nav-tab" data-tab="checklist"> <span class="tab-icon">✅</span> Final Checklist </button></div>
+</nav><!-- Main Content --><main class="main-content"><!-- Overview Tab -->
+<div id="overview" class="tab-content active">
+<div class="section-header"><span class="section-icon">📋</span>
+<h2>Week 15: Polish Your MVP</h2>
+</div>
+<div class="alert alert-info"><span class="alert-icon">💡</span>
+<div><strong>This Week's Mission:</strong> Transform your working MVP from Week 14 into something you'd be proud to share with a team. Add tests, improve error handling, and write documentation that makes your tool easy to use.</div>
+</div>
+<div class="stats-row">
+<div class="stat-box">
+<div class="stat-value" id="progress-percent">0%</div>
+<div class="stat-label">Overall Progress</div>
+</div>
+<div class="stat-box">
+<div class="stat-value" id="tests-written">0</div>
+<div class="stat-label">Tests Written</div>
+</div>
+<div class="stat-box">
+<div class="stat-value" id="ai-entries">0</div>
+<div class="stat-label">AI Log Entries</div>
+</div>
+<div class="stat-box">
+<div class="stat-value">2-3 hrs</div>
+<div class="stat-label">Estimated Time</div>
+</div>
+</div>
+<div class="grid-2">
+<div class="card">
+<div class="card-header"><span class="card-icon">🎯</span>
+<h3>Learning Objectives</h3>
+</div>
+<ul style="padding-left: 1.5rem; color: var(--text-secondary);">
+<li style="margin-bottom: 0.5rem;">Write unit tests using <code>pytest</code> and <code>unittest</code></li>
+<li style="margin-bottom: 0.5rem;">Design test cases: normal, edge, and invalid inputs</li>
+<li style="margin-bottom: 0.5rem;">Implement robust JSON validation and error handling</li>
+<li style="margin-bottom: 0.5rem;">Configure Python's <code>logging</code> module effectively</li>
+<li style="margin-bottom: 0.5rem;">Write professional README documentation</li>
+<li style="margin-bottom: 0.5rem;">Track and reflect on AI-assisted development</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">📦</span>
+<h3>Deliverables</h3>
+</div>
+<ul style="padding-left: 1.5rem; color: var(--text-secondary);">
+<li style="margin-bottom: 0.5rem;"><strong>Refined codebase</strong> with working test suite</li>
+<li style="margin-bottom: 0.5rem;"><strong>Improved error handling</strong> and logging</li>
+<li style="margin-bottom: 0.5rem;"><strong>Polished README.md</strong> with usage examples</li>
+<li style="margin-bottom: 0.5rem;"><strong>Updated JSON examples</strong> (input/output)</li>
+<li style="margin-bottom: 0.5rem;"><strong>AI Usage Log (draft)</strong> documenting key prompts</li>
+</ul>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">🗺️</span>
+<h3>Your Capstone Journey</h3>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1rem 0;">
+<div style="text-align: center; flex: 1; min-width: 150px;">
+<div style="font-size: 2rem;">📝</div>
+<div style="color: var(--text-secondary); margin-top: 0.5rem;">Week 13</div>
+<div style="color: var(--text-primary); font-weight: 500;">Planning</div>
+<span class="badge badge-green">Complete</span></div>
+<div style="font-size: 2rem; color: var(--border-color);">→</div>
+<div style="text-align: center; flex: 1; min-width: 150px;">
+<div style="font-size: 2rem;">⚙️</div>
+<div style="color: var(--text-secondary); margin-top: 0.5rem;">Week 14</div>
+<div style="color: var(--text-primary); font-weight: 500;">MVP Build</div>
+<span class="badge badge-green">Complete</span></div>
+<div style="font-size: 2rem; color: var(--border-color);">→</div>
+<div style="text-align: center; flex: 1; min-width: 150px; padding: 1rem; border: 2px solid var(--accent-red); border-radius: 8px;">
+<div style="font-size: 2rem;">✨</div>
+<div style="color: var(--accent-red); margin-top: 0.5rem;">Week 15</div>
+<div style="color: var(--text-primary); font-weight: 500;">Polish</div>
+<span class="badge badge-red">YOU ARE HERE</span></div>
+<div style="font-size: 2rem; color: var(--border-color);">→</div>
+<div style="text-align: center; flex: 1; min-width: 150px;">
+<div style="font-size: 2rem;">🎓</div>
+<div style="color: var(--text-secondary); margin-top: 0.5rem;">Week 16</div>
+<div style="color: var(--text-primary); font-weight: 500;">Final Demo</div>
+<span class="badge badge-gray">Upcoming</span></div>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">🤖</span>
+<h3>AI Focus This Week</h3>
+</div>
+<div class="grid-2" style="margin-top: 1rem;">
+<div style="padding: 1rem; background: var(--bg-light); border-radius: 6px;">
+<h4 style="color: var(--success-green); margin-bottom: 0.5rem;">✅ Use AI For</h4>
+<ul style="padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.95rem;">
+<li>Generating test case ideas</li>
+<li>Suggesting edge cases to cover</li>
+<li>Refactoring long functions into smaller ones</li>
+<li>Writing docstrings and comments</li>
+<li>Formatting README sections</li>
+</ul>
+</div>
+<div style="padding: 1rem; background: var(--bg-light); border-radius: 6px;">
+<h4 style="color: var(--accent-red); margin-bottom: 0.5rem;">⚠️ Stay In Control</h4>
+<ul style="padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.95rem;">
+<li>Review every test AI generates</li>
+<li>Understand what each test validates</li>
+<li>Document which suggestions you accepted/rejected</li>
+<li>Be able to explain your test strategy</li>
+<li>Know why each edge case matters</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<!-- Testing Lab Tab -->
+<div id="testing" class="tab-content">
+<div class="section-header"><span class="section-icon">🧪</span>
+<h2>Testing Lab</h2>
+</div>
+<div class="alert alert-info"><span class="alert-icon">🎯</span>
+<div><strong>Goal:</strong> Write unit tests that validate your core logic works correctly. Focus on pure functions first—they're easiest to test.</div>
+</div>
+<!-- Testing Framework Tabs -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📚</span>
+<h3>Choose Your Testing Framework</h3>
+</div>
+<div class="inner-tabs"><button class="inner-tab active" data-inner="pytest">pytest (Recommended)</button> <button class="inner-tab" data-inner="unittest">unittest (Built-in)</button> <button class="inner-tab" data-inner="comparison">Comparison</button></div>
+<div id="pytest" class="inner-content active">
+<h4 style="color: var(--text-primary); margin-bottom: 1rem;">pytest: Simple and Powerful</h4>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">pytest is the most popular Python testing framework. It requires minimal boilerplate and has intuitive syntax.</p>
+<div class="code-block">
+<div class="code-header"><span class="code-lang">Python - pytest example</span> <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="comment"># test_risk_scorer.py</span>
+<span class="keyword">import</span> pytest
+<span class="keyword">from</span> risk_scorer <span class="keyword">import</span> calculate_risk_score
+
+<span class="comment"># Normal case: typical input</span>
+<span class="keyword">def</span> <span class="function">test_calculate_risk_score_normal</span>():
+    finding = {
+        <span class="string">"severity"</span>: <span class="string">"high"</span>,
+        <span class="string">"cvss_score"</span>: <span class="number">8.5</span>,
+        <span class="string">"exploitable"</span>: <span class="keyword">True</span>
+    }
+    score = calculate_risk_score(finding)
+    <span class="keyword">assert</span> score == <span class="number">85</span>
+    <span class="keyword">assert</span> <span class="builtin">isinstance</span>(score, <span class="builtin">int</span>)
+
+<span class="comment"># Edge case: boundary values</span>
+<span class="keyword">def</span> <span class="function">test_calculate_risk_score_max_cvss</span>():
+    finding = {
+        <span class="string">"severity"</span>: <span class="string">"critical"</span>,
+        <span class="string">"cvss_score"</span>: <span class="number">10.0</span>,
+        <span class="string">"exploitable"</span>: <span class="keyword">True</span>
+    }
+    score = calculate_risk_score(finding)
+    <span class="keyword">assert</span> score == <span class="number">100</span>  <span class="comment"># Should cap at 100</span>
+
+<span class="comment"># Invalid input: should raise exception</span>
+<span class="keyword">def</span> <span class="function">test_calculate_risk_score_invalid_severity</span>():
+    finding = {
+        <span class="string">"severity"</span>: <span class="string">"super-bad"</span>,  <span class="comment"># Invalid!</span>
+        <span class="string">"cvss_score"</span>: <span class="number">5.0</span>
+    }
+    <span class="keyword">with</span> pytest.raises(<span class="builtin">ValueError</span>):
+        calculate_risk_score(finding)</pre>
+</div>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span></div>
+<div class="terminal-body">
+<div class="terminal-line"><span class="terminal-prompt">$ </span> <span class="terminal-command">pip install pytest</span></div>
+<div class="terminal-line"><span class="terminal-prompt">$ </span> <span class="terminal-command">pytest test_risk_scorer.py -v</span></div>
+<div class="terminal-line terminal-output">========================= test session starts =========================</div>
+<div class="terminal-line terminal-output" style="color: var(--success-green);">test_risk_scorer.py::test_calculate_risk_score_normal PASSED</div>
+<div class="terminal-line terminal-output" style="color: var(--success-green);">test_risk_scorer.py::test_calculate_risk_score_max_cvss PASSED</div>
+<div class="terminal-line terminal-output" style="color: var(--success-green);">test_risk_scorer.py::test_calculate_risk_score_invalid_severity PASSED</div>
+<div class="terminal-line terminal-output" style="color: var(--success-green);">========================== 3 passed in 0.02s ==========================</div>
+</div>
+</div>
+</div>
+<div id="unittest" class="inner-content">
+<h4 style="color: var(--text-primary); margin-bottom: 1rem;">unittest: Python's Built-in Framework</h4>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">unittest comes with Python—no installation needed. It uses a class-based approach inspired by Java's JUnit.</p>
+<div class="code-block">
+<div class="code-header"><span class="code-lang">Python - unittest example</span> <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="comment"># test_risk_scorer.py</span>
+<span class="keyword">import</span> unittest
+<span class="keyword">from</span> risk_scorer <span class="keyword">import</span> calculate_risk_score
+
+<span class="keyword">class</span> <span class="class-name">TestRiskScorer</span>(unittest.TestCase):
+    
+    <span class="keyword">def</span> <span class="function">test_calculate_risk_score_normal</span>(self):
+        <span class="string">"""Test with typical valid input."""</span>
+        finding = {
+            <span class="string">"severity"</span>: <span class="string">"high"</span>,
+            <span class="string">"cvss_score"</span>: <span class="number">8.5</span>,
+            <span class="string">"exploitable"</span>: <span class="keyword">True</span>
+        }
+        score = calculate_risk_score(finding)
+        self.assertEqual(score, <span class="number">85</span>)
+        self.assertIsInstance(score, <span class="builtin">int</span>)
+    
+    <span class="keyword">def</span> <span class="function">test_calculate_risk_score_max_cvss</span>(self):
+        <span class="string">"""Edge case: maximum CVSS score."""</span>
+        finding = {
+            <span class="string">"severity"</span>: <span class="string">"critical"</span>,
+            <span class="string">"cvss_score"</span>: <span class="number">10.0</span>,
+            <span class="string">"exploitable"</span>: <span class="keyword">True</span>
+        }
+        score = calculate_risk_score(finding)
+        self.assertEqual(score, <span class="number">100</span>)
+    
+    <span class="keyword">def</span> <span class="function">test_calculate_risk_score_invalid_severity</span>(self):
+        <span class="string">"""Invalid input should raise ValueError."""</span>
+        finding = {
+            <span class="string">"severity"</span>: <span class="string">"super-bad"</span>,
+            <span class="string">"cvss_score"</span>: <span class="number">5.0</span>
+        }
+        <span class="keyword">with</span> self.assertRaises(<span class="builtin">ValueError</span>):
+            calculate_risk_score(finding)
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    unittest.main()</pre>
+</div>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span></div>
+<div class="terminal-body">
+<div class="terminal-line"><span class="terminal-prompt">$ </span> <span class="terminal-command">python -m unittest test_risk_scorer -v</span></div>
+<div class="terminal-line terminal-output">test_calculate_risk_score_invalid_severity ... ok</div>
+<div class="terminal-line terminal-output">test_calculate_risk_score_max_cvss ... ok</div>
+<div class="terminal-line terminal-output">test_calculate_risk_score_normal ... ok</div>
+<div class="terminal-line terminal-output" style="color: var(--success-green);">----------------------------------------------------------------------</div>
+<div class="terminal-line terminal-output" style="color: var(--success-green);">Ran 3 tests in 0.001s</div>
+<div class="terminal-line terminal-output" style="color: var(--success-green);">OK</div>
+</div>
+</div>
+</div>
+<div id="comparison" class="inner-content">
+<h4 style="color: var(--text-primary); margin-bottom: 1rem;">pytest vs unittest Comparison</h4>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>pytest</th>
+<th>unittest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Installation</td>
+<td><code>pip install pytest</code></td>
+<td>Built-in (no install)</td>
+</tr>
+<tr>
+<td>Assertions</td>
+<td>Plain <code>assert</code></td>
+<td><code>self.assertEqual()</code>, etc.</td>
+</tr>
+<tr>
+<td>Test Discovery</td>
+<td>Automatic</td>
+<td>Automatic</td>
+</tr>
+<tr>
+<td>Syntax</td>
+<td>Functions</td>
+<td>Classes</td>
+</tr>
+<tr>
+<td>Output Detail</td>
+<td>Excellent failure messages</td>
+<td>Basic messages</td>
+</tr>
+<tr>
+<td>Learning Curve</td>
+<td>Very easy</td>
+<td>Moderate</td>
+</tr>
+<tr>
+<td>Enterprise Use</td>
+<td>Widely used</td>
+<td>Standard library</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="alert alert-success" style="margin-top: 1rem;"><span class="alert-icon">💡</span>
+<div><strong>Recommendation:</strong> Start with pytest for its simplicity. You can always add unittest later if your team requires it.</div>
+</div>
+</div>
+</div>
+<!-- Test Case Design -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🎯</span>
+<h3>Designing High-Value Test Cases</h3>
+</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Not all tests are equal. Focus on tests that catch real bugs. Every test should answer: "What could go wrong here?"</p>
+<div class="grid-3">
+<div class="expandable open">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>✅ Normal Case</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<p style="color: var(--text-secondary); margin-bottom: 0.75rem;">The "happy path"—typical, expected input that your code should handle every day.</p>
+<strong style="color: var(--text-primary);">Examples:</strong>
+<ul style="padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+<li>Valid JSON with all required fields</li>
+<li>Log entry with standard timestamp format</li>
+<li>User input within expected ranges</li>
+<li>File that exists and is readable</li>
+</ul>
+</div>
+</div>
+<div class="expandable">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>⚠️ Edge Case</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<p style="color: var(--text-secondary); margin-bottom: 0.75rem;">Boundary conditions and unusual-but-valid inputs that often reveal bugs.</p>
+<strong style="color: var(--text-primary);">Examples:</strong>
+<ul style="padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+<li>Empty list or empty dictionary</li>
+<li>Maximum/minimum allowed values</li>
+<li>Single item in a list</li>
+<li>Very long strings</li>
+<li>Unicode characters</li>
+<li>Timestamps at midnight or year boundaries</li>
+</ul>
+</div>
+</div>
+<div class="expandable">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>❌ Invalid Input</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<p style="color: var(--text-secondary); margin-bottom: 0.75rem;">Bad data that should be rejected gracefully with clear error messages.</p>
+<strong style="color: var(--text-primary);">Examples:</strong>
+<ul style="padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+<li>Missing required fields</li>
+<li>Wrong data types (string instead of int)</li>
+<li>Values outside valid ranges</li>
+<li>Malformed JSON</li>
+<li>File that doesn't exist</li>
+<li>None/null when not expected</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive Test Builder -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🔨</span>
+<h3>Exercise: Design Your Test Cases</h3>
+</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Plan test cases for one of your capstone's core functions. Describe what you're testing, not the code itself.</p>
+<div class="form-group"><label>Function Being Tested</label> <input type="text" id="test-function-name" placeholder="e.g., calculate_risk_score, parse_log_entry, validate_config"></div>
+<div class="form-group"><label>What Does This Function Do? (one sentence)</label> <input type="text" id="test-function-desc" placeholder="e.g., Takes a finding dict and returns a risk score from 0-100"></div>
+<div style="margin: 1.5rem 0;">
+<h4 style="color: var(--text-primary); margin-bottom: 1rem;">Your Test Cases:</h4>
+<div id="test-cases-container"><!-- Test cases will be added here --></div>
+<button class="btn btn-secondary" style="margin-top: 0.5rem;" onclick="addTestCase()"> + Add Test Case </button></div>
+<div style="display: flex; gap: 1rem; flex-wrap: wrap;"><button class="btn btn-primary" onclick="generateTestTemplate()"> Generate pytest Template </button> <button class="btn btn-secondary" onclick="generateUnittestTemplate()"> Generate unittest Template </button></div>
+<div id="generated-test-code" style="display: none; margin-top: 1.5rem;">
+<h4 style="color: var(--text-primary); margin-bottom: 0.75rem;">Generated Test Template:</h4>
+<div class="code-block">
+<div class="code-header"><span class="code-lang" id="generated-lang">Python</span> <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre id="generated-test-pre"></pre>
+</div>
+</div>
+</div>
+<!-- AI Prompt for Testing -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🤖</span>
+<h3>AI Prompt: Test Case Generator</h3>
+</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Use this prompt template to ask AI for test case ideas:</p>
+<div class="code-block">
+<div class="code-header"><span class="code-lang">AI Prompt Template</span> <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre>I have a Python function that [describe what it does].
+
+Here's the function signature:
+```python
+def [function_name]([parameters]) -&gt; [return_type]:
+    """[docstring]"""
+```
+
+Please suggest:
+1. 3 normal test cases with expected inputs/outputs
+2. 3 edge cases I should test (boundary values, empty inputs, etc.)
+3. 3 invalid inputs that should raise exceptions
+
+For each test case, explain WHY it's important to test.</pre>
+</div>
+<div class="alert alert-warning" style="margin-top: 1rem;"><span class="alert-icon">⚠️</span>
+<div><strong>Remember:</strong> Review every test case AI suggests. Ask yourself: "Does this test something that could actually break? Can I explain why this matters?"</div>
+</div>
+</div>
+</div>
+<!-- Hardening Tab -->
+<div id="hardening" class="tab-content">
+<div class="section-header"><span class="section-icon">🔒</span>
+<h2>Hardening Workshop</h2>
+</div>
+<div class="alert alert-info"><span class="alert-icon">🎯</span>
+<div><strong>Goal:</strong> Make your tool resilient. Bad input should produce helpful error messages, not stack traces. Users should be able to troubleshoot issues using your logs.</div>
+</div>
+<!-- Input Validation -->
+<div class="card">
+<div class="card-header"><span class="card-icon">✅</span>
+<h3>JSON Input Validation</h3>
+</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Never trust input. Validate everything: required fields, data types, and value ranges.</p>
+<div class="inner-tabs"><button class="inner-tab active" data-inner="validation-basic">Basic Validation</button> <button class="inner-tab" data-inner="validation-schema">Schema Validation</button> <button class="inner-tab" data-inner="validation-exercise">Exercise</button></div>
+<div id="validation-basic" class="inner-content active">
+<div class="code-block">
+<div class="code-header"><span class="code-lang">Python - Manual Validation</span> <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="keyword">def</span> <span class="function">validate_finding</span>(data: <span class="builtin">dict</span>) -&gt; <span class="builtin">dict</span>:
+    <span class="string">"""
+    Validate a security finding before processing.
+    
+    Raises:
+        ValueError: If required fields are missing or invalid.
+    """</span>
+    errors = []
+    
+    <span class="comment"># Check required fields exist</span>
+    required_fields = [<span class="string">"id"</span>, <span class="string">"severity"</span>, <span class="string">"cvss_score"</span>]
+    <span class="keyword">for</span> field <span class="keyword">in</span> required_fields:
+        <span class="keyword">if</span> field <span class="keyword">not in</span> data:
+            errors.append(<span class="string">f"Missing required field: </span>{{field}}<span class="string">"</span>)
+    
+    <span class="comment"># Early return if missing required fields</span>
+    <span class="keyword">if</span> errors:
+        <span class="keyword">raise</span> <span class="builtin">ValueError</span>(<span class="string">"Validation failed: "</span> + <span class="string">"; "</span>.join(errors))
+    
+    <span class="comment"># Validate data types</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="builtin">isinstance</span>(data[<span class="string">"id"</span>], <span class="builtin">str</span>):
+        errors.append(<span class="string">f"'id' must be string, got </span>{<span class="builtin">type</span>(data[<span class="string">'id'</span>]).__name__}<span class="string">"</span>)
+    
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="builtin">isinstance</span>(data[<span class="string">"cvss_score"</span>], (<span class="builtin">int</span>, <span class="builtin">float</span>)):
+        errors.append(<span class="string">"'cvss_score' must be a number"</span>)
+    
+    <span class="comment"># Validate value ranges</span>
+    valid_severities = [<span class="string">"low"</span>, <span class="string">"medium"</span>, <span class="string">"high"</span>, <span class="string">"critical"</span>]
+    <span class="keyword">if</span> data.get(<span class="string">"severity"</span>) <span class="keyword">not in</span> valid_severities:
+        errors.append(
+            <span class="string">f"'severity' must be one of </span>{valid_severities}<span class="string">, "</span>
+            <span class="string">f"got '</span>{data.get(<span class="string">'severity'</span>)}<span class="string">'"</span>
+        )
+    
+    cvss = data.get(<span class="string">"cvss_score"</span>, <span class="number">0</span>)
+    <span class="keyword">if</span> <span class="builtin">isinstance</span>(cvss, (<span class="builtin">int</span>, <span class="builtin">float</span>)) <span class="keyword">and not</span> (<span class="number">0</span> &lt;= cvss &lt;= <span class="number">10</span>):
+        errors.append(<span class="string">f"'cvss_score' must be 0-10, got </span>{{cvss}}<span class="string">"</span>)
+    
+    <span class="keyword">if</span> errors:
+        <span class="keyword">raise</span> <span class="builtin">ValueError</span>(<span class="string">"Validation failed: "</span> + <span class="string">"; "</span>.join(errors))
+    
+    <span class="keyword">return</span> data</pre>
+</div>
+</div>
+<div id="validation-schema" class="inner-content">
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">For complex validation, consider a schema-based approach:</p>
+<div class="code-block">
+<div class="code-header"><span class="code-lang">Python - Schema-Based Validation</span> <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="comment"># Define your schema as a dict</span>
+FINDING_SCHEMA = {
+    <span class="string">"required"</span>: [<span class="string">"id"</span>, <span class="string">"severity"</span>, <span class="string">"cvss_score"</span>],
+    <span class="string">"types"</span>: {
+        <span class="string">"id"</span>: <span class="builtin">str</span>,
+        <span class="string">"severity"</span>: <span class="builtin">str</span>,
+        <span class="string">"cvss_score"</span>: (<span class="builtin">int</span>, <span class="builtin">float</span>),
+        <span class="string">"description"</span>: <span class="builtin">str</span>,
+        <span class="string">"exploitable"</span>: <span class="builtin">bool</span>,
+    },
+    <span class="string">"allowed_values"</span>: {
+        <span class="string">"severity"</span>: [<span class="string">"low"</span>, <span class="string">"medium"</span>, <span class="string">"high"</span>, <span class="string">"critical"</span>],
+    },
+    <span class="string">"ranges"</span>: {
+        <span class="string">"cvss_score"</span>: (<span class="number">0</span>, <span class="number">10</span>),
+    }
+}
+
+<span class="keyword">def</span> <span class="function">validate_against_schema</span>(data: <span class="builtin">dict</span>, schema: <span class="builtin">dict</span>) -&gt; <span class="builtin">list</span>:
+    <span class="string">"""Validate data against a schema definition."""</span>
+    errors = []
+    
+    <span class="comment"># Check required fields</span>
+    <span class="keyword">for</span> field <span class="keyword">in</span> schema.get(<span class="string">"required"</span>, []):
+        <span class="keyword">if</span> field <span class="keyword">not in</span> data:
+            errors.append(<span class="string">f"Missing required field: </span>{{field}}<span class="string">"</span>)
+    
+    <span class="comment"># Check types</span>
+    <span class="keyword">for</span> field, expected_type <span class="keyword">in</span> schema.get(<span class="string">"types"</span>, {}).items():
+        <span class="keyword">if</span> field <span class="keyword">in</span> data <span class="keyword">and not</span> <span class="builtin">isinstance</span>(data[field], expected_type):
+            errors.append(
+                <span class="string">f"'</span>{{field}}<span class="string">' must be </span>{expected_type}<span class="string">, "</span>
+                <span class="string">f"got </span>{<span class="builtin">type</span>(data[field]).__name__}<span class="string">"</span>
+            )
+    
+    <span class="comment"># Check allowed values</span>
+    <span class="keyword">for</span> field, allowed <span class="keyword">in</span> schema.get(<span class="string">"allowed_values"</span>, {}).items():
+        <span class="keyword">if</span> field <span class="keyword">in</span> data <span class="keyword">and</span> data[field] <span class="keyword">not in</span> allowed:
+            errors.append(
+                <span class="string">f"'</span>{{field}}<span class="string">' must be one of </span>{{allowed}}<span class="string">"</span>
+            )
+    
+    <span class="comment"># Check ranges</span>
+    <span class="keyword">for</span> field, (min_val, max_val) <span class="keyword">in</span> schema.get(<span class="string">"ranges"</span>, {}).items():
+        <span class="keyword">if</span> field <span class="keyword">in</span> data:
+            val = data[field]
+            <span class="keyword">if</span> <span class="builtin">isinstance</span>(val, (<span class="builtin">int</span>, <span class="builtin">float</span>)):
+                <span class="keyword">if not</span> (min_val &lt;= val &lt;= max_val):
+                    errors.append(
+                        <span class="string">f"'</span>{{field}}<span class="string">' must be between "</span>
+                        <span class="string">f"</span>{min_val}<span class="string"> and </span>{max_val}<span class="string">"</span>
+                    )
+    
+    <span class="keyword">return</span> errors</pre>
+</div>
+</div>
+<div id="validation-exercise" class="inner-content">
+<h4 style="color: var(--text-primary); margin-bottom: 1rem;">Interactive: Validate This JSON</h4>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Enter JSON data and see validation in action:</p>
+<div class="interactive-editor">
+<div class="editor-header"><span class="editor-title">Input JSON</span>
+<div class="editor-actions"><button class="copy-btn" onclick="loadValidSample()">Load Valid Sample</button> <button class="copy-btn" onclick="loadInvalidSample()">Load Invalid Sample</button></div>
+</div>
+<textarea class="code-editor" id="validation-input">{
+  "id": "CVE-2024-1234",
+  "severity": "high",
+  "cvss_score": 8.5,
+  "description": "Remote code execution vulnerability",
+  "exploitable": true
+}</textarea></div>
+<button class="btn btn-primary" style="margin-top: 1rem;" onclick="runValidation()"> Run Validation </button>
+<div id="validation-output" class="output-area" style="margin-top: 1rem;"><span style="color: var(--text-secondary);">Click "Run Validation" to check your JSON...</span></div>
+</div>
+</div>
+<!-- Error Handling -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🛡️</span>
+<h3>Robust Error Handling</h3>
+</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Replace stack traces with helpful error messages. Users shouldn't need to read Python tracebacks.</p>
+<div class="grid-2">
+<div>
+<h4 style="color: var(--accent-red); margin-bottom: 0.75rem;">❌ Before: Stack Trace</h4>
+<div class="code-block" style="font-size: 0.8rem;">
+<pre style="color: var(--accent-red);">Traceback (most recent call last):
+  File "main.py", line 45, in <module>
+    process_findings(data)
+  File "processor.py", line 23, in process_findings
+    score = finding["cvss_score"] * 10
+KeyError: 'cvss_score'</module></pre>
+</div>
+</div>
+<div>
+<h4 style="color: var(--success-green); margin-bottom: 0.75rem;">✅ After: Helpful Message</h4>
+<div class="code-block" style="font-size: 0.8rem;">
+<pre style="color: var(--success-green);">ERROR: Invalid finding in input file
+  → Missing required field: 'cvss_score'
+  → Finding ID: CVE-2024-5678
+  → Location: findings[2]
+
+Hint: Each finding must have 'id', 
+'severity', and 'cvss_score' fields.</pre>
+</div>
+</div>
+</div>
+<div class="code-block" style="margin-top: 1.5rem;">
+<div class="code-header"><span class="code-lang">Python - Error Handling Pattern</span> <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="keyword">import</span> sys
+<span class="keyword">import</span> logging
+
+logger = logging.getLogger(__name__)
+
+<span class="keyword">class</span> <span class="class-name">ValidationError</span>(<span class="builtin">Exception</span>):
+    <span class="string">"""Custom exception for validation failures."""</span>
+    <span class="keyword">pass</span>
+
+<span class="keyword">def</span> <span class="function">main</span>():
+    <span class="keyword">try</span>:
+        <span class="comment"># Load and validate input</span>
+        config = load_config(args.config)
+        data = load_json(args.input)
+        validated_data = validate_input(data)
+        
+        <span class="comment"># Process data</span>
+        results = process_findings(validated_data)
+        
+        <span class="comment"># Write output</span>
+        write_output(results, args.output)
+        
+    <span class="keyword">except</span> FileNotFoundError <span class="keyword">as</span> e:
+        logger.error(<span class="string">f"File not found: </span>{e.filename}<span class="string">"</span>)
+        <span class="builtin">print</span>(<span class="string">f"ERROR: Could not find file '</span>{e.filename}<span class="string">'"</span>)
+        <span class="builtin">print</span>(<span class="string">"Hint: Check that the file path is correct."</span>)
+        sys.exit(<span class="number">1</span>)
+        
+    <span class="keyword">except</span> json.JSONDecodeError <span class="keyword">as</span> e:
+        logger.error(<span class="string">f"Invalid JSON: </span>{{e}}<span class="string">"</span>)
+        <span class="builtin">print</span>(<span class="string">f"ERROR: Invalid JSON in input file"</span>)
+        <span class="builtin">print</span>(<span class="string">f"  → Line </span>{e.lineno}<span class="string">, column </span>{e.colno}<span class="string">"</span>)
+        <span class="builtin">print</span>(<span class="string">f"  → </span>{e.msg}<span class="string">"</span>)
+        sys.exit(<span class="number">1</span>)
+        
+    <span class="keyword">except</span> ValidationError <span class="keyword">as</span> e:
+        logger.error(<span class="string">f"Validation failed: </span>{{e}}<span class="string">"</span>)
+        <span class="builtin">print</span>(<span class="string">f"ERROR: Input validation failed"</span>)
+        <span class="builtin">print</span>(<span class="string">f"  → </span>{{e}}<span class="string">"</span>)
+        sys.exit(<span class="number">1</span>)
+        
+    <span class="keyword">except</span> <span class="builtin">Exception</span> <span class="keyword">as</span> e:
+        <span class="comment"># Catch-all for unexpected errors</span>
+        logger.exception(<span class="string">"Unexpected error occurred"</span>)
+        <span class="builtin">print</span>(<span class="string">f"ERROR: An unexpected error occurred"</span>)
+        <span class="builtin">print</span>(<span class="string">f"  → </span>{<span class="builtin">type</span>(e).__name__}<span class="string">: </span>{{e}}<span class="string">"</span>)
+        <span class="builtin">print</span>(<span class="string">"Please check the log file for details."</span>)
+        sys.exit(<span class="number">1</span>)</pre>
+</div>
+</div>
+<!-- Logging -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📋</span>
+<h3>Logging for Troubleshooting</h3>
+</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">Good logs help you (and others) understand what your tool did and why it failed.</p>
+<div class="code-block">
+<div class="code-header"><span class="code-lang">Python - Logging Setup</span> <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre><span class="keyword">import</span> logging
+<span class="keyword">from</span> datetime <span class="keyword">import</span> datetime
+
+<span class="keyword">def</span> <span class="function">setup_logging</span>(log_file: <span class="builtin">str</span> = <span class="keyword">None</span>, level: <span class="builtin">str</span> = <span class="string">"INFO"</span>):
+    <span class="string">"""
+    Configure logging for the application.
+    
+    Args:
+        log_file: Path to log file (optional, logs to stderr if None)
+        level: Logging level (DEBUG, INFO, WARNING, ERROR)
+    """</span>
+    <span class="comment"># Create formatter</span>
+    formatter = logging.Formatter(
+        fmt=<span class="string">"%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"</span>,
+        datefmt=<span class="string">"%Y-%m-%d %H:%M:%S"</span>
+    )
+    
+    <span class="comment"># Get root logger</span>
+    root_logger = logging.getLogger()
+    root_logger.setLevel(getattr(logging, level.upper()))
+    
+    <span class="comment"># Console handler (always)</span>
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    root_logger.addHandler(console_handler)
+    
+    <span class="comment"># File handler (optional)</span>
+    <span class="keyword">if</span> log_file:
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setFormatter(formatter)
+        root_logger.addHandler(file_handler)
+    
+    <span class="keyword">return</span> root_logger
+
+<span class="comment"># Usage in your modules</span>
+logger = logging.getLogger(__name__)
+
+<span class="keyword">def</span> <span class="function">process_findings</span>(findings: <span class="builtin">list</span>) -&gt; <span class="builtin">list</span>:
+    logger.info(<span class="string">f"Processing </span>{<span class="builtin">len</span>(findings)}<span class="string"> findings"</span>)
+    
+    results = []
+    <span class="keyword">for</span> i, finding <span class="keyword">in</span> <span class="builtin">enumerate</span>(findings):
+        logger.debug(<span class="string">f"Processing finding </span>{i+<span class="number">1</span>}<span class="string">: </span>{finding.get(<span class="string">'id'</span>)}<span class="string">"</span>)
+        
+        <span class="keyword">try</span>:
+            result = analyze_finding(finding)
+            results.append(result)
+        <span class="keyword">except</span> <span class="builtin">Exception</span> <span class="keyword">as</span> e:
+            logger.warning(
+                <span class="string">f"Failed to process finding </span>{finding.get(<span class="string">'id'</span>)}<span class="string">: </span>{{e}}<span class="string">"</span>
+            )
+    
+    logger.info(<span class="string">f"Successfully processed </span>{<span class="builtin">len</span>(results)}<span class="string">/</span>{<span class="builtin">len</span>(findings)}<span class="string"> findings"</span>)
+    <span class="keyword">return</span> results</pre>
+</div>
+<div class="alert alert-success" style="margin-top: 1rem;"><span class="alert-icon">💡</span>
+<div><strong>Logging Levels Guide:</strong><br><code>DEBUG</code> - Detailed info for debugging<br><code>INFO</code> - Confirmation that things work as expected<br><code>WARNING</code> - Something unexpected happened, but app continues<br><code>ERROR</code> - A serious problem occurred</div>
+</div>
+</div>
+</div>
+<!-- Documentation Tab -->
+<div id="documentation" class="tab-content">
+<div class="section-header"><span class="section-icon">📝</span>
+<h2>Documentation Best Practices</h2>
+</div>
+<div class="alert alert-info"><span class="alert-icon">🎯</span>
+<div><strong>Goal:</strong> Write documentation that helps someone use your tool in 5 minutes. A good README is the difference between code that gets used and code that gets ignored.</div>
+</div>
+<!-- README Structure -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📄</span>
+<h3>Anatomy of a Great README</h3>
+</div>
+<div class="grid-2" style="margin-top: 1rem;">
+<div>
+<h4 style="color: var(--accent-red); margin-bottom: 1rem;">Essential Sections</h4>
+<div class="expandable open">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>1. Title &amp; Description</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<p style="color: var(--text-secondary);">One paragraph explaining what the tool does and who it's for.</p>
+<code style="display: block; margin-top: 0.5rem; padding: 0.5rem; background: var(--code-bg); border-radius: 4px;">
+                                    # Vulnerability Risk Scorer<br>
+                                    A command-line tool that analyzes security findings and calculates risk scores based on CVSS, exploitability, and asset criticality.
+                                </code></div>
+</div>
+<div class="expandable">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>2. Installation</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<p style="color: var(--text-secondary);">Step-by-step instructions to get the tool running.</p>
+<ul style="padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.9rem;">
+<li>Prerequisites (Python version, etc.)</li>
+<li>Clone/download instructions</li>
+<li>Install dependencies</li>
+<li>Verify installation</li>
+</ul>
+</div>
+</div>
+<div class="expandable">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>3. Quick Start / Usage</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<p style="color: var(--text-secondary);">Show the most common use case immediately.</p>
+<code style="display: block; margin-top: 0.5rem; padding: 0.5rem; background: var(--code-bg); border-radius: 4px;">
+                                    python main.py --input findings.json --output report.json
+                                </code></div>
+</div>
+<div class="expandable">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>4. Examples</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<p style="color: var(--text-secondary);">Concrete examples with real data:</p>
+<ul style="padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.9rem;">
+<li>Sample input JSON</li>
+<li>Sample output JSON</li>
+<li>Different use cases</li>
+</ul>
+</div>
+</div>
+<div class="expandable">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>5. CLI Reference</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<p style="color: var(--text-secondary);">Document all command-line arguments:</p>
+<code style="display: block; margin-top: 0.5rem; padding: 0.5rem; background: var(--code-bg); border-radius: 4px; font-size: 0.85rem;">
+                                    --input, -i&nbsp;&nbsp;&nbsp;Path to input JSON file (required)<br>
+                                    --output, -o&nbsp;&nbsp;Path to output file (default: stdout)<br>
+                                    --verbose, -v&nbsp;Enable detailed logging
+                                </code></div>
+</div>
+</div>
+<div>
+<h4 style="color: var(--text-secondary); margin-bottom: 1rem;">Optional (But Nice) Sections</h4>
+<ul style="list-style: none; padding: 0;">
+<li style="padding: 0.75rem; background: var(--bg-light); border-radius: 6px; margin-bottom: 0.5rem;"><strong>Architecture/Flow Diagram</strong><br><span style="color: var(--text-secondary); font-size: 0.9rem;">How the tool works internally</span></li>
+<li style="padding: 0.75rem; background: var(--bg-light); border-radius: 6px; margin-bottom: 0.5rem;"><strong>Configuration Options</strong><br><span style="color: var(--text-secondary); font-size: 0.9rem;">Config file format and options</span></li>
+<li style="padding: 0.75rem; background: var(--bg-light); border-radius: 6px; margin-bottom: 0.5rem;"><strong>Troubleshooting</strong><br><span style="color: var(--text-secondary); font-size: 0.9rem;">Common errors and solutions</span></li>
+<li style="padding: 0.75rem; background: var(--bg-light); border-radius: 6px; margin-bottom: 0.5rem;"><strong>Contributing</strong><br><span style="color: var(--text-secondary); font-size: 0.9rem;">How to report bugs or add features</span></li>
+<li style="padding: 0.75rem; background: var(--bg-light); border-radius: 6px; margin-bottom: 0.5rem;"><strong>License</strong><br><span style="color: var(--text-secondary); font-size: 0.9rem;">MIT, Apache, etc.</span></li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Architecture Description -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🏗️</span>
+<h3>Writing Architecture Descriptions</h3>
+</div>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">A brief architecture section helps others understand your code quickly. Use a simple flow diagram:</p>
+<div class="code-block">
+<div class="code-header"><span class="code-lang">Markdown - Architecture Section</span> <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+<pre>## Architecture
+
+### Data Flow
+
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│ Input JSON  │────▶│  Processor   │────▶│ Output JSON │
+│ (findings)  │     │  (scoring)   │     │  (report)   │
+└─────────────┘     └──────────────┘     └─────────────┘
+                           │
+                           ▼
+                    ┌──────────────┐
+                    │   Logging    │
+                    │  (app.log)   │
+                    └──────────────┘
+```
+
+### Key Components
+
+| File | Purpose |
+|------|---------|
+| `main.py` | CLI entry point, argument parsing |
+| `processor.py` | Core scoring logic |
+| `validator.py` | Input validation |
+| `models.py` | Finding and Report classes |
+| `utils.py` | Helper functions |</pre>
+</div>
+<div class="alert alert-warning" style="margin-top: 1rem;"><span class="alert-icon">💡</span>
+<div><strong>Pro Tip:</strong> Keep architecture docs simple. If you need more than one diagram, your code might be too complex.</div>
+</div>
+</div>
+</div>
+<!-- README Builder Tab -->
+<div id="readme-builder" class="tab-content">
+<div class="section-header"><span class="section-icon">🔧</span>
+<h2>README Builder</h2>
+</div>
+<div class="alert alert-info"><span class="alert-icon">🎯</span>
+<div>Fill out the form below to generate a professional README for your capstone project.</div>
+</div>
+<div class="grid-2">
+<div><!-- README Form -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📝</span>
+<h3>Project Information</h3>
+</div>
+<div class="form-group"><label>Project Title *</label> <input type="text" id="readme-title" placeholder="e.g., Vulnerability Risk Scorer" oninput="updateReadmePreview()"></div>
+<div class="form-group"><label>One-Line Description *</label> <input type="text" id="readme-tagline" placeholder="e.g., A CLI tool for prioritizing security findings" oninput="updateReadmePreview()"></div>
+<div class="form-group"><label>Detailed Description</label> <textarea id="readme-description" rows="3" placeholder="What problem does this solve? Who is it for?" oninput="updateReadmePreview()"></textarea></div>
+<div class="form-group"><label>Key Features (one per line)</label> <textarea id="readme-features" rows="4" placeholder="- Calculates risk scores from CVSS data
+- Supports multiple input formats
+- Generates detailed reports" oninput="updateReadmePreview()"></textarea></div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">⚙️</span>
+<h3>Installation &amp; Usage</h3>
+</div>
+<div class="form-group"><label>Python Version</label><select id="readme-python" onchange="updateReadmePreview()">
+<option value="3.8">Python 3.8+</option>
+<option value="3.9">Python 3.9+</option>
+<option value="3.10" selected="selected">Python 3.10+</option>
+<option value="3.11">Python 3.11+</option>
+</select></div>
+<div class="form-group"><label>Dependencies (one per line)</label> <textarea id="readme-deps" rows="3" placeholder="requests
+pytest" oninput="updateReadmePreview()"></textarea></div>
+<div class="form-group"><label>Basic Usage Command *</label> <input type="text" id="readme-usage" placeholder="python main.py --input findings.json --output report.json" oninput="updateReadmePreview()"></div>
+<div class="form-group"><label>CLI Arguments (format: --arg Description)</label> <textarea id="readme-args" rows="4" placeholder="--input, -i   Path to input JSON file (required)
+--output, -o  Path to output file (default: stdout)
+--verbose     Enable detailed logging" oninput="updateReadmePreview()"></textarea></div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">📁</span>
+<h3>Examples</h3>
+</div>
+<div class="form-group"><label>Sample Input JSON</label> <textarea id="readme-input-example" rows="6" class="code-editor" placeholder="{
+  &quot;findings&quot;: [
+    {&quot;id&quot;: &quot;CVE-2024-1234&quot;, &quot;severity&quot;: &quot;high&quot;, &quot;cvss_score&quot;: 8.5}
+  ]
+}" oninput="updateReadmePreview()"></textarea></div>
+<div class="form-group"><label>Sample Output JSON</label> <textarea id="readme-output-example" rows="6" class="code-editor" placeholder="{
+  &quot;total_findings&quot;: 1,
+  &quot;high_risk&quot;: 1,
+  &quot;risk_score&quot;: 85
+}" oninput="updateReadmePreview()"></textarea></div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">🏗️</span>
+<h3>Architecture</h3>
+</div>
+<div class="form-group"><label>Project Structure (key files)</label> <textarea id="readme-structure" rows="6" placeholder="main.py          - CLI entry point
+processor.py     - Core logic
+validator.py     - Input validation
+models.py        - Data classes
+tests/           - Test suite" oninput="updateReadmePreview()"></textarea></div>
+<div class="form-group"><label>Brief Flow Description</label> <textarea id="readme-flow" rows="3" placeholder="The tool reads JSON findings, validates them, calculates risk scores using CVSS and exploitability factors, then outputs a prioritized report." oninput="updateReadmePreview()"></textarea></div>
+</div>
+</div>
+<div><!-- Preview -->
+<div class="card" style="position: sticky; top: 120px;">
+<div class="card-header"><span class="card-icon">👁️</span>
+<h3>Live Preview</h3>
+<div style="margin-left: auto; display: flex; gap: 0.5rem;"><button class="btn btn-secondary" onclick="copyReadme()">Copy Markdown</button> <button class="btn btn-primary" onclick="downloadReadme()">Download</button></div>
+</div>
+<div id="readme-preview" class="readme-preview" style="max-height: 70vh; overflow-y: auto;"><!-- Preview will be rendered here --></div>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Tracker Tab -->
+<div id="ai-tracker" class="tab-content">
+<div class="section-header"><span class="section-icon">🤖</span>
+<h2>AI Usage Log</h2>
+</div>
+<div class="alert alert-info"><span class="alert-icon">🎯</span>
+<div><strong>Purpose:</strong> Document how you used AI tools to develop your capstone. This helps you reflect on your process and demonstrates responsible AI-assisted development.</div>
+</div>
+<div class="grid-2">
+<div><!-- Add Entry Form -->
+<div class="card">
+<div class="card-header"><span class="card-icon">➕</span>
+<h3>Add AI Interaction</h3>
+</div>
+<div class="form-group"><label>Category</label><select id="ai-category">
+<option value="test-generation">Test Case Generation</option>
+<option value="refactoring">Refactoring / Code Cleanup</option>
+<option value="error-handling">Error Handling</option>
+<option value="documentation">Documentation</option>
+<option value="debugging">Debugging</option>
+<option value="design">Design / Architecture</option>
+<option value="other">Other</option>
+</select></div>
+<div class="form-group"><label>Prompt Used</label> <textarea id="ai-prompt" rows="4" placeholder="Describe what you asked the AI..."></textarea></div>
+<div class="form-group"><label>Outcome</label><select id="ai-outcome">
+<option value="accepted">Accepted - Used as-is</option>
+<option value="modified">Modified - Used with changes</option>
+<option value="rejected">Rejected - Did not use</option>
+<option value="inspired">Inspired - Led to different approach</option>
+</select></div>
+<div class="form-group"><label>Notes (why you accepted/rejected)</label> <textarea id="ai-notes" rows="2" placeholder="Explain your decision..."></textarea></div>
+<button class="btn btn-primary" onclick="addAILogEntry()">Add Entry</button></div>
+<!-- Stats -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📊</span>
+<h3>Usage Statistics</h3>
+</div>
+<div class="stats-row">
+<div class="stat-box">
+<div class="stat-value" id="stat-total">0</div>
+<div class="stat-label">Total Entries</div>
+</div>
+<div class="stat-box">
+<div class="stat-value" id="stat-accepted">0</div>
+<div class="stat-label">Accepted</div>
+</div>
+<div class="stat-box">
+<div class="stat-value" id="stat-rejected">0</div>
+<div class="stat-label">Rejected</div>
+</div>
+</div>
+</div>
+</div>
+<div><!-- Log Entries -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📋</span>
+<h3>AI Usage Log</h3>
+<div style="margin-left: auto; display: flex; gap: 0.5rem;"><button class="btn btn-secondary" onclick="exportAILog()">Export</button></div>
+</div>
+<div id="ai-log-entries">
+<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No entries yet. Add your first AI interaction above.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Prompt Templates -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📝</span>
+<h3>Effective AI Prompts for Week 15</h3>
+</div>
+<div class="grid-3">
+<div class="expandable">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>🧪 Test Generation</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<div class="code-block" style="font-size: 0.85rem;">
+<pre>Here's my function:
+```python
+def [your function]
+```
+
+Generate pytest test cases for:
+1. Normal inputs
+2. Edge cases (empty, max values)
+3. Invalid inputs that should fail
+
+Explain why each test matters.</pre>
+</div>
+<button class="copy-btn" style="margin-top: 0.5rem;" onclick="copyPromptTemplate(this)">Copy Template</button></div>
+</div>
+<div class="expandable">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>🔧 Refactoring</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<div class="code-block" style="font-size: 0.85rem;">
+<pre>This function is too long (50+ lines):
+```python
+def process_data(data):
+    [your code]
+```
+
+Suggest how to break it into smaller, 
+testable functions. Keep the same 
+overall behavior.</pre>
+</div>
+<button class="copy-btn" style="margin-top: 0.5rem;" onclick="copyPromptTemplate(this)">Copy Template</button></div>
+</div>
+<div class="expandable">
+<div class="expandable-header" onclick="toggleExpand(this)">
+<h4>📝 Documentation</h4>
+<span class="expandable-arrow">▼</span></div>
+<div class="expandable-content">
+<div class="code-block" style="font-size: 0.85rem;">
+<pre>Write a docstring for this function:
+```python
+def calculate_risk(finding, config):
+    [your code]
+```
+
+Include:
+- Brief description
+- Args with types
+- Returns
+- Raises (if any)
+- Example usage</pre>
+</div>
+<button class="copy-btn" style="margin-top: 0.5rem;" onclick="copyPromptTemplate(this)">Copy Template</button></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Checklist Tab -->
+<div id="checklist" class="tab-content">
+<div class="section-header"><span class="section-icon">✅</span>
+<h2>Final Submission Checklist</h2>
+</div>
+<div class="alert alert-warning"><span class="alert-icon">⏰</span>
+<div><strong>Before You Submit:</strong> Complete all items below. This checklist ensures your capstone meets all Week 15 requirements.</div>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" id="checklist-progress" style="width: 0%;"></div>
+</div>
+<p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;"><span id="checklist-count">0</span> of <span id="checklist-total">0</span> items complete</p>
+<div class="grid-2">
+<div class="card">
+<div class="card-header"><span class="card-icon">🧪</span>
+<h3>Testing</h3>
+</div>
+<ul class="checklist" id="checklist-testing">
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Test file exists</strong> <span>Created test_*.py or *_test.py file</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Tests actually run</strong> <span>pytest or unittest executes without import errors</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Normal case tests</strong> <span>At least 2 tests for typical/expected inputs</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Edge case tests</strong> <span>At least 2 tests for boundary conditions</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Invalid input tests</strong> <span>At least 1 test that expects an exception</span></div>
+</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">🔒</span>
+<h3>Hardening</h3>
+</div>
+<ul class="checklist" id="checklist-hardening">
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Input validation</strong> <span>Validates required fields and data types</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Clear error messages</strong> <span>No raw stack traces for user errors</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Logging configured</strong> <span>Uses logging module, not just print()</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>File error handling</strong> <span>Handles missing/unreadable files gracefully</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>JSON error handling</strong> <span>Handles malformed JSON with helpful message</span></div>
+</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">📝</span>
+<h3>Documentation</h3>
+</div>
+<ul class="checklist" id="checklist-docs">
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>README.md exists</strong> <span>Has a README file in the project root</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Description included</strong> <span>Explains what the tool does</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Installation instructions</strong> <span>How to set up and install dependencies</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Usage examples</strong> <span>Shows how to run the tool with sample commands</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Sample input/output</strong> <span>Includes example JSON files or snippets</span></div>
+</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">🤖</span>
+<h3>AI Usage</h3>
+</div>
+<ul class="checklist" id="checklist-ai">
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>AI log started</strong> <span>Has at least 3 entries documenting AI use</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Prompts documented</strong> <span>Records what you asked the AI</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Outcomes recorded</strong> <span>Notes whether suggestions were used/rejected</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Can explain code</strong> <span>You understand every line AI helped with</span></div>
+</li>
+</ul>
+</div>
+</div>
+<div class="card" style="margin-top: 1.5rem;">
+<div class="card-header"><span class="card-icon">🎯</span>
+<h3>Final Steps</h3>
+</div>
+<ul class="checklist" id="checklist-final">
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Code runs end-to-end</strong> <span>Tool works from input to output without errors</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>All tests pass</strong> <span>Running pytest shows no failures</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Sample files included</strong> <span>Example input.json and output.json in repo</span></div>
+</li>
+<li class="checklist-item" onclick="toggleChecklistItem(this)"><input type="checkbox">
+<div class="checklist-text"><strong>Ready for demo</strong> <span>Can walk through your tool in 5 minutes</span></div>
+</li>
+</ul>
+</div>
+<div style="text-align: center; margin-top: 2rem;"><button class="btn btn-success" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="exportChecklist()"> 📥 Export Checklist Progress </button></div>
+</div>
+</main><!-- Modal for Generated Content -->
+<div class="modal-overlay" id="modal">
+<div class="modal">
+<div class="modal-header">
+<h3 id="modal-title">Generated Content</h3>
+<button class="modal-close" onclick="closeModal()">×</button></div>
+<div class="modal-body" id="modal-body"><!-- Content inserted dynamically --></div>
+<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Close</button> <button class="btn btn-primary" id="modal-action-btn">Copy</button></div>
+</div>
+</div>
+<p><script>
+        // ========================================
+        // Navigation
+        // ========================================
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update nav tabs
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                // Save state
+                localStorage.setItem('week15-active-tab', tab.dataset.tab);
+            });
+        });
+
+        // Inner tabs
+        document.querySelectorAll('.inner-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const parent = tab.closest('.card');
+                parent.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+                parent.querySelectorAll('.inner-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                parent.querySelector(`#${tab.dataset.inner}`).classList.add('active');
+            });
+        });
+
+        // ========================================
+        // Expandable Sections
+        // ========================================
+        function toggleExpand(header) {
+            const expandable = header.closest('.expandable');
+            expandable.classList.toggle('open');
+        }
+
+        // ========================================
+        // Code Copy
+        // ========================================
+        function copyCode(btn) {
+            const codeBlock = btn.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy', 2000);
+            });
+        }
+
+        function copyPromptTemplate(btn) {
+            const code = btn.previousElementSibling.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy Template', 2000);
+            });
+        }
+
+        // ========================================
+        // Test Case Builder
+        // ========================================
+        let testCases = [];
+        let testCaseId = 0;
+
+        function addTestCase() {
+            testCaseId++;
+            const container = document.getElementById('test-cases-container');
+            
+            const testCaseHtml = `
+                <div class="test-case-entry" id="test-case-${{testCaseId}}" style="background: var(--bg-light); padding: 1rem; border-radius: 6px; margin-bottom: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <span style="font-weight: 500; color: var(--accent-red);">Test Case #${{testCaseId}}</span>
+                        <button class="copy-btn" onclick="removeTestCase(${{testCaseId}})" style="background: transparent; border: 1px solid var(--accent-red); color: var(--accent-red);">Remove</button>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                        <label style="font-size: 0.9rem;">Type</label>
+                        <select class="test-type" style="width: 100%; padding: 0.5rem; background: var(--bg-medium); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                            <option value="normal">Normal Case</option>
+                            <option value="edge">Edge Case</option>
+                            <option value="invalid">Invalid Input</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                        <label style="font-size: 0.9rem;">Test Name</label>
+                        <input type="text" class="test-name" placeholder="e.g., test_handles_empty_list" style="width: 100%; padding: 0.5rem; background: var(--bg-medium); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                        <label style="font-size: 0.9rem;">Description</label>
+                        <input type="text" class="test-desc" placeholder="What does this test verify?" style="width: 100%; padding: 0.5rem; background: var(--bg-medium); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-size: 0.9rem;">Expected Behavior</label>
+                        <input type="text" class="test-expect" placeholder="e.g., Returns empty list, Raises ValueError" style="width: 100%; padding: 0.5rem; background: var(--bg-medium); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', testCaseHtml);
+            updateTestCount();
+        }
+
+        function removeTestCase(id) {
+            document.getElementById(`test-case-${{id}}`).remove();
+            updateTestCount();
+        }
+
+        function updateTestCount() {
+            const count = document.querySelectorAll('.test-case-entry').length;
+            document.getElementById('tests-written').textContent = count;
+        }
+
+        function generateTestTemplate() {
+            const funcName = document.getElementById('test-function-name').value || 'my_function';
+            const funcDesc = document.getElementById('test-function-desc').value || 'Does something';
+            const entries = document.querySelectorAll('.test-case-entry');
+            
+            let code = `# test_${funcName.replace(/[^a-z0-9_]/gi, '_').toLowerCase()}.py
+import pytest
+from your_module import ${{funcName}}
+
+"""
+Tests for ${{funcName}}
+${{funcDesc}}
+"""
+
+`;
+            
+            entries.forEach(entry => {
+                const type = entry.querySelector('.test-type').value;
+                const name = entry.querySelector('.test-name').value || `test_${{type}}_case`;
+                const desc = entry.querySelector('.test-desc').value || 'TODO: Add description';
+                const expect = entry.querySelector('.test-expect').value || 'TODO: Add expected behavior';
+                
+                if (type === 'invalid') {
+                    code += `def ${{name}}():
+    """${{desc}}"""
+    # Expected: ${{expect}}
+    with pytest.raises(ValueError):  # or appropriate exception
+        ${{funcName}}(invalid_input)
+
+
+`;
+                } else {
+                    code += `def ${{name}}():
+    """${{desc}}"""
+    # Arrange
+    input_data = {}  # TODO: Add test input
+    expected = None  # TODO: Add expected output
+    
+    # Act
+    result = ${{funcName}}(input_data)
+    
+    # Assert - ${{expect}}
+    assert result == expected
+
+
+`;
+                }
+            });
+            
+            document.getElementById('generated-test-code').style.display = 'block';
+            document.getElementById('generated-lang').textContent = 'Python - pytest';
+            document.getElementById('generated-test-pre').textContent = code;
+        }
+
+        function generateUnittestTemplate() {
+            const funcName = document.getElementById('test-function-name').value || 'my_function';
+            const funcDesc = document.getElementById('test-function-desc').value || 'Does something';
+            const entries = document.querySelectorAll('.test-case-entry');
+            
+            let code = `# test_${funcName.replace(/[^a-z0-9_]/gi, '_').toLowerCase()}.py
+import unittest
+from your_module import ${{funcName}}
+
+
+class Test${funcName.charAt(0).toUpperCase() + funcName.slice(1).replace(/_([a-z])/g, (m, p1) => p1.toUpperCase())}(unittest.TestCase):
+    """
+    Tests for ${{funcName}}
+    ${{funcDesc}}
+    """
+    
+`;
+            
+            entries.forEach(entry => {
+                const type = entry.querySelector('.test-type').value;
+                const name = entry.querySelector('.test-name').value || `test_${{type}}_case`;
+                const desc = entry.querySelector('.test-desc').value || 'TODO: Add description';
+                const expect = entry.querySelector('.test-expect').value || 'TODO: Add expected behavior';
+                
+                if (type === 'invalid') {
+                    code += `    def ${{name}}(self):
+        """${{desc}}"""
+        # Expected: ${{expect}}
+        with self.assertRaises(ValueError):  # or appropriate exception
+            ${{funcName}}(invalid_input)
+    
+`;
+                } else {
+                    code += `    def ${{name}}(self):
+        """${{desc}}"""
+        # Arrange
+        input_data = {}  # TODO: Add test input
+        expected = None  # TODO: Add expected output
+        
+        # Act
+        result = ${{funcName}}(input_data)
+        
+        # Assert - ${{expect}}
+        self.assertEqual(result, expected)
+    
+`;
+                }
+            });
+            
+            code += `
+
+if __name__ == "__main__":
+    unittest.main()
+`;
+            
+            document.getElementById('generated-test-code').style.display = 'block';
+            document.getElementById('generated-lang').textContent = 'Python - unittest';
+            document.getElementById('generated-test-pre').textContent = code;
+        }
+
+        // ========================================
+        // Validation Exercise
+        // ========================================
+        function loadValidSample() {
+            document.getElementById('validation-input').value = JSON.stringify({
+                "id": "CVE-2024-1234",
+                "severity": "high",
+                "cvss_score": 8.5,
+                "description": "Remote code execution vulnerability",
+                "exploitable": true
+            }, null, 2);
+        }
+
+        function loadInvalidSample() {
+            document.getElementById('validation-input').value = JSON.stringify({
+                "id": 12345,
+                "severity": "super-critical",
+                "cvss_score": "high"
+            }, null, 2);
+        }
+
+        function runValidation() {
+            const output = document.getElementById('validation-output');
+            const input = document.getElementById('validation-input').value;
+            
+            try {
+                const data = JSON.parse(input);
+                const errors = validateFinding(data);
+                
+                if (errors.length === 0) {
+                    output.innerHTML = `<span class="output-success">✅ Validation passed! All fields are valid.</span>`;
+                } else {
+                    output.innerHTML = `<span class="output-error">❌ Validation failed:</span><br><br>` +
+                        errors.map(e => `  • ${{e}}`).join('<br>');
+                }
+            } catch (e) {
+                output.innerHTML = `<span class="output-error">❌ JSON Parse Error: ${e.message}</span>`;
+            }
+        }
+
+        function validateFinding(data) {
+            const errors = [];
+            const requiredFields = ['id', 'severity', 'cvss_score'];
+            const validSeverities = ['low', 'medium', 'high', 'critical'];
+            
+            // Check required fields
+            for (const field of requiredFields) {
+                if (!(field in data)) {
+                    errors.push(`Missing required field: '${{field}}'`);
+                }
+            }
+            
+            if (errors.length > 0) return errors;
+            
+            // Type checks
+            if (typeof data.id !== 'string') {
+                errors.push(`'id' must be string, got ${typeof data.id}`);
+            }
+            
+            if (typeof data.cvss_score !== 'number') {
+                errors.push(`'cvss_score' must be number, got ${typeof data.cvss_score}`);
+            }
+            
+            // Value checks
+            if (!validSeverities.includes(data.severity)) {
+                errors.push(`'severity' must be one of ${validSeverities.join(', ')}, got '${data.severity}'`);
+            }
+            
+            if (typeof data.cvss_score === 'number' && (data.cvss_score < 0 || data.cvss_score > 10)) {
+                errors.push(`'cvss_score' must be between 0 and 10, got ${data.cvss_score}`);
+            }
+            
+            return errors;
+        }
+
+        // ========================================
+        // README Builder
+        // ========================================
+        function updateReadmePreview() {
+            const title = document.getElementById('readme-title').value || 'Project Title';
+            const tagline = document.getElementById('readme-tagline').value || 'A brief description';
+            const description = document.getElementById('readme-description').value;
+            const features = document.getElementById('readme-features').value;
+            const python = document.getElementById('readme-python').value;
+            const deps = document.getElementById('readme-deps').value;
+            const usage = document.getElementById('readme-usage').value || 'python main.py';
+            const args = document.getElementById('readme-args').value;
+            const inputExample = document.getElementById('readme-input-example').value;
+            const outputExample = document.getElementById('readme-output-example').value;
+            const structure = document.getElementById('readme-structure').value;
+            const flow = document.getElementById('readme-flow').value;
+            
+            let preview = `<h1>${escapeHtml(title)}</h1>
+<p>${escapeHtml(tagline)}</p>`;
+            
+            if (description) {
+                preview += `<h2>Overview</h2><p>${escapeHtml(description)}</p>`;
+            }
+            
+            if (features) {
+                preview += `<h2>Features</h2><ul>${features.split('\n').map(f => f.trim()).filter(f => f).map(f => `<li>${escapeHtml(f.replace(/^[-*]\s*/, ''))}</li>`).join('')}</ul>`;
+            }
+            
+            preview += `<h2>Installation</h2>
+<h3>Prerequisites</h3>
+<ul><li>Python ${{python}} or higher</li></ul>
+<h3>Setup</h3>
+<pre><code>git clone &lt;repository-url&gt;
+cd ${title.toLowerCase().replace(/\s+/g, '-')}
+pip install -r requirements.txt</code></pre>`;
+            
+            if (deps) {
+                preview += `<h3>Dependencies</h3><ul>${deps.split('\n').map(d => d.trim()).filter(d => d).map(d => `<li><code>${escapeHtml(d)}</code></li>`).join('')}</ul>`;
+            }
+            
+            preview += `<h2>Usage</h2>
+<h3>Basic Usage</h3>
+<pre><code>${escapeHtml(usage)}</code></pre>`;
+            
+            if (args) {
+                preview += `<h3>CLI Arguments</h3><pre><code>${escapeHtml(args)}</code></pre>`;
+            }
+            
+            if (inputExample || outputExample) {
+                preview += `<h2>Examples</h2>`;
+                if (inputExample) {
+                    preview += `<h3>Sample Input</h3><pre><code>${escapeHtml(inputExample)}</code></pre>`;
+                }
+                if (outputExample) {
+                    preview += `<h3>Sample Output</h3><pre><code>${escapeHtml(outputExample)}</code></pre>`;
+                }
+            }
+            
+            if (structure || flow) {
+                preview += `<h2>Architecture</h2>`;
+                if (flow) {
+                    preview += `<p>${escapeHtml(flow)}</p>`;
+                }
+                if (structure) {
+                    preview += `<h3>Project Structure</h3><pre><code>${escapeHtml(structure)}</code></pre>`;
+                }
+            }
+            
+            preview += `<h2>Testing</h2>
+<pre><code>pytest tests/ -v</code></pre>
+
+<h2>License</h2>
+<p>MIT License</p>`;
+            
+            document.getElementById('readme-preview').innerHTML = preview;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateReadmeMarkdown() {
+            const title = document.getElementById('readme-title').value || 'Project Title';
+            const tagline = document.getElementById('readme-tagline').value || 'A brief description';
+            const description = document.getElementById('readme-description').value;
+            const features = document.getElementById('readme-features').value;
+            const python = document.getElementById('readme-python').value;
+            const deps = document.getElementById('readme-deps').value;
+            const usage = document.getElementById('readme-usage').value || 'python main.py';
+            const args = document.getElementById('readme-args').value;
+            const inputExample = document.getElementById('readme-input-example').value;
+            const outputExample = document.getElementById('readme-output-example').value;
+            const structure = document.getElementById('readme-structure').value;
+            const flow = document.getElementById('readme-flow').value;
+            
+            let md = `# ${{title}}
+
+${{tagline}}
+
+`;
+            
+            if (description) {
+                md += `## Overview
+
+${{description}}
+
+`;
+            }
+            
+            if (features) {
+                md += `## Features
+
+${{features}}
+
+`;
+            }
+            
+            md += `## Installation
+
+### Prerequisites
+
+- Python ${{python}} or higher
+
+### Setup
+
+\`\`\`bash
+git clone <repository-url>
+cd ${title.toLowerCase().replace(/\s+/g, '-')}
+pip install -r requirements.txt
+\`\`\`
+
+`;
+            
+            if (deps) {
+                md += `### Dependencies
+
+${deps.split('\n').map(d => d.trim()).filter(d => d).map(d => `- ${{d}}`).join('\n')}
+
+`;
+            }
+            
+            md += `## Usage
+
+### Basic Usage
+
+\`\`\`bash
+${{usage}}
+\`\`\`
+
+`;
+            
+            if (args) {
+                md += `### CLI Arguments
+
+\`\`\`
+${{args}}
+\`\`\`
+
+`;
+            }
+            
+            if (inputExample || outputExample) {
+                md += `## Examples
+
+`;
+                if (inputExample) {
+                    md += `### Sample Input
+
+\`\`\`json
+${{inputExample}}
+\`\`\`
+
+`;
+                }
+                if (outputExample) {
+                    md += `### Sample Output
+
+\`\`\`json
+${{outputExample}}
+\`\`\`
+
+`;
+                }
+            }
+            
+            if (structure || flow) {
+                md += `## Architecture
+
+`;
+                if (flow) {
+                    md += `${{flow}}
+
+`;
+                }
+                if (structure) {
+                    md += `### Project Structure
+
+\`\`\`
+${{structure}}
+\`\`\`
+
+`;
+                }
+            }
+            
+            md += `## Testing
+
+\`\`\`bash
+pytest tests/ -v
+\`\`\`
+
+## License
+
+MIT License
+`;
+            
+            return md;
+        }
+
+        function copyReadme() {
+            const md = generateReadmeMarkdown();
+            navigator.clipboard.writeText(md).then(() => {
+                alert('README copied to clipboard!');
+            });
+        }
+
+        function downloadReadme() {
+            const md = generateReadmeMarkdown();
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'README.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ========================================
+        // AI Usage Log
+        // ========================================
+        let aiLogEntries = [];
+
+        function addAILogEntry() {
+            const category = document.getElementById('ai-category').value;
+            const prompt = document.getElementById('ai-prompt').value;
+            const outcome = document.getElementById('ai-outcome').value;
+            const notes = document.getElementById('ai-notes').value;
+            
+            if (!prompt.trim()) {
+                alert('Please enter the prompt you used.');
+                return;
+            }
+            
+            const entry = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString(),
+                category: category,
+                categoryLabel: document.getElementById('ai-category').options[document.getElementById('ai-category').selectedIndex].text,
+                prompt: prompt,
+                outcome: outcome,
+                outcomeLabel: document.getElementById('ai-outcome').options[document.getElementById('ai-outcome').selectedIndex].text,
+                notes: notes
+            };
+            
+            aiLogEntries.push(entry);
+            renderAILog();
+            updateAIStats();
+            
+            // Clear form
+            document.getElementById('ai-prompt').value = '';
+            document.getElementById('ai-notes').value = '';
+            
+            // Save to localStorage
+            localStorage.setItem('week15-ai-log', JSON.stringify(aiLogEntries));
+        }
+
+        function renderAILog() {
+            const container = document.getElementById('ai-log-entries');
+            
+            if (aiLogEntries.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">
+                    No entries yet. Add your first AI interaction above.
+                </p>`;
+                return;
+            }
+            
+            container.innerHTML = aiLogEntries.map(entry => `
+                <div class="ai-log-entry">
+                    <div class="ai-log-header">
+                        <span class="ai-log-category">${entry.categoryLabel}</span>
+                        <span class="ai-log-timestamp">${entry.timestamp}</span>
+                    </div>
+                    <div class="ai-log-prompt">${escapeHtml(entry.prompt)}</div>
+                    <div class="ai-log-outcome">
+                        <strong>Outcome:</strong> ${entry.outcomeLabel}
+                        ${entry.notes ? `<br><strong>Notes:</strong> ${escapeHtml(entry.notes)}` : ''}
+                    </div>
+                    <button class="copy-btn" style="margin-top: 0.5rem;" onclick="deleteAIEntry(${entry.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteAIEntry(id) {
+            aiLogEntries = aiLogEntries.filter(e => e.id !== id);
+            renderAILog();
+            updateAIStats();
+            localStorage.setItem('week15-ai-log', JSON.stringify(aiLogEntries));
+        }
+
+        function updateAIStats() {
+            document.getElementById('stat-total').textContent = aiLogEntries.length;
+            document.getElementById('ai-entries').textContent = aiLogEntries.length;
+            document.getElementById('stat-accepted').textContent = aiLogEntries.filter(e => e.outcome === 'accepted' || e.outcome === 'modified').length;
+            document.getElementById('stat-rejected').textContent = aiLogEntries.filter(e => e.outcome === 'rejected').length;
+        }
+
+        function exportAILog() {
+            if (aiLogEntries.length === 0) {
+                alert('No entries to export.');
+                return;
+            }
+            
+            let md = `# AI Usage Log - Week 15
+
+## Summary
+- Total interactions: ${aiLogEntries.length}
+- Accepted/Modified: ${aiLogEntries.filter(e => e.outcome === 'accepted' || e.outcome === 'modified').length}
+- Rejected: ${aiLogEntries.filter(e => e.outcome === 'rejected').length}
+
+## Log Entries
+
+`;
+            
+            aiLogEntries.forEach((entry, i) => {
+                md += `### Entry ${i + 1}: ${entry.categoryLabel}
+**Date:** ${entry.timestamp}
+
+**Prompt:**
+\`\`\`
+${entry.prompt}
+\`\`\`
+
+**Outcome:** ${entry.outcomeLabel}
+${entry.notes ? `\n**Notes:** ${entry.notes}` : ''}
+
+---
+
+`;
+            });
+            
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ai_usage_log.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ========================================
+        // Checklist
+        // ========================================
+        function toggleChecklistItem(item) {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            item.classList.toggle('checked', checkbox.checked);
+            updateChecklistProgress();
+            saveChecklistState();
+        }
+
+        function updateChecklistProgress() {
+            const total = document.querySelectorAll('.checklist-item').length;
+            const checked = document.querySelectorAll('.checklist-item.checked').length;
+            const percent = Math.round((checked / total) * 100);
+            
+            document.getElementById('checklist-progress').style.width = percent + '%';
+            document.getElementById('checklist-count').textContent = checked;
+            document.getElementById('checklist-total').textContent = total;
+            document.getElementById('progress-percent').textContent = percent + '%';
+        }
+
+        function saveChecklistState() {
+            const state = {};
+            document.querySelectorAll('.checklist-item').forEach((item, index) => {
+                state[index] = item.classList.contains('checked');
+            });
+            localStorage.setItem('week15-checklist', JSON.stringify(state));
+        }
+
+        function loadChecklistState() {
+            const state = JSON.parse(localStorage.getItem('week15-checklist') || '{}');
+            document.querySelectorAll('.checklist-item').forEach((item, index) => {
+                if (state[index]) {
+                    item.classList.add('checked');
+                    item.querySelector('input[type="checkbox"]').checked = true;
+                }
+            });
+            updateChecklistProgress();
+        }
+
+        function exportChecklist() {
+            const sections = [
+                { id: 'checklist-testing', name: 'Testing' },
+                { id: 'checklist-hardening', name: 'Hardening' },
+                { id: 'checklist-docs', name: 'Documentation' },
+                { id: 'checklist-ai', name: 'AI Usage' },
+                { id: 'checklist-final', name: 'Final Steps' }
+            ];
+            
+            let md = `# Week 15 Submission Checklist
+
+**Date:** ${new Date().toLocaleDateString()}
+**Progress:** ${document.getElementById('checklist-count').textContent}/${document.getElementById('checklist-total').textContent} items complete
+
+`;
+            
+            sections.forEach(section => {
+                const list = document.getElementById(section.id);
+                if (!list) return;
+                
+                md += `## ${section.name}\n\n`;
+                list.querySelectorAll('.checklist-item').forEach(item => {
+                    const checked = item.classList.contains('checked');
+                    const title = item.querySelector('strong').textContent;
+                    const desc = item.querySelector('span').textContent;
+                    md += `- [${checked ? 'x' : ' '}] **${{title}}**: ${{desc}}\n`;
+                });
+                md += '\n';
+            });
+            
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'week15_checklist.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ========================================
+        // Modal
+        // ========================================
+        function openModal(title, content, actionFn) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('modal-action-btn').onclick = actionFn;
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // ========================================
+        // Initialization
+        // ========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved tab
+            const savedTab = localStorage.getItem('week15-active-tab');
+            if (savedTab) {
+                const tab = document.querySelector(`.nav-tab[data-tab="${{savedTab}}"]`);
+                if (tab) tab.click();
+            }
+            
+            // Load checklist state
+            loadChecklistState();
+            
+            // Load AI log
+            const savedLog = localStorage.getItem('week15-ai-log');
+            if (savedLog) {
+                aiLogEntries = JSON.parse(savedLog);
+                renderAILog();
+                updateAIStats();
+            }
+            
+            // Initialize README preview
+            updateReadmePreview();
+            
+            // Add initial test case
+            addTestCase();
+        });
+    </script></p></body></html>
