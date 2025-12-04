@@ -1,0 +1,2497 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 5: Login Failure Log Scanner | Cybersecurity Programming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a0000 0%, #000000 100%);
+            border: 2px solid #ff0000;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #ff0000;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .warning-banner {
+            background: rgba(255, 0, 0, 0.1);
+            border-left: 4px solid #ff0000;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+
+        .warning-banner strong {
+            color: #ff0000;
+        }
+
+        .progress-container {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #0a0a0a;
+            border: 2px solid #ff0000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000 0%, #cc0000 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .nav-btn {
+            background: #1a1a1a;
+            color: #999;
+            border: 2px solid #333;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        .nav-btn:hover {
+            background: #2a2a2a;
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .nav-btn.active {
+            background: #ff0000;
+            color: #000;
+            border-color: #ff0000;
+        }
+
+        .nav-btn.completed {
+            background: #1a1a1a;
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .section {
+            display: none;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #ff0000;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+
+        h3 {
+            color: #ff4444;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+
+        .terminal {
+            background: #0a0a0a;
+            border: 2px solid #ff0000;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .terminal-header {
+            color: #ff0000;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .terminal-output {
+            color: #00ff00;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .log-line {
+            color: #999;
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 2px;
+        }
+
+        .log-line.fail {
+            border-left: 3px solid #ff0000;
+        }
+
+        .log-line.success {
+            border-left: 3px solid #00ff00;
+        }
+
+        .code-editor {
+            background: #0a0a0a;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            background: #000;
+            color: #00ff00;
+            border: 2px solid #ff0000;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        .btn {
+            background: #ff0000;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 10px 10px 10px 0;
+        }
+
+        .btn:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: #ff0000;
+        }
+
+        .btn-secondary:hover {
+            background: #444;
+        }
+
+        .info-box {
+            background: rgba(255, 0, 0, 0.1);
+            border-left: 4px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 4px solid #00ff00;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #00ff00;
+        }
+
+        .error-box {
+            background: rgba(255, 0, 0, 0.2);
+            border-left: 4px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #ff6666;
+        }
+
+        .hint-box {
+            background: rgba(255, 255, 0, 0.05);
+            border: 2px solid #666;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #ccc;
+        }
+
+        .hint-box summary {
+            color: #ff0000;
+            cursor: pointer;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .hint-box summary:hover {
+            color: #ff4444;
+        }
+
+        .interactive-demo {
+            background: #0a0a0a;
+            border: 2px solid #ff0000;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .output-window {
+            background: #000;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            min-height: 150px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        code {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff6666;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre {
+            background: #0a0a0a;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        pre code {
+            background: none;
+            color: #00ff00;
+            padding: 0;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin: 10px 0;
+        }
+
+        .key-value {
+            background: rgba(255, 0, 0, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #ff9999;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #0a0a0a;
+        }
+
+        th, td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #ff0000;
+            color: #000;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .challenge-box {
+            background: linear-gradient(135deg, #1a0000 0%, #0a0a0a 100%);
+            border: 3px solid #ff0000;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .challenge-title {
+            color: #ff0000;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .challenge-icon {
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+        }
+
+        .copilot-prompt {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid #8a2be2;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .copilot-prompt::before {
+            content: "🤖 GitHub Copilot Prompt:";
+            display: block;
+            color: #8a2be2;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .quiz-container {
+            margin: 30px 0;
+        }
+
+        .quiz-question {
+            background: #0a0a0a;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quiz-options {
+            margin: 15px 0;
+        }
+
+        .quiz-option {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            border-color: #ff0000;
+            background: #2a2a2a;
+        }
+
+        .quiz-option.correct {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .quiz-option.incorrect {
+            border-color: #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .loading {
+            display: inline-block;
+            color: #ff0000;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+    </style>
+</head><body><div class="container"><header>
+<h1>⚠️ WEEK 6: LOGIN FAILURE LOG SCANNER</h1>
+<div class="subtitle">String Parsing, Counters, and JSON Reporting for SOC Operations</div>
+<div class="warning-banner"><strong>INCIDENT ALERT:</strong> Your organization's authentication server has been experiencing abnormal login failures. As a SOC analyst, you need to parse authentication logs, identify attack patterns, and generate actionable intelligence reports.</div>
+</header>
+<div class="progress-container">
+<h3 style="color: #ff0000; margin-bottom: 10px;">Mission Progress</h3>
+<div class="progress-bar">
+<div class="progress-fill" id="progressBar"></div>
+<div class="progress-text" id="progressText">0%</div>
+</div>
+<div class="nav-buttons" id="navButtons"></div>
+</div>
+<!-- Section 1: Introduction & Scenario -->
+<div class="section active" id="section1">
+<h2>🎯 Mission Briefing: Authentication Attack Analysis</h2>
+<div class="terminal">
+<div class="terminal-header">► INCIDENT REPORT - CASE #2024-11-25-AUTH</div>
+<div class="terminal-output">Timestamp: 2024-11-25 03:47:22 UTC Classification: CRITICAL - Potential Brute Force Attack Affected System: auth-server-prod-01.company.com Status: ACTIVE INVESTIGATION Initial Analysis: - 15,247 failed login attempts detected in 6-hour window - 89% failure rate (normal baseline: 2-5%) - Top attacking IP: 198.51.100.45 (3,891 attempts) - Primary targets: admin, root, administrator accounts - Attack pattern: Sequential password guessing (dictionary attack) Your Mission: Build a Python log scanner to parse authentication logs, identify attack patterns, and generate intelligence reports for the incident response team.</div>
+</div>
+<h3>Real-World Context: Why This Matters</h3>
+<p>In Security Operations Centers (SOCs), analysts constantly monitor authentication systems for signs of compromise. Brute force attacks—where attackers try thousands of username/password combinations—are among the most common threats you'll investigate.</p>
+<div class="info-box"><strong>Industry Reality:</strong> According to the 2024 Verizon Data Breach Investigations Report:
+<ul>
+<li>49% of breaches involve stolen credentials</li>
+<li>Automated brute force attacks occur every 39 seconds on average</li>
+<li>SOC analysts spend 30-40% of their time analyzing authentication logs</li>
+<li>Average time to detect a brute force attack: 2-4 hours (we need to do better!)</li>
+</ul>
+</div>
+<h3>Learning Objectives</h3>
+<p>By the end of this module, you'll be able to:</p>
+<ol>
+<li><strong>Parse line-based authentication logs</strong> with key=value format</li>
+<li><strong>Extract and validate critical fields</strong> (timestamp, user, IP, status)</li>
+<li><strong>Handle malformed log entries</strong> without crashing your scanner</li>
+<li><strong>Aggregate data using dictionaries and Counter</strong> to identify patterns</li>
+<li><strong>Generate JSON reports</strong> for SIEM integration</li>
+<li><strong>Create human-readable reports</strong> for your SOC team</li>
+<li><strong>Leverage GitHub Copilot effectively</strong> for edge case discovery and code review</li>
+</ol>
+<h3>Tools You'll Use</h3>
+<table>
+<tbody>
+<tr>
+<th>Python Module</th>
+<th>Purpose</th>
+<th>Why It Matters</th>
+</tr>
+<tr>
+<td><code>collections.Counter</code></td>
+<td>Counting &amp; aggregation</td>
+<td>Optimized for frequency analysis—essential for identifying top attackers</td>
+</tr>
+<tr>
+<td><code>json</code></td>
+<td>Structured output</td>
+<td>Standard format for SIEM tools, APIs, and automation</td>
+</tr>
+<tr>
+<td><code>str.split()</code></td>
+<td>String parsing</td>
+<td>Breaking down log lines into analyzable components</td>
+</tr>
+<tr>
+<td><code>dict</code></td>
+<td>Data aggregation</td>
+<td>Flexible structure for tracking multiple metrics simultaneously</td>
+</tr>
+</tbody>
+</table>
+<div class="info-box"><strong>⏱️ Time Allocation:</strong> This module is designed for 2-3 hours of focused work. Pace yourself:
+<ul>
+<li>Sections 1-3: Understanding (30 min)</li>
+<li>Sections 4-6: Implementation (60-90 min)</li>
+<li>Sections 7-8: Advanced Topics (30 min)</li>
+<li>Section 9: Final Challenge (30-45 min)</li>
+</ul>
+</div>
+<button class="btn" onclick="completeSection(1)">Begin Mission →</button></div>
+<!-- Section 2: Understanding Authentication Logs -->
+<div class="section" id="section2">
+<h2>📋 Understanding Authentication Logs</h2>
+<h3>What Are Authentication Logs?</h3>
+<p>Authentication logs record every attempt to access a system—successful or failed. They're the digital equivalent of a security guard's logbook, tracking who tried to enter, when, and whether they succeeded.</p>
+<div class="terminal">
+<div class="terminal-header">► SAMPLE AUTH LOG (auth.log)</div>
+<div class="terminal-output">2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH 2024-11-25 03:45:15 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH 2024-11-25 03:45:18 event=LOGIN status=FAIL user=root ip=198.51.100.45 method=SSH 2024-11-25 03:46:02 event=LOGIN status=SUCCESS user=jsmith ip=10.0.1.50 method=WEB 2024-11-25 03:46:31 event=LOGIN status=FAIL user=administrator ip=198.51.100.45 method=SSH 2024-11-25 03:47:05 event=LOGIN status=FAIL user=admin ip=203.0.113.89 method=SSH</div>
+</div>
+<h3>Log Format Anatomy</h3>
+<p>Each log line follows a consistent structure with <span class="key-value">key=value</span> pairs separated by spaces:</p>
+<div class="interactive-demo">
+<h4 style="color: #ff0000;">Interactive Log Dissector</h4>
+<div class="demo-controls"><button class="btn btn-secondary" onclick="dissectLog()">Dissect Sample Log</button> <button class="btn btn-secondary" onclick="clearDissection()">Clear</button></div>
+<div class="output-window" id="dissectionOutput">Click "Dissect Sample Log" to see detailed breakdown...</div>
+</div>
+<h3>Key Fields Explained</h3>
+<table>
+<tbody>
+<tr>
+<th>Field</th>
+<th>Example</th>
+<th>Purpose</th>
+<th>Security Relevance</th>
+</tr>
+<tr>
+<td><code>event</code></td>
+<td>LOGIN</td>
+<td>Type of authentication event</td>
+<td>Filters out non-login events</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>FAIL / SUCCESS</td>
+<td>Outcome of attempt</td>
+<td><strong>Critical:</strong> Failed attempts indicate attacks</td>
+</tr>
+<tr>
+<td><code>user</code></td>
+<td>admin</td>
+<td>Account being targeted</td>
+<td>Identifies compromised or targeted accounts</td>
+</tr>
+<tr>
+<td><code>ip</code></td>
+<td>198.51.100.45</td>
+<td>Source IP address</td>
+<td>Tracks attacker location and patterns</td>
+</tr>
+<tr>
+<td><code>method</code></td>
+<td>SSH / WEB</td>
+<td>Authentication method</td>
+<td>Different vectors have different risk profiles</td>
+</tr>
+</tbody>
+</table>
+<h3>SUCCESS vs FAIL: The Critical Distinction</h3>
+<div class="info-box"><strong>Security Analysis Rule #1:</strong> Failed login attempts are your primary indicator of attack activity.
+<ul>
+<li><strong>Multiple FAILs from same IP:</strong> Likely brute force attack</li>
+<li><strong>Multiple FAILs for same user:</strong> Targeted credential attack</li>
+<li><strong>FAIL followed by SUCCESS:</strong> Potential successful compromise (investigate immediately!)</li>
+<li><strong>Normal SUCCESS rate:</strong> 95-98% in typical environments</li>
+</ul>
+</div>
+<div class="terminal">
+<div class="terminal-header">► ATTACK PATTERN EXAMPLE</div>
+<div class="terminal-output" style="font-size: 12px;">03:45:12 status=<span style="color: #ff0000;">FAIL</span> user=admin ip=198.51.100.45 ← First attempt 03:45:15 status=<span style="color: #ff0000;">FAIL</span> user=admin ip=198.51.100.45 ← 3 seconds later, same IP 03:45:18 status=<span style="color: #ff0000;">FAIL</span> user=root ip=198.51.100.45 ← Changed username 03:45:21 status=<span style="color: #ff0000;">FAIL</span> user=admin ip=198.51.100.45 ← Back to admin 03:45:24 status=<span style="color: #ff0000;">FAIL</span> user=admin ip=198.51.100.45 ← Persistent attempts ⚠️ Pattern Analysis: Automated brute force attack - Consistent 3-second intervals (scripted) - Same source IP - Trying common administrator account names</div>
+</div>
+<h3>Knowledge Check</h3>
+<div class="quiz-container">
+<div class="quiz-question"><strong>Question 1:</strong> What's the FIRST field you should check to identify potential security incidents?
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer(this, false)">A) user= field (who's being targeted)</div>
+<div class="quiz-option" onclick="checkAnswer(this, true)">B) status= field (FAIL vs SUCCESS)</div>
+<div class="quiz-option" onclick="checkAnswer(this, false)">C) ip= field (attacker location)</div>
+<div class="quiz-option" onclick="checkAnswer(this, false)">D) method= field (attack vector)</div>
+</div>
+<div id="q1-feedback"></div>
+</div>
+<div class="quiz-question"><strong>Question 2:</strong> An IP address shows 500 FAIL attempts followed by 1 SUCCESS. What does this indicate?
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer(this, false)">A) False alarm - user forgot password</div>
+<div class="quiz-option" onclick="checkAnswer(this, true)">B) Critical: Successful breach after brute force</div>
+<div class="quiz-option" onclick="checkAnswer(this, false)">C) Normal behavior for automated systems</div>
+<div class="quiz-option" onclick="checkAnswer(this, false)">D) Log corruption - ignore this entry</div>
+</div>
+<div id="q2-feedback"></div>
+</div>
+</div>
+<button class="btn" onclick="completeSection(2)">Continue to Parsing →</button></div>
+<!-- Section 3: String Parsing Fundamentals -->
+<div class="section" id="section3">
+<h2>🔍 String Parsing Fundamentals</h2>
+<h3>The Challenge: From String to Structured Data</h3>
+<p>As a SOC analyst, you'll receive logs as raw text. Your job is to transform this unstructured data into something you can analyze programmatically.</p>
+<div class="terminal">
+<div class="terminal-header">► THE PARSING PROBLEM</div>
+<div class="terminal-output">Input (raw string): "2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH" Desired Output (structured dict): { 'timestamp': '2024-11-25 03:45:12', 'event': 'LOGIN', 'status': 'FAIL', 'user': 'admin', 'ip': '198.51.100.45', 'method': 'SSH' }</div>
+</div>
+<h3>Step 1: Splitting on Spaces</h3>
+<p>The first step is breaking the log line into manageable pieces using Python's <code>split()</code> method:</p>
+<pre><code># Basic splitting
+line = "2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin"
+parts = line.split()
+# Result: ['2024-11-25', '03:45:12', 'event=LOGIN', 'status=FAIL', 'user=admin']</code></pre>
+<div class="info-box"><strong>Key Insight:</strong> <code>split()</code> without arguments splits on whitespace (spaces, tabs, newlines) and automatically removes empty strings from the result.</div>
+<h3>Step 2: Extracting Timestamp vs Key=Value Pairs</h3>
+<p>Notice that the first two elements are the timestamp (date + time), while the rest are key=value pairs. We need to handle them differently:</p>
+<pre><code>line = "2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45"
+parts = line.split()
+
+# Extract timestamp (first two parts)
+timestamp = parts[0] + " " + parts[1]  # "2024-11-25 03:45:12"
+
+# Extract key=value pairs (everything after timestamp)
+kv_pairs = parts[2:]  # ['event=LOGIN', 'status=FAIL', 'user=admin', 'ip=198.51.100.45']</code></pre>
+<h3>Step 3: Parsing Key=Value Pairs</h3>
+<p>Each key=value string needs to be split on the <code>=</code> character:</p>
+<pre><code>data = {}
+for pair in kv_pairs:
+    key, value = pair.split('=')
+    data[key] = value
+
+# Result:
+# data = {
+#     'event': 'LOGIN',
+#     'status': 'FAIL',
+#     'user': 'admin',
+#     'ip': '198.51.100.45'
+# }</code></pre>
+<div class="interactive-demo">
+<h4 style="color: #ff0000;">Interactive Parser Builder</h4>
+<p>Try parsing this log line step-by-step:</p>
+<input type="text" id="parseInput" value="2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH" style="width: 100%; padding: 10px; background: #000; color: #00ff00; border: 2px solid #333; border-radius: 4px; font-family: 'Courier New', monospace; margin: 10px 0;">
+<div class="demo-controls"><button class="btn btn-secondary" onclick="parseStep1()">Step 1: Split on Spaces</button> <button class="btn btn-secondary" onclick="parseStep2()">Step 2: Extract Timestamp</button> <button class="btn btn-secondary" onclick="parseStep3()">Step 3: Parse Key=Value</button> <button class="btn btn-secondary" onclick="parseComplete()">Complete Parse</button></div>
+<div class="output-window" id="parseOutput">Ready to parse...</div>
+</div>
+<h3>Putting It All Together: Complete Parser Function</h3>
+<pre><code>def parse_log_line(line):
+    """Parse a single authentication log line into a dictionary."""
+    parts = line.split()
+    
+    # Extract timestamp (first two elements)
+    timestamp = parts[0] + " " + parts[1]
+    
+    # Parse key=value pairs
+    data = {'timestamp': timestamp}
+    for pair in parts[2:]:
+        key, value = pair.split('=')
+        data[key] = value
+    
+    return data
+
+# Usage example
+line = "2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH"
+result = parse_log_line(line)
+print(result)</code></pre>
+<h3>Challenge: But What About Errors?</h3>
+<div class="error-box"><strong>⚠️ Problem:</strong> Real-world logs aren't perfect. What happens if:
+<ul>
+<li>A line has only 1 element (missing timestamp)?</li>
+<li>A key=value pair is missing the <code>=</code> sign?</li>
+<li>A value contains spaces (like <code>user=John Smith</code>)?</li>
+<li>The line is completely malformed?</li>
+</ul>
+<strong>Current code behavior:</strong> CRASH with <code>ValueError</code> or <code>IndexError</code></div>
+<details class="hint-box">
+<summary>💡 Hint: How to Handle Parsing Errors</summary>
+<p>We'll address this in Section 7 (Error Handling), but think about using:</p>
+<ul>
+<li><code>try/except</code> blocks to catch splitting errors</li>
+<li><code>if len(parts) &gt;= 2:</code> to validate timestamp exists</li>
+<li><code>if '=' in pair:</code> to validate key=value format</li>
+<li>Default values for missing fields</li>
+</ul>
+</details>
+<h3>Practice Exercise</h3>
+<div class="challenge-box">
+<div class="challenge-title"><span class="challenge-icon">🎯</span> Quick Coding Challenge</div>
+<p>Write code to parse this log line and extract the <strong>user</strong> and <strong>status</strong> fields:</p>
+<div class="terminal"><code>2024-11-25 04:12:55 event=LOGIN status=SUCCESS user=jdoe ip=10.0.1.23 method=WEB</code></div>
+<textarea id="parseExercise" placeholder="# Write your parsing code here
+line = '2024-11-25 04:12:55 event=LOGIN status=SUCCESS user=jdoe ip=10.0.1.23 method=WEB'
+
+# Your code here...
+"></textarea> <button class="btn" onclick="checkParseExercise()">Test Your Code</button>
+<div id="parseExerciseOutput"></div>
+</div>
+<button class="btn" onclick="completeSection(3)">Continue to Counting &amp; Aggregation →</button></div>
+<!-- Section 4: Counting and Aggregation -->
+<div class="section" id="section4">
+<h2>📊 Counting and Aggregation with Dictionaries</h2>
+<h3>The Core Security Question</h3>
+<p>Once you can parse individual log lines, the real analysis begins: <strong>"Which users are being targeted most? Which IPs are attacking most frequently?"</strong></p>
+<div class="info-box"><strong>SOC Analyst Workflow:</strong>
+<ol>
+<li>Parse all log lines</li>
+<li>Filter for FAIL events (attacks)</li>
+<li>Count failures per user → Identify targeted accounts</li>
+<li>Count failures per IP → Identify attack sources</li>
+<li>Rank and report "Top N Offenders"</li>
+</ol>
+</div>
+<h3>Method 1: Using Plain Dictionaries</h3>
+<p>The simplest approach uses Python dictionaries to track counts:</p>
+<pre><code># Initialize counters
+failed_by_user = {}
+failed_by_ip = {}
+
+# Process each log line
+for line in log_lines:
+    data = parse_log_line(line)
+    
+    # Only count FAIL events
+    if data.get('status') == 'FAIL':
+        user = data.get('user', 'UNKNOWN')
+        ip = data.get('ip', 'UNKNOWN')
+        
+        # Count failures per user
+        if user in failed_by_user:
+            failed_by_user[user] += 1
+        else:
+            failed_by_user[user] = 1
+        
+        # Count failures per IP
+        if ip in failed_by_ip:
+            failed_by_ip[ip] += 1
+        else:
+            failed_by_ip[ip] = 1
+
+print(failed_by_user)  # {'admin': 156, 'root': 89, 'administrator': 45}
+print(failed_by_ip)    # {'198.51.100.45': 3891, '203.0.113.89': 245}</code></pre>
+<div class="info-box"><strong>💡 Better Pattern:</strong> Use <code>dict.get()</code> with default values to simplify:
+<pre><code>failed_by_user[user] = failed_by_user.get(user, 0) + 1</code></pre>
+This automatically handles the "key doesn't exist yet" case!</div>
+<h3>Method 2: Using collections.Counter (Recommended)</h3>
+<p><code>Counter</code> is a specialized dictionary designed exactly for this use case—counting hashable objects:</p>
+<pre><code>from collections import Counter
+
+# Initialize counters
+failed_by_user = Counter()
+failed_by_ip = Counter()
+
+# Process each log line
+for line in log_lines:
+    data = parse_log_line(line)
+    
+    if data.get('status') == 'FAIL':
+        failed_by_user[data.get('user', 'UNKNOWN')] += 1
+        failed_by_ip[data.get('ip', 'UNKNOWN')] += 1
+
+# Counter provides useful methods:
+print(failed_by_user.most_common(3))  # Top 3 targeted users
+# Output: [('admin', 3891), ('root', 1245), ('administrator', 892)]</code></pre>
+<div class="success-box"><strong>✓ Why Counter is Better:</strong>
+<ul>
+<li>No need to check if key exists—auto-initializes to 0</li>
+<li><code>most_common(n)</code> method automatically sorts and returns top N</li>
+<li>Cleaner, more readable code</li>
+<li>Industry-standard approach for frequency analysis</li>
+</ul>
+</div>
+<h3>Interactive Demo: Live Aggregation</h3>
+<div class="interactive-demo">
+<h4 style="color: #ff0000;">Real-Time Log Aggregator</h4>
+<p>Watch how Counter tracks failures as we process logs:</p>
+<div class="demo-controls"><button class="btn btn-secondary" onclick="startAggregation()">Start Processing</button> <button class="btn btn-secondary" onclick="resetAggregation()">Reset</button></div>
+<div class="output-window" id="aggregationOutput">Click "Start Processing" to begin...</div>
+</div>
+<h3>Building "Top N" Lists</h3>
+<p>In incident response, you need to quickly identify the worst offenders:</p>
+<pre><code>from collections import Counter
+
+failed_by_user = Counter()
+failed_by_ip = Counter()
+
+# ... process logs ...
+
+# Get top 5 targeted users
+top_users = failed_by_user.most_common(5)
+print("Top 5 Targeted Accounts:")
+for user, count in top_users:
+    print(f"  {{user}}: {{count}} failed attempts")
+
+# Get top 5 attacking IPs
+top_ips = failed_by_ip.most_common(5)
+print("\nTop 5 Attacking IPs:")
+for ip, count in top_ips:
+    print(f"  {{ip}}: {{count}} failed attempts")</code></pre>
+<div class="terminal">
+<div class="terminal-header">► EXAMPLE OUTPUT</div>
+<div class="terminal-output">Top 5 Targeted Accounts: admin: 3891 failed attempts root: 1245 failed attempts administrator: 892 failed attempts user: 543 failed attempts test: 287 failed attempts Top 5 Attacking IPs: 198.51.100.45: 6234 failed attempts 203.0.113.89: 2156 failed attempts 192.0.2.15: 1823 failed attempts 198.51.100.92: 1098 failed attempts 203.0.113.200: 847 failed attempts</div>
+</div>
+<h3>Tracking Total Statistics</h3>
+<p>Keep running totals for your summary report:</p>
+<pre><code>total_lines = 0
+total_success = 0
+total_fail = 0
+
+for line in log_lines:
+    total_lines += 1
+    data = parse_log_line(line)
+    
+    status = data.get('status')
+    if status == 'SUCCESS':
+        total_success += 1
+    elif status == 'FAIL':
+        total_fail += 1
+
+# Calculate failure rate
+if total_lines &gt; 0:
+    failure_rate = (total_fail / total_lines) * 100
+    print(f"Failure Rate: {failure_rate:.1f}%")
+    
+    if failure_rate &gt; 10:
+        print("⚠️ ALERT: Abnormally high failure rate detected!")</code></pre>
+<h3>Coding Challenge</h3>
+<div class="challenge-box">
+<div class="challenge-title"><span class="challenge-icon">🎯</span> Build a Counter</div>
+<p>Complete this function to count failed logins per user using Counter:</p>
+<textarea id="counterChallenge" style="min-height: 350px;">from collections import Counter
+
+def count_failed_logins(log_lines):
+    """
+    Count failed login attempts per user.
+    
+    Args:
+        log_lines: List of log line strings
+    
+    Returns:
+        Counter object with usernames as keys and failure counts as values
+    """
+    failed_by_user = Counter()
+    
+    for line in log_lines:
+        # TODO: Parse the line
+        # TODO: Check if status is 'FAIL'
+        # TODO: Increment counter for the user
+        pass
+    
+    return failed_by_user
+
+# Test your function
+test_logs = [
+    "2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH",
+    "2024-11-25 03:45:15 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH",
+    "2024-11-25 03:45:18 event=LOGIN status=FAIL user=root ip=198.51.100.45 method=SSH",
+    "2024-11-25 03:46:02 event=LOGIN status=SUCCESS user=jsmith ip=10.0.1.50 method=WEB"
+]
+
+result = count_failed_logins(test_logs)
+print(result)
+# Expected: Counter({'admin': 2, 'root': 1})
+</textarea> <button class="btn" onclick="checkCounterChallenge()">Test Your Code</button>
+<div id="counterChallengeOutput"></div>
+<details class="hint-box">
+<summary>💡 Need Help?</summary>
+<p>Remember the parsing steps from Section 3:</p>
+<ol>
+<li>Split the line: <code>parts = line.split()</code></li>
+<li>Create a data dict for key=value pairs</li>
+<li>Check <code>data.get('status') == 'FAIL'</code></li>
+<li>Increment: <code>failed_by_user[data['user']] += 1</code></li>
+</ol>
+</details>
+</div>
+<button class="btn" onclick="completeSection(4)">Continue to JSON Reporting →</button></div>
+<!-- Section 5: JSON Reporting -->
+<div class="section" id="section5">
+<h2>📤 JSON Reporting for SIEM Integration</h2>
+<h3>Why JSON?</h3>
+<p>In modern SOCs, your log scanner doesn't just print to the terminal—it needs to integrate with Security Information and Event Management (SIEM) platforms like Splunk, Sentinel, or ELK Stack.</p>
+<div class="info-box"><strong>JSON Advantages:</strong>
+<ul>
+<li><strong>Machine-readable:</strong> Other tools can automatically parse and process</li>
+<li><strong>Standardized format:</strong> Works with APIs, databases, and SIEM tools</li>
+<li><strong>Structured data:</strong> Maintains relationships between fields</li>
+<li><strong>Language-agnostic:</strong> Works with Python, JavaScript, PowerShell, etc.</li>
+</ul>
+</div>
+<h3>Basic JSON Output with json.dumps()</h3>
+<p>Python's <code>json</code> module converts Python objects to JSON strings:</p>
+<pre><code>import json
+
+# Simple dictionary to JSON
+data = {
+    'total_failed': 15247,
+    'total_success': 2891,
+    'failure_rate': 84.1
+}
+
+json_output = json.dumps(data)
+print(json_output)
+# Output: {"total_failed": 15247, "total_success": 2891, "failure_rate": 84.1}</code></pre>
+<div class="info-box"><strong>Pretty Printing:</strong> Use <code>indent</code> parameter for human-readable JSON:
+<pre><code>json_output = json.dumps(data, indent=2)</code></pre>
+</div>
+<h3>Building a Complete Intelligence Report</h3>
+<p>A professional SOC report includes metadata, statistics, and ranked findings:</p>
+<pre><code>import json
+from collections import Counter
+from datetime import datetime
+
+def generate_json_report(log_lines):
+    """Generate a JSON intelligence report from authentication logs."""
+    
+    # Initialize counters
+    failed_by_user = Counter()
+    failed_by_ip = Counter()
+    total_success = 0
+    total_fail = 0
+    
+    # Process logs
+    for line in log_lines:
+        data = parse_log_line(line)
+        status = data.get('status')
+        
+        if status == 'SUCCESS':
+            total_success += 1
+        elif status == 'FAIL':
+            total_fail += 1
+            failed_by_user[data.get('user', 'UNKNOWN')] += 1
+            failed_by_ip[data.get('ip', 'UNKNOWN')] += 1
+    
+    # Build report structure
+    report = {
+        'metadata': {
+            'generated_at': datetime.now().isoformat(),
+            'analyst': 'SOC Automation',
+            'classification': 'INTERNAL'
+        },
+        'summary': {
+            'total_events': len(log_lines),
+            'total_success': total_success,
+            'total_fail': total_fail,
+            'failure_rate': round((total_fail / len(log_lines)) * 100, 2) if log_lines else 0
+        },
+        'top_targeted_users': [
+            {'username': user, 'failed_attempts': count}
+            for user, count in failed_by_user.most_common(10)
+        ],
+        'top_attacking_ips': [
+            {'ip_address': ip, 'failed_attempts': count}
+            for ip, count in failed_by_ip.most_common(10)
+        ]
+    }
+    
+    return json.dumps(report, indent=2)
+
+# Usage
+json_report = generate_json_report(log_lines)
+print(json_report)</code></pre>
+<h3>Example JSON Output</h3>
+<div class="terminal">
+<div class="terminal-header">► INCIDENT_REPORT.JSON</div>
+<div class="terminal-output" style="color: #888; font-size: 13px;">{ "metadata": { "generated_at": "2024-11-25T14:32:15.482931", "analyst": "SOC Automation", "classification": "INTERNAL" }, "summary": { "total_events": 18138, "total_success": 2891, "total_fail": 15247, "failure_rate": 84.06 }, "top_targeted_users": [ {"username": "admin", "failed_attempts": 3891}, {"username": "root", "failed_attempts": 1245}, {"username": "administrator", "failed_attempts": 892}, {"username": "user", "failed_attempts": 543}, {"username": "test", "failed_attempts": 287} ], "top_attacking_ips": [ {"ip_address": "198.51.100.45", "ip_country": "US", "failed_attempts": 6234}, {"ip_address": "203.0.113.89", "ip_country": "CN", "failed_attempts": 2156}, {"ip_address": "192.0.2.15", "ip_country": "RU", "failed_attempts": 1823} ] }</div>
+</div>
+<h3>Writing JSON to File</h3>
+<p>For SIEM integration, write the report to a file:</p>
+<pre><code>import json
+
+def save_json_report(report_data, filename='incident_report.json'):
+    """Save intelligence report to JSON file."""
+    with open(filename, 'w') as f:
+        json.dump(report_data, f, indent=2)
+    
+    print(f"Report saved to {{filename}}")
+
+# Usage
+report = generate_report_dict(log_lines)  # Returns dict, not string
+save_json_report(report, 'auth_incident_2024-11-25.json')</code></pre>
+<div class="info-box"><strong>⚠️ Important Distinction:</strong>
+<ul>
+<li><code>json.dumps()</code> → Converts dict to JSON string (for printing/APIs)</li>
+<li><code>json.dump()</code> → Writes dict directly to file (no intermediate string)</li>
+</ul>
+</div>
+<h3>Interactive Demo: JSON Builder</h3>
+<div class="interactive-demo">
+<h4 style="color: #ff0000;">Build Your Own JSON Report</h4>
+<div class="demo-controls"><button class="btn btn-secondary" onclick="generateSampleJSON()">Generate Sample Report</button> <button class="btn btn-secondary" onclick="validateJSON()">Validate JSON</button></div>
+<textarea id="jsonBuilder" style="width: 100%; min-height: 400px; background: #000; color: #888; border: 2px solid #333; padding: 15px; font-family: 'Courier New', monospace; font-size: 12px; resize: vertical;" placeholder="Your JSON report will appear here..."></textarea>
+<div id="jsonValidation"></div>
+</div>
+<h3>Coding Challenge</h3>
+<div class="challenge-box">
+<div class="challenge-title"><span class="challenge-icon">🎯</span> Create JSON Intelligence Report</div>
+<p>Complete this function to generate a JSON report with summary statistics:</p>
+<textarea id="jsonChallenge" style="min-height: 400px;">import json
+from collections import Counter
+
+def generate_intelligence_report(log_lines):
+    """
+    Generate a JSON intelligence report from log lines.
+    
+    Returns:
+        JSON string with summary and top offenders
+    """
+    failed_by_user = Counter()
+    failed_by_ip = Counter()
+    total_success = 0
+    total_fail = 0
+    
+    # TODO: Process log_lines and populate counters
+    # TODO: Build report dictionary with structure:
+    #   - summary: {total_events, total_success, total_fail, failure_rate}
+    #   - top_users: list of top 5 users with their counts
+    #   - top_ips: list of top 5 IPs with their counts
+    
+    report = {}  # Build your report structure here
+    
+    return json.dumps(report, indent=2)
+
+# Test your function
+test_logs = [
+    "2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH",
+    "2024-11-25 03:45:15 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH",
+    "2024-11-25 03:45:18 event=LOGIN status=FAIL user=root ip=203.0.113.89 method=SSH",
+    "2024-11-25 03:46:02 event=LOGIN status=SUCCESS user=jsmith ip=10.0.1.50 method=WEB"
+]
+
+print(generate_intelligence_report(test_logs))
+</textarea> <button class="btn" onclick="checkJSONChallenge()">Test Your Code</button>
+<div id="jsonChallengeOutput"></div>
+</div>
+<button class="btn" onclick="completeSection(5)">Continue to Human-Readable Reports →</button></div>
+<!-- Section 6: Human-Readable Reports -->
+<div class="section" id="section6">
+<h2>📝 Human-Readable Reports for Your Team</h2>
+<h3>Why Human Reports Matter</h3>
+<p>While JSON is perfect for machines, your SOC teammates need clear, actionable text reports they can quickly read during incident response.</p>
+<div class="info-box"><strong>The 5-Second Rule:</strong> A SOC analyst should be able to look at your report for 5 seconds and immediately know:
+<ul>
+<li>Is this an emergency? (Critical vs routine)</li>
+<li>What's being attacked? (Which accounts, systems)</li>
+<li>Who's attacking? (Source IPs, patterns)</li>
+<li>What actions should I take? (Block IPs, lock accounts, escalate)</li>
+</ul>
+</div>
+<h3>Report Structure: The Inverted Pyramid</h3>
+<p>Use journalistic style—most critical information first:</p>
+<div class="terminal">
+<div class="terminal-header">► AUTHENTICATION INCIDENT REPORT</div>
+<div class="terminal-output">╔════════════════════════════════════════════════════════════════════╗ ║ AUTHENTICATION FAILURE ANALYSIS REPORT ║ ║ Generated: 2024-11-25 14:32:15 UTC ║ ╚════════════════════════════════════════════════════════════════════╝ <span style="color: #ff0000;">[ CRITICAL ALERT ]</span> Abnormally high failure rate detected: <span style="color: #ff0000;">84.1%</span> (baseline: 2-5%) Potential BRUTE FORCE ATTACK in progress. ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SUMMARY STATISTICS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Total Events: 18,138 Successful Logins: 2,891 (15.9%) Failed Attempts: 15,247 (84.1%) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TOP 5 TARGETED ACCOUNTS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1. admin 3,891 attempts <span style="color: #ff0000;">⚠ CRITICAL</span> 2. root 1,245 attempts <span style="color: #ff0000;">⚠ CRITICAL</span> 3. administrator 892 attempts <span style="color: #ffaa00;">⚠ HIGH</span> 4. user 543 attempts <span style="color: #ffaa00;">⚠ HIGH</span> 5. test 287 attempts <span style="color: #ffff00;">⚠ MEDIUM</span> ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TOP 5 ATTACKING SOURCE IPs ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1. 198.51.100.45 6,234 attempts <span style="color: #ff0000;">⚠ BLOCK IMMEDIATELY</span> 2. 203.0.113.89 2,156 attempts <span style="color: #ff0000;">⚠ BLOCK IMMEDIATELY</span> 3. 192.0.2.15 1,823 attempts <span style="color: #ff0000;">⚠ BLOCK IMMEDIATELY</span> 4. 198.51.100.92 1,098 attempts <span style="color: #ffaa00;">⚠ INVESTIGATE</span> 5. 203.0.113.200 847 attempts <span style="color: #ffaa00;">⚠ INVESTIGATE</span> ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ RECOMMENDED ACTIONS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ <span style="color: #ff0000;">[ IMMEDIATE ]</span> • Block IPs 198.51.100.45, 203.0.113.89, 192.0.2.15 at firewall • Lock accounts: admin, root, administrator (require password reset) • Enable MFA on all privileged accounts • Escalate to Incident Response team <span style="color: #ffaa00;">[ HIGH PRIORITY ]</span> • Review logs for any successful logins from attacking IPs • Check for lateral movement from compromised accounts • Implement rate limiting on authentication endpoints Report generated by: SOC Automation Platform Analyst: [Your Name Here]</div>
+</div>
+<h3>Building the Report: Python Code</h3>
+<pre><code>def generate_text_report(log_lines):
+    """Generate human-readable text report for SOC team."""
+    from datetime import datetime
+    from collections import Counter
+    
+    # Process logs
+    failed_by_user = Counter()
+    failed_by_ip = Counter()
+    total_success = 0
+    total_fail = 0
+    
+    for line in log_lines:
+        data = parse_log_line(line)
+        status = data.get('status')
+        
+        if status == 'SUCCESS':
+            total_success += 1
+        elif status == 'FAIL':
+            total_fail += 1
+            failed_by_user[data.get('user', 'UNKNOWN')] += 1
+            failed_by_ip[data.get('ip', 'UNKNOWN')] += 1
+    
+    total_events = len(log_lines)
+    failure_rate = (total_fail / total_events * 100) if total_events &gt; 0 else 0
+    
+    # Build report
+    report = []
+    report.append("=" * 70)
+    report.append("       AUTHENTICATION FAILURE ANALYSIS REPORT")
+    report.append(f"       Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}")
+    report.append("=" * 70)
+    report.append("")
+    
+    # Alert if high failure rate
+    if failure_rate &gt; 10:
+        report.append("[ CRITICAL ALERT ]")
+        report.append(f"Abnormally high failure rate: {failure_rate:.1f}% (baseline: 2-5%)")
+        report.append("Potential BRUTE FORCE ATTACK in progress.")
+        report.append("")
+    
+    # Summary
+    report.append("-" * 70)
+    report.append("SUMMARY STATISTICS")
+    report.append("-" * 70)
+    report.append(f"Total Events:        {total_events:,}")
+    report.append(f"Successful Logins:   {total_success:,}  ({total_success/total_events*100:.1f}%)")
+    report.append(f"Failed Attempts:     {total_fail:,}  ({failure_rate:.1f}%)")
+    report.append("")
+    
+    # Top targeted users
+    report.append("-" * 70)
+    report.append("TOP 5 TARGETED ACCOUNTS")
+    report.append("-" * 70)
+    for i, (user, count) in enumerate(failed_by_user.most_common(5), 1):
+        severity = "CRITICAL" if count &gt; 1000 else "HIGH" if count &gt; 500 else "MEDIUM"
+        report.append(f"{{i}}. {user:20} {count:,} attempts  ⚠ {{severity}}")
+    report.append("")
+    
+    # Top attacking IPs
+    report.append("-" * 70)
+    report.append("TOP 5 ATTACKING SOURCE IPs")
+    report.append("-" * 70)
+    for i, (ip, count) in enumerate(failed_by_ip.most_common(5), 1):
+        action = "BLOCK IMMEDIATELY" if count &gt; 1000 else "INVESTIGATE"
+        report.append(f"{{i}}. {ip:20} {count:,} attempts  ⚠ {{action}}")
+    report.append("")
+    
+    # Recommendations
+    report.append("-" * 70)
+    report.append("RECOMMENDED ACTIONS")
+    report.append("-" * 70)
+    if failure_rate &gt; 50:
+        report.append("[ IMMEDIATE ]")
+        top_ips = [ip for ip, _ in failed_by_ip.most_common(3)]
+        report.append(f"  • Block IPs {', '.join(top_ips)} at firewall")
+        report.append("  • Lock high-value accounts (require password reset)")
+        report.append("  • Escalate to Incident Response team")
+    
+    return "\n".join(report)
+
+# Usage
+text_report = generate_text_report(log_lines)
+print(text_report)
+
+# Save to file
+with open('incident_report.txt', 'w') as f:
+    f.write(text_report)</code></pre>
+<h3>Formatting Tips for Readability</h3>
+<table>
+<tbody>
+<tr>
+<th>Technique</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+<tr>
+<td>Section dividers</td>
+<td>Visual separation</td>
+<td><code>"=" * 70</code> or <code>"-" * 70</code></td>
+</tr>
+<tr>
+<td>Thousands separators</td>
+<td>Number readability</td>
+<td><code>f"{count:,}"</code> → "15,247"</td>
+</tr>
+<tr>
+<td>Alignment</td>
+<td>Column formatting</td>
+<td><code>f"{user:20}"</code> → pads to 20 chars</td>
+</tr>
+<tr>
+<td>Percentages</td>
+<td>Context for numbers</td>
+<td><code>f"{rate:.1f}%"</code> → "84.1%"</td>
+</tr>
+<tr>
+<td>Severity labels</td>
+<td>Quick prioritization</td>
+<td>"⚠ CRITICAL", "⚠ HIGH", "⚠ MEDIUM"</td>
+</tr>
+</tbody>
+</table>
+<h3>Interactive Demo: Report Generator</h3>
+<div class="interactive-demo">
+<h4 style="color: #ff0000;">Live Report Generator</h4>
+<div class="demo-controls"><button class="btn btn-secondary" onclick="generateLiveReport()">Generate Sample Report</button> <button class="btn btn-secondary" onclick="downloadReport()">Download as TXT</button></div>
+<div class="terminal">
+<div class="terminal-output" id="liveReport">Click "Generate Sample Report" to create a full text report...</div>
+</div>
+</div>
+<h3>Coding Challenge</h3>
+<div class="challenge-box">
+<div class="challenge-title"><span class="challenge-icon">🎯</span> Build Your Report Generator</div>
+<p>Create a function that generates a simple text report with statistics and top users:</p>
+<textarea id="reportChallenge" style="min-height: 400px;">def generate_simple_report(log_lines):
+    """
+    Generate a simple text report showing:
+    - Total events
+    - Success/Fail counts
+    - Top 3 targeted users
+    """
+    from collections import Counter
+    
+    # TODO: Initialize counters
+    # TODO: Process log lines
+    # TODO: Build report string with:
+    #   - Header with "=" * 50
+    #   - Summary statistics
+    #   - Top 3 users with counts
+    
+    report = ""  # Build your report here
+    
+    return report
+
+# Test your function
+test_logs = [
+    "2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH",
+    "2024-11-25 03:45:15 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH",
+    "2024-11-25 03:45:18 event=LOGIN status=FAIL user=root ip=203.0.113.89 method=SSH",
+    "2024-11-25 03:46:02 event=LOGIN status=SUCCESS user=jsmith ip=10.0.1.50 method=WEB",
+    "2024-11-25 03:46:15 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH"
+]
+
+print(generate_simple_report(test_logs))
+</textarea> <button class="btn" onclick="checkReportChallenge()">Test Your Code</button>
+<div id="reportChallengeOutput"></div>
+</div>
+<button class="btn" onclick="completeSection(6)">Continue to Error Handling →</button></div>
+<!-- Section 7: Edge Cases & Error Handling -->
+<div class="section" id="section7">
+<h2>🛡️ Edge Cases and Robust Error Handling</h2>
+<h3>The Reality of Production Logs</h3>
+<p>Real-world log files are messy. Systems crash mid-write, network packets get corrupted, developers make mistakes. Your scanner must handle these gracefully without crashing.</p>
+<div class="error-box"><strong>Common Log Problems You'll Encounter:</strong>
+<ul>
+<li>Incomplete lines (truncated during write)</li>
+<li>Missing key=value pairs</li>
+<li>Malformed key=value (missing <code>=</code> sign)</li>
+<li>Extra whitespace or special characters</li>
+<li>Empty lines</li>
+<li>Non-UTF8 characters (binary corruption)</li>
+</ul>
+</div>
+<h3>Example: Real Malformed Logs</h3>
+<div class="terminal">
+<div class="terminal-header">► MALFORMED LOG EXAMPLES</div>
+<div class="terminal-output" style="color: #ff6666;">2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH ✓ VALID 2024-11-25 03:45:15 event=LOGIN status user=admin ip=198.51.100.45 ✗ MISSING = in "status" 2024-11-25 event=LOGIN status=FAIL user=admin ✗ MISSING TIMESTAMP event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH ✗ MISSING DATE 2024-11-25 03:45:18 ✗ MISSING ALL FIELDS ✗ EMPTY LINE 2024-11-25 03:45:21 event=LOGIN status=FAIL user=admin with spaces ip=198.51.100.45 ✗ USER HAS SPACES 2024-11-25 03:45:24 event=LOGIN status=FAIL user= ip=198.51.100.45 ✗ MISSING USER VALUE</div>
+</div>
+<h3>Strategy 1: Defensive Parsing with try/except</h3>
+<p>Wrap risky operations in exception handlers:</p>
+<pre><code>def parse_log_line_safe(line):
+    """Safely parse a log line, returning None if malformed."""
+    try:
+        # Remove extra whitespace
+        line = line.strip()
+        
+        # Skip empty lines
+        if not line:
+            return None
+        
+        # Split on spaces
+        parts = line.split()
+        
+        # Validate minimum length (need at least date + time)
+        if len(parts) &lt; 2:
+            print(f"WARNING: Line too short: {{line}}")
+            return None
+        
+        # Extract timestamp
+        timestamp = parts[0] + " " + parts[1]
+        
+        # Parse key=value pairs
+        data = {'timestamp': timestamp}
+        for pair in parts[2:]:
+            # Check if pair contains =
+            if '=' not in pair:
+                print(f"WARNING: Malformed pair '{{pair}}' in line: {{line}}")
+                continue
+            
+            # Split on first = only (in case value contains =)
+            key, value = pair.split('=', 1)
+            data[key] = value
+        
+        return data
+    
+    except Exception as e:
+        print(f"ERROR: Failed to parse line: {{line}}")
+        print(f"       Exception: {{e}}")
+        return None
+
+# Usage
+for line in log_lines:
+    data = parse_log_line_safe(line)
+    if data:  # Only process valid lines
+        # Do your analysis
+        pass</code></pre>
+<h3>Strategy 2: Validation and Default Values</h3>
+<p>Check for required fields and provide sensible defaults:</p>
+<pre><code>def validate_and_process(data):
+    """Validate parsed data has required fields."""
+    if not data:
+        return False
+    
+    # Required fields for authentication analysis
+    required_fields = ['status', 'user', 'ip']
+    
+    for field in required_fields:
+        if field not in data or not data[field]:
+            print(f"WARNING: Missing required field '{{field}}'")
+            return False
+    
+    # Validate status is either SUCCESS or FAIL
+    if data['status'] not in ['SUCCESS', 'FAIL']:
+        print(f"WARNING: Invalid status '{data['status']}'")
+        return False
+    
+    return True
+
+# Usage
+for line in log_lines:
+    data = parse_log_line_safe(line)
+    if validate_and_process(data):
+        # Safe to analyze
+        if data['status'] == 'FAIL':
+            failed_by_user[data['user']] += 1</code></pre>
+<h3>Strategy 3: Tracking Parse Failures</h3>
+<p>Keep statistics on what went wrong for your report:</p>
+<pre><code>from collections import Counter
+
+# Track parsing issues
+parse_errors = Counter()
+successful_parses = 0
+total_lines = 0
+
+for line in log_lines:
+    total_lines += 1
+    data = parse_log_line_safe(line)
+    
+    if data is None:
+        parse_errors['malformed_line'] += 1
+        continue
+    
+    if not validate_and_process(data):
+        parse_errors['missing_fields'] += 1
+        continue
+    
+    successful_parses += 1
+    # Process the line...
+
+# Report parsing statistics
+print(f"\nParsing Statistics:")
+print(f"  Total lines: {total_lines}")
+print(f"  Successfully parsed: {successful_parses} ({successful_parses/total_lines*100:.1f}%)")
+print(f"  Parse failures: {sum(parse_errors.values())}")
+for error_type, count in parse_errors.most_common():
+    print(f"    - {error_type}: {{count}}")</code></pre>
+<h3>Interactive Demo: Error Handler Tester</h3>
+<div class="interactive-demo">
+<h4 style="color: #ff0000;">Test Your Error Handling</h4>
+<p>Try parsing these problematic log lines:</p>
+<textarea id="errorTestInput" style="width: 100%; min-height: 200px; background: #000; color: #00ff00; border: 2px solid #333; padding: 10px; font-family: 'Courier New', monospace;">2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH
+2024-11-25 03:45:15 event=LOGIN status user=admin ip=198.51.100.45
+2024-11-25 event=LOGIN status=FAIL user=admin
+
+event=LOGIN status=FAIL user=admin ip=198.51.100.45</textarea>
+<div class="demo-controls"><button class="btn btn-secondary" onclick="testErrorHandling()">Test Parsing</button> <button class="btn btn-secondary" onclick="clearErrorTest()">Clear Results</button></div>
+<div class="output-window" id="errorTestOutput">Click "Test Parsing" to see results...</div>
+</div>
+<h3>Common Edge Cases to Handle</h3>
+<table>
+<tbody>
+<tr>
+<th>Edge Case</th>
+<th>Detection</th>
+<th>Handling Strategy</th>
+</tr>
+<tr>
+<td>Empty line</td>
+<td><code>if not line.strip()</code></td>
+<td>Skip with <code>continue</code></td>
+</tr>
+<tr>
+<td>Too few fields</td>
+<td><code>if len(parts) &lt; 2</code></td>
+<td>Log warning, return None</td>
+</tr>
+<tr>
+<td>Missing =</td>
+<td><code>if '=' not in pair</code></td>
+<td>Skip that pair, log warning</td>
+</tr>
+<tr>
+<td>Empty value</td>
+<td><code>if not value</code></td>
+<td>Use default "UNKNOWN"</td>
+</tr>
+<tr>
+<td>Invalid status</td>
+<td><code>if status not in ['SUCCESS', 'FAIL']</code></td>
+<td>Treat as "UNKNOWN", log warning</td>
+</tr>
+<tr>
+<td>File doesn't exist</td>
+<td><code>try/except FileNotFoundError</code></td>
+<td>Exit with error message</td>
+</tr>
+</tbody>
+</table>
+<div class="info-box"><strong>Production Best Practice:</strong> Always log errors to a separate error file:
+<pre><code>with open('parse_errors.log', 'a') as error_log:
+    error_log.write(f"{datetime.now()}: Failed to parse: {{line}}\n")</code></pre>
+This helps you debug issues without cluttering your main output.</div>
+<h3>Coding Challenge</h3>
+<div class="challenge-box">
+<div class="challenge-title"><span class="challenge-icon">🎯</span> Build a Robust Parser</div>
+<p>Improve this parser to handle malformed logs:</p>
+<textarea id="robustChallenge" style="min-height: 450px;">def parse_log_robust(line):
+    """
+    Robustly parse a log line, handling common errors.
+    
+    Returns:
+        dict with parsed fields, or None if line is unusable
+    """
+    # TODO: Add try/except wrapper
+    # TODO: Check for empty lines
+    # TODO: Validate minimum parts length
+    # TODO: Check for = in key=value pairs
+    # TODO: Handle missing fields gracefully
+    
+    parts = line.split()
+    timestamp = parts[0] + " " + parts[1]
+    
+    data = {'timestamp': timestamp}
+    for pair in parts[2:]:
+        key, value = pair.split('=')
+        data[key] = value
+    
+    return data
+
+# Test with malformed logs
+test_logs = [
+    "2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45",  # Valid
+    "2024-11-25 03:45:15 event=LOGIN status user=admin",  # Missing = in status
+    "2024-11-25 event=LOGIN",  # Missing time
+    "",  # Empty line
+    "event=LOGIN status=FAIL"  # No timestamp
+]
+
+for line in test_logs:
+    result = parse_log_robust(line)
+    print(f"Input: {{line}}")
+    print(f"Result: {{result}}\n")
+</textarea> <button class="btn" onclick="checkRobustChallenge()">Test Your Code</button>
+<div id="robustChallengeOutput"></div>
+<details class="hint-box">
+<summary>💡 Solution Hints</summary>
+<ol>
+<li>Wrap everything in <code>try/except Exception as e</code></li>
+<li>Add <code>if not line.strip(): return None</code> at the start</li>
+<li>Check <code>if len(parts) &lt; 2: return None</code> before accessing timestamp</li>
+<li>Use <code>if '=' not in pair: continue</code> to skip bad pairs</li>
+<li>Return None on any exception</li>
+</ol>
+</details>
+</div>
+<button class="btn" onclick="completeSection(7)">Continue to GitHub Copilot Workshop →</button></div>
+<!-- Section 8: GitHub Copilot Workshop -->
+<div class="section" id="section8">
+<h2>🤖 GitHub Copilot Workshop: AI-Assisted Development</h2>
+<h3>Using AI Effectively (Not Just Copy-Paste)</h3>
+<p>GitHub Copilot is a powerful tool, but like any tool, it requires skill to use effectively. This section teaches you how to leverage Copilot for edge case discovery, code review, and intelligent assistance—<strong>not</strong> to write your entire project.</p>
+<div class="warning-banner"><strong>LEARNING OBJECTIVE:</strong> You should use Copilot to <em>enhance</em> your understanding and catch edge cases you might miss—not to avoid learning. If you don't understand the code Copilot suggests, don't use it.</div>
+<h3>Effective Copilot Workflow for Log Scanners</h3>
+<ol>
+<li><strong>Write your own parser first</strong> (even if basic)</li>
+<li><strong>Ask Copilot for edge cases</strong> you might have missed</li>
+<li><strong>Request code review</strong> for your implementation</li>
+<li><strong>Generate test cases</strong> for validation</li>
+<li><strong>Refine</strong> based on suggestions you understand</li>
+</ol>
+<h3>Strategy 1: Edge Case Discovery</h3>
+<p>After writing your parser, ask Copilot to identify potential issues:</p>
+<div class="copilot-prompt">I've written a log parser for authentication logs. Here's my code: [paste your code] Can you identify 5-10 edge cases or malformed log formats that might break this parser? For each edge case, explain why it would cause an issue and suggest how to handle it.</div>
+<div class="info-box"><strong>Why this works:</strong> You're not asking Copilot to write code—you're using it as a code reviewer to find blind spots in your logic. This helps you learn what you might have missed.</div>
+<h3>Strategy 2: Prompt for Specific Improvements</h3>
+<p>Instead of "fix my code," ask targeted questions:</p>
+<div class="copilot-prompt">My log parser currently crashes if a key=value pair is missing the '=' sign. How can I modify this section to handle that gracefully? Current code: ```python for pair in parts[2:]: key, value = pair.split('=') data[key] = value ``` I want to skip malformed pairs and log a warning.</div>
+<div class="success-box"><strong>✓ Good Prompt Characteristics:</strong>
+<ul>
+<li>Specific problem stated clearly</li>
+<li>Relevant code included</li>
+<li>Desired behavior explained</li>
+<li>Context provided (skip + log warning)</li>
+</ul>
+</div>
+<h3>Strategy 3: Generate Test Cases</h3>
+<p>Ask Copilot to create comprehensive test data:</p>
+<div class="copilot-prompt">Generate 15-20 test log lines for my authentication log parser, including: - 5 valid SUCCESS events - 5 valid FAIL events - 10 malformed lines testing different edge cases (missing fields, extra spaces, invalid formats, etc.) Use this format: 2024-11-25 HH:MM:SS event=LOGIN status=[SUCCESS|FAIL] user=[username] ip=[ip] method=[SSH|WEB]</div>
+<div class="terminal">
+<div class="terminal-header">► COPILOT GENERATED TEST CASES</div>
+<div class="terminal-output" style="font-size: 12px; color: #888;"># Valid SUCCESS events 2024-11-25 08:12:34 event=LOGIN status=SUCCESS user=jsmith ip=10.0.1.50 method=WEB 2024-11-25 08:15:22 event=LOGIN status=SUCCESS user=admin ip=10.0.1.10 method=SSH 2024-11-25 08:18:45 event=LOGIN status=SUCCESS user=alice ip=192.168.1.100 method=WEB 2024-11-25 08:22:10 event=LOGIN status=SUCCESS user=bob ip=172.16.0.50 method=SSH 2024-11-25 08:25:33 event=LOGIN status=SUCCESS user=charlie ip=10.0.2.75 method=WEB # Valid FAIL events 2024-11-25 08:30:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH 2024-11-25 08:30:15 event=LOGIN status=FAIL user=root ip=198.51.100.45 method=SSH 2024-11-25 08:30:18 event=LOGIN status=FAIL user=administrator ip=203.0.113.89 method=SSH 2024-11-25 08:30:21 event=LOGIN status=FAIL user=admin ip=192.0.2.15 method=SSH 2024-11-25 08:30:24 event=LOGIN status=FAIL user=test ip=198.51.100.92 method=WEB # Malformed edge cases 2024-11-25 08:35:10 event=LOGIN status user=admin ip=198.51.100.45 method=SSH # Missing = in status 2024-11-25 event=LOGIN status=FAIL user=admin ip=198.51.100.45 # Missing timestamp event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH # No date 2024-11-25 08:40:00 # Only timestamp # Empty line 2024-11-25 08:42:30 event=LOGIN status=FAIL user= ip=198.51.100.45 method=SSH # Empty user 2024-11-25 08:43:00 event=LOGIN status=INVALID user=admin ip=198.51.100.45 # Invalid status 2024-11-25 08:44:00 event=LOGIN status=FAIL user=admin with spaces ip=198.51.100.45 # User with spaces 2024-11-25 08:45:00 status=FAIL user=admin ip=198.51.100.45 method=SSH # Missing event field 2024-11-25 08:46:00 event=LOGIN status=FAIL user=admin method=SSH # Missing IP field</div>
+</div>
+<h3>Strategy 4: Code Review and Optimization</h3>
+<p>Ask Copilot to review your complete solution:</p>
+<div class="copilot-prompt">Review this authentication log scanner code for: 1. Security issues (could it be exploited?) 2. Performance problems (processing large log files) 3. Code quality (readability, maintainability) 4. Edge cases I might have missed [paste your complete code] Provide specific suggestions with examples.</div>
+<h3>What NOT to Do with Copilot</h3>
+<div class="error-box"><strong>❌ Anti-Patterns to Avoid:</strong>
+<ul>
+<li><strong>Don't:</strong> Ask "write me a complete log scanner" without trying first</li>
+<li><strong>Don't:</strong> Accept code you don't understand</li>
+<li><strong>Don't:</strong> Copy-paste without reading and testing</li>
+<li><strong>Don't:</strong> Skip error handling because "Copilot didn't include it"</li>
+<li><strong>Don't:</strong> Ignore security implications of suggested code</li>
+</ul>
+<strong>Remember:</strong> You're accountable for the code you deploy, not Copilot.</div>
+<h3>Interactive Exercise: Practice Copilot Prompting</h3>
+<div class="interactive-demo">
+<h4 style="color: #ff0000;">Copilot Prompt Workshop</h4>
+<p>Practice writing effective prompts. Choose a scenario:</p>
+<div class="demo-controls"><button class="btn btn-secondary" onclick="showPromptScenario(1)">Scenario 1: Edge Cases</button> <button class="btn btn-secondary" onclick="showPromptScenario(2)">Scenario 2: Optimization</button> <button class="btn btn-secondary" onclick="showPromptScenario(3)">Scenario 3: Testing</button></div>
+<div class="output-window" id="promptScenario" style="min-height: 200px;">Select a scenario to practice...</div>
+</div>
+<h3>Real-World Copilot Tips from SOC Professionals</h3>
+<table>
+<tbody>
+<tr>
+<th>Situation</th>
+<th>Bad Prompt</th>
+<th>Good Prompt</th>
+</tr>
+<tr>
+<td>Need error handling</td>
+<td>"Add error handling"</td>
+<td>"Add try/except to handle ValueError when splitting malformed key=value pairs. Skip invalid pairs and log warning."</td>
+</tr>
+<tr>
+<td>Performance issue</td>
+<td>"Make it faster"</td>
+<td>"I'm processing 1M log lines. Current approach takes 45 seconds. How can I optimize the parsing loop? Consider using generators or batch processing."</td>
+</tr>
+<tr>
+<td>Need test data</td>
+<td>"Create test data"</td>
+<td>"Generate 20 auth log lines testing: normal operations, brute force patterns, missing fields, Unicode in usernames, and IP format variations."</td>
+</tr>
+<tr>
+<td>Code review</td>
+<td>"Is this good?"</td>
+<td>"Review this parser for: 1) SQL injection via usernames, 2) Memory leaks on large files, 3) Race conditions if run concurrently, 4) Missing input validation."</td>
+</tr>
+</tbody>
+</table>
+<h3>Assignment: Apply These Techniques</h3>
+<div class="challenge-box">
+<div class="challenge-title"><span class="challenge-icon">🎯</span> Copilot-Assisted Improvement</div>
+<p>Take your log parser from previous sections and:</p>
+<ol>
+<li>Write a prompt asking Copilot for 5 edge cases</li>
+<li>Write a prompt requesting test data generation</li>
+<li>Write a prompt for code review focused on security</li>
+</ol>
+<p>Document what Copilot suggested and which suggestions you implemented (and why).</p>
+</div>
+<div class="success-box"><strong>Key Takeaway:</strong> Copilot is a collaborator, not a replacement for understanding. Use it to:
+<ul>
+<li>Discover edge cases you didn't consider</li>
+<li>Review your logic for issues</li>
+<li>Generate comprehensive test data</li>
+<li>Learn alternative approaches</li>
+</ul>
+Always understand and validate what it suggests before using it.</div>
+<button class="btn" onclick="completeSection(8)">Continue to Final Challenge →</button></div>
+<!-- Section 9: Final Challenge -->
+<div class="section" id="section9">
+<h2>🎖️ Final Mission: Complete Log Scanner</h2>
+<div class="challenge-box" style="background: linear-gradient(135deg, #1a0000 0%, #000000 100%);">
+<div class="challenge-title" style="font-size: 2em;"><span class="challenge-icon">⚠️</span> CAPSTONE PROJECT: PRODUCTION LOG SCANNER</div>
+<p style="font-size: 1.1em;">Build a complete, production-ready authentication log scanner that combines everything you've learned.</p>
+</div>
+<h3>Mission Requirements</h3>
+<div class="info-box"><strong>Your scanner must:</strong>
+<ol>
+<li><strong>Parse authentication logs</strong> from a file (format: timestamp event=LOGIN status=[SUCCESS/FAIL] user=[username] ip=[ip] method=[SSH/WEB])</li>
+<li><strong>Handle malformed logs gracefully</strong> without crashing</li>
+<li><strong>Count failed login attempts</strong> per user and per IP</li>
+<li><strong>Generate JSON report</strong> with:
+<ul>
+<li>Total events, success count, fail count, failure rate</li>
+<li>Top 5 targeted users</li>
+<li>Top 5 attacking IPs</li>
+</ul>
+</li>
+<li><strong>Generate text report</strong> for SOC team with formatted output</li>
+<li><strong>Track parsing errors</strong> and report statistics</li>
+</ol>
+</div>
+<h3>Starter Code Structure</h3>
+<p>Use this template to organize your code:</p>
+<textarea id="finalChallenge" style="min-height: 600px; font-size: 13px;">#!/usr/bin/env python3
+"""
+Authentication Log Scanner
+Analyzes authentication logs for security incidents
+
+Author: [Your Name]
+Date: 2024-11-25
+"""
+
+import json
+from collections import Counter
+from datetime import datetime
+
+
+def parse_log_line(line):
+    """
+    Parse a single authentication log line.
+    
+    Args:
+        line: Raw log line string
+    
+    Returns:
+        dict with parsed fields, or None if malformed
+    """
+    # TODO: Implement robust parsing with error handling
+    pass
+
+
+def analyze_logs(filename):
+    """
+    Analyze authentication logs from a file.
+    
+    Args:
+        filename: Path to log file
+    
+    Returns:
+        dict containing analysis results
+    """
+    failed_by_user = Counter()
+    failed_by_ip = Counter()
+    total_success = 0
+    total_fail = 0
+    parse_errors = 0
+    
+    # TODO: Read file and process each line
+    # TODO: Count successes, failures, and parse errors
+    # TODO: Aggregate by user and IP
+    
+    results = {
+        'total_events': 0,
+        'total_success': total_success,
+        'total_fail': total_fail,
+        'failure_rate': 0.0,
+        'parse_errors': parse_errors,
+        'failed_by_user': failed_by_user,
+        'failed_by_ip': failed_by_ip
+    }
+    
+    return results
+
+
+def generate_json_report(results):
+    """
+    Generate JSON report from analysis results.
+    
+    Args:
+        results: dict from analyze_logs()
+    
+    Returns:
+        JSON string
+    """
+    # TODO: Build structured report with metadata, summary, and top offenders
+    pass
+
+
+def generate_text_report(results):
+    """
+    Generate human-readable text report.
+    
+    Args:
+        results: dict from analyze_logs()
+    
+    Returns:
+        Formatted text string
+    """
+    # TODO: Create formatted report with sections and statistics
+    pass
+
+
+def main():
+    """Main execution function."""
+    # TODO: Get filename from user or command line
+    # TODO: Run analysis
+    # TODO: Generate and save both reports
+    # TODO: Print summary to console
+    
+    print("Authentication Log Scanner")
+    print("=" * 50)
+    
+    # Your code here...
+    
+
+if __name__ == "__main__":
+    main()
+</textarea>
+<div class="demo-controls" style="margin: 20px 0;"><button class="btn" onclick="downloadStarterCode()">Download Starter Code</button> <button class="btn btn-secondary" onclick="downloadTestData()">Download Test Log File</button></div>
+<h3>Test Data</h3>
+<p>Create a file named <code>auth_test.log</code> with this content to test your scanner:</p>
+<div class="terminal" style="max-height: 300px; overflow-y: auto;">
+<div class="terminal-header">► auth_test.log</div>
+<div class="terminal-output" id="testDataDisplay" style="font-size: 11px; color: #888;">2024-11-25 08:12:34 event=LOGIN status=SUCCESS user=jsmith ip=10.0.1.50 method=WEB 2024-11-25 08:15:22 event=LOGIN status=SUCCESS user=admin ip=10.0.1.10 method=SSH 2024-11-25 08:30:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH 2024-11-25 08:30:15 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH 2024-11-25 08:30:18 event=LOGIN status=FAIL user=root ip=198.51.100.45 method=SSH 2024-11-25 08:30:21 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH 2024-11-25 08:30:24 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH 2024-11-25 08:35:10 event=LOGIN status user=admin ip=198.51.100.45 method=SSH 2024-11-25 event=LOGIN status=FAIL user=admin ip=198.51.100.45 2024-11-25 08:40:12 event=LOGIN status=FAIL user=root ip=203.0.113.89 method=SSH 2024-11-25 08:40:15 event=LOGIN status=FAIL user=administrator ip=203.0.113.89 method=SSH 2024-11-25 08:42:30 event=LOGIN status=SUCCESS user=alice ip=192.168.1.100 method=WEB 2024-11-25 08:45:12 event=LOGIN status=FAIL user=admin ip=192.0.2.15 method=SSH 2024-11-25 08:45:15 event=LOGIN status=FAIL user=root ip=192.0.2.15 method=SSH 2024-11-25 08:50:00 event=LOGIN status=SUCCESS user=bob ip=172.16.0.50 method=SSH 2024-11-25 08:52:00 event=LOGIN status=FAIL user=test ip=198.51.100.92 method=WEB 2024-11-25 08:54:00 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH 2024-11-25 08:55:00 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH 2024-11-25 08:56:00 event=LOGIN status= user=admin ip=198.51.100.45 method=SSH event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH</div>
+</div>
+<h3>Expected Output</h3>
+<p>When you run your scanner on the test data, you should see output similar to this:</p>
+<div class="terminal">
+<div class="terminal-header">► EXPECTED CONSOLE OUTPUT</div>
+<div class="terminal-output" style="font-size: 12px;">Authentication Log Scanner ================================================== Processing: auth_test.log Parsing Statistics: Total lines: 20 Successfully parsed: 17 (85.0%) Parse failures: 3 Analysis Complete: Total events: 17 Successful logins: 4 (23.5%) Failed logins: 13 (76.5%) ⚠ ALERT: High failure rate detected (76.5%) Reports generated: ✓ incident_report.json ✓ incident_report.txt ==================================================</div>
+</div>
+<h3>Evaluation Criteria</h3>
+<table>
+<tbody>
+<tr>
+<th>Requirement</th>
+<th>Points</th>
+<th>Check</th>
+</tr>
+<tr>
+<td>Parses valid log lines correctly</td>
+<td>20</td>
+<td>✓ Extracts all key=value pairs</td>
+</tr>
+<tr>
+<td>Handles malformed logs without crashing</td>
+<td>20</td>
+<td>✓ Uses try/except, validates fields</td>
+</tr>
+<tr>
+<td>Counts failures per user and IP</td>
+<td>15</td>
+<td>✓ Uses Counter or dict</td>
+</tr>
+<tr>
+<td>Generates valid JSON report</td>
+<td>15</td>
+<td>✓ Proper structure, top 5 lists</td>
+</tr>
+<tr>
+<td>Generates formatted text report</td>
+<td>15</td>
+<td>✓ Readable, sections, statistics</td>
+</tr>
+<tr>
+<td>Code quality and organization</td>
+<td>10</td>
+<td>✓ Functions, comments, readable</td>
+</tr>
+<tr>
+<td>Tracks parsing errors</td>
+<td>5</td>
+<td>✓ Reports statistics</td>
+</tr>
+</tbody>
+</table>
+<h3>Submission Checklist</h3>
+<div class="info-box"><strong>Before submitting, verify:</strong>
+<ul>
+<li>☐ Code runs without errors on test data</li>
+<li>☐ Handles all malformed log examples</li>
+<li>☐ Generates valid JSON (test with json.loads())</li>
+<li>☐ Text report is readable and formatted</li>
+<li>☐ Code has comments explaining key sections</li>
+<li>☐ Function docstrings are complete</li>
+<li>☐ No hardcoded filenames (accept as argument)</li>
+<li>☐ Tested with your own additional edge cases</li>
+</ul>
+</div>
+<h3>Bonus Challenges (Optional)</h3>
+<details class="hint-box">
+<summary>🌟 Extra Credit Opportunities</summary>
+<p>For students who finish early, try adding:</p>
+<ol>
+<li><strong>Time-based analysis:</strong> Group attacks by hour to identify peak attack times</li>
+<li><strong>Geolocation:</strong> Add mock country codes for IP addresses</li>
+<li><strong>Alert thresholds:</strong> Flag IPs with &gt;100 attempts as "critical"</li>
+<li><strong>Command-line arguments:</strong> Use argparse for filename and options</li>
+<li><strong>Multiple log formats:</strong> Support both space-separated and JSON log formats</li>
+<li><strong>Real-time monitoring:</strong> Watch log file for new entries using tail -f logic</li>
+</ol>
+</details>
+<div class="success-box" style="margin-top: 30px;">
+<h3 style="color: #00ff00; margin-bottom: 15px;">🎉 Congratulations!</h3>
+<p>You've completed Week 5: Login Failure Log Scanner. You now have the skills to:</p>
+<ul>
+<li>Parse structured log data using string manipulation</li>
+<li>Aggregate security data with Counter and dictionaries</li>
+<li>Generate professional JSON and text reports</li>
+<li>Handle edge cases and malformed data robustly</li>
+<li>Use GitHub Copilot effectively for code improvement</li>
+</ul>
+<p><strong>These skills are the foundation of security automation and SOC analysis.</strong></p>
+</div>
+<button class="btn" style="font-size: 1.2em; padding: 15px 40px;" onclick="completeSection(9)">Mission Complete! 🎖️</button></div>
+</div>
+<p><script>
+        // Configuration
+        const totalSections = 9;
+        let completedSections = new Set();
+
+        // Initialize navigation
+        function initializeNav() {
+            const navContainer = document.getElementById('navButtons');
+            for (let i = 1; i <= totalSections; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                btn.textContent = `Section ${{i}}`;
+                btn.onclick = () => navigateToSection(i);
+                navContainer.appendChild(btn);
+            }
+            // Mark first section as active
+            document.querySelectorAll('.nav-btn')[0].classList.add('active');
+            updateProgress();
+        }
+
+        // Navigate to section
+        function navigateToSection(sectionNum) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            // Show target section
+            document.getElementById(`section${{sectionNum}}`).classList.add('active');
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
+                btn.classList.remove('active');
+                if (idx + 1 === sectionNum) {
+                    btn.classList.add('active');
+                }
+            });
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Complete section
+        function completeSection(sectionNum) {
+            completedSections.add(sectionNum);
+            updateProgress();
+            // Navigate to next section if available
+            if (sectionNum < totalSections) {
+                navigateToSection(sectionNum + 1);
+            }
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (completedSections.size / totalSections) * 100;
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+            
+            if (progressText) {
+                progressText.textContent = Math.round(progress) + '%';
+            }
+            
+            // Update nav button styles
+            document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
+                if (completedSections.has(idx + 1)) {
+                    btn.classList.add('completed');
+                }
+            });
+        }
+
+        // Section 2: Interactive demos
+        function dissectLog() {
+            const output = document.getElementById('dissectionOutput');
+            const sample = "2024-11-25 03:45:12 event=LOGIN status=FAIL user=admin ip=198.51.100.45 method=SSH";
+            
+            output.innerHTML = `<span style="color: #ff0000;">Original Log Line:</span>
+${{sample}}
+
+<span style="color: #ff0000;">Breaking it down:</span>
+
+<span style="color: #ffaa00;">Timestamp:</span> "2024-11-25 03:45:12"
+  └─ Date: 2024-11-25
+  └─ Time: 03:45:12 (3:45 AM)
+
+<span style="color: #ffaa00;">Key=Value Pairs:</span>
+  event=LOGIN        → Event type: LOGIN
+  status=FAIL        → <span style="color: #ff0000;">CRITICAL:</span> Failed authentication
+  user=admin         → Target account: admin (high-value target!)
+  ip=198.51.100.45   → Source IP: 198.51.100.45 (attacker location)
+  method=SSH         → Access method: SSH (remote shell)
+
+<span style="color: #ff0000;">Security Analysis:</span>
+This is a failed SSH login attempt on a privileged 'admin' account
+from an external IP address. Pattern suggests brute force attack.`;
+        }
+
+        function clearDissection() {
+            document.getElementById('dissectionOutput').textContent = 'Click "Dissect Sample Log" to see detailed breakdown...';
+        }
+
+        function checkAnswer(element, isCorrect) {
+            const options = element.parentElement.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.innerHTML += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.innerHTML += ' ✗ Incorrect';
+            }
+        }
+
+        // Section 3: Parsing demos
+        function parseStep1() {
+            const input = document.getElementById('parseInput').value;
+            const parts = input.split(/\s+/);
+            document.getElementById('parseOutput').innerHTML = `<span style="color: #ff0000;">Step 1: Split on spaces</span>
+
+Result: ${JSON.stringify(parts, null, 2)}
+
+<span style="color: #ffaa00;">Total parts: ${parts.length}</span>`;
+        }
+
+        function parseStep2() {
+            const input = document.getElementById('parseInput').value;
+            const parts = input.split(/\s+/);
+            const timestamp = parts[0] + " " + parts[1];
+            document.getElementById('parseOutput').innerHTML = `<span style="color: #ff0000;">Step 2: Extract timestamp</span>
+
+Timestamp: "${{timestamp}}"
+Remaining parts: ${JSON.stringify(parts.slice(2), null, 2)}`;
+        }
+
+        function parseStep3() {
+            const input = document.getElementById('parseInput').value;
+            const parts = input.split(/\s+/);
+            const kvPairs = parts.slice(2);
+            let result = 'Key=Value pairs parsed:\n\n';
+            kvPairs.forEach(pair => {
+                const [key, value] = pair.split('=');
+                result += `  ${{key}} → "${{value}}"\n`;
+            });
+            document.getElementById('parseOutput').innerHTML = `<span style="color: #ff0000;">Step 3: Parse Key=Value</span>
+
+${{result}}`;
+        }
+
+        function parseComplete() {
+            const input = document.getElementById('parseInput').value;
+            const parts = input.split(/\s+/);
+            const timestamp = parts[0] + " " + parts[1];
+            const data = { timestamp: timestamp };
+            
+            parts.slice(2).forEach(pair => {
+                const [key, value] = pair.split('=');
+                data[key] = value;
+            });
+            
+            document.getElementById('parseOutput').innerHTML = `<span style="color: #ff0000;">Complete parsed result:</span>
+
+${JSON.stringify(data, null, 2)}
+
+<span style="color: #00ff00;">✓ Successfully parsed all fields!</span>`;
+        }
+
+        function checkParseExercise() {
+            const code = document.getElementById('parseExercise').value;
+            const output = document.getElementById('parseExerciseOutput');
+            
+            if (code.includes('.split()') && (code.includes('user') || code.includes('status'))) {
+                output.innerHTML = `<div class="success-box">
+<strong>✓ Good attempt!</strong> Make sure your code extracts:
+- user field (should be "jdoe")
+- status field (should be "SUCCESS")
+
+Example output:
+<pre>user: jdoe
+status: SUCCESS</pre>
+</div>`;
+            } else {
+                output.innerHTML = `<div class="hint-box">
+<summary>💡 Hint</summary>
+Remember to:
+1. Split the line: <code>parts = line.split()</code>
+2. Loop through key=value pairs (parts[2:])
+3. Split each pair on '=' to get key and value
+</div>`;
+            }
+        }
+
+        // Section 4: Aggregation demo
+        let aggregationInterval;
+        function startAggregation() {
+            const output = document.getElementById('aggregationOutput');
+            const testLogs = [
+                { user: 'admin', ip: '198.51.100.45' },
+                { user: 'admin', ip: '198.51.100.45' },
+                { user: 'root', ip: '198.51.100.45' },
+                { user: 'admin', ip: '203.0.113.89' },
+                { user: 'admin', ip: '198.51.100.45' },
+                { user: 'test', ip: '192.0.2.15' },
+                { user: 'admin', ip: '198.51.100.45' }
+            ];
+            
+            let userCounts = {};
+            let ipCounts = {};
+            let index = 0;
+            
+            aggregationInterval = setInterval(() => {
+                if (index >= testLogs.length) {
+                    clearInterval(aggregationInterval);
+                    output.innerHTML += '\n\n<span style="color: #00ff00;">✓ Processing complete!</span>';
+                    return;
+                }
+                
+                const log = testLogs[index];
+                userCounts[log.user] = (userCounts[log.user] || 0) + 1;
+                ipCounts[log.ip] = (ipCounts[log.ip] || 0) + 1;
+                
+                output.innerHTML = `<span style="color: #ff0000;">Processing log ${index + 1}/${testLogs.length}...</span>
+Log: user=${log.user} ip=${log.ip}
+
+<span style="color: #ffaa00;">Failed by User:</span>
+${Object.entries(userCounts).map(([u, c]) => `  ${{u}}: ${{c}}`).join('\n')}
+
+<span style="color: #ffaa00;">Failed by IP:</span>
+${Object.entries(ipCounts).map(([i, c]) => `  ${{i}}: ${{c}}`).join('\n')}`;
+                
+                index++;
+            }, 1000);
+        }
+
+        function resetAggregation() {
+            clearInterval(aggregationInterval);
+            document.getElementById('aggregationOutput').textContent = 'Click "Start Processing" to begin...';
+        }
+
+        function checkCounterChallenge() {
+            const code = document.getElementById('counterChallenge').value;
+            const output = document.getElementById('counterChallengeOutput');
+            
+            if (code.includes('Counter()') && code.includes("'FAIL'") && code.includes('+=')) {
+                output.innerHTML = `<div class="success-box">
+<strong>✓ Excellent work!</strong> Your solution should output:
+<pre>Counter({'admin': 2, 'root': 1})</pre>
+
+Key points your code should include:
+- Initialize: <code>failed_by_user = Counter()</code>
+- Parse each line
+- Check: <code>if data.get('status') == 'FAIL':</code>
+- Increment: <code>failed_by_user[data['user']] += 1</code>
+</div>`;
+            } else {
+                output.innerHTML = `<div class="hint-box">
+<summary>💡 Need help?</summary>
+Your code should:
+1. Initialize a Counter: <code>failed_by_user = Counter()</code>
+2. Loop through log_lines
+3. Parse each line (use the parsing from Section 3)
+4. Check if status == 'FAIL'
+5. Increment the counter for that user
+</div>`;
+            }
+        }
+
+        // Section 5: JSON demos
+        function generateSampleJSON() {
+            const sampleReport = {
+                metadata: {
+                    generated_at: new Date().toISOString(),
+                    analyst: "SOC Automation",
+                    classification: "INTERNAL"
+                },
+                summary: {
+                    total_events: 20,
+                    total_success: 4,
+                    total_fail: 16,
+                    failure_rate: 80.0
+                },
+                top_targeted_users: [
+                    { username: "admin", failed_attempts: 7 },
+                    { username: "root", failed_attempts: 3 },
+                    { username: "administrator", failed_attempts: 2 }
+                ],
+                top_attacking_ips: [
+                    { ip_address: "198.51.100.45", failed_attempts: 10 },
+                    { ip_address: "203.0.113.89", failed_attempts: 4 },
+                    { ip_address: "192.0.2.15", failed_attempts: 2 }
+                ]
+            };
+            
+            document.getElementById('jsonBuilder').value = JSON.stringify(sampleReport, null, 2);
+        }
+
+        function validateJSON() {
+            const jsonText = document.getElementById('jsonBuilder').value;
+            const output = document.getElementById('jsonValidation');
+            
+            try {
+                JSON.parse(jsonText);
+                output.innerHTML = '<div class="success-box">✓ Valid JSON! This report can be parsed by SIEM tools.</div>';
+            } catch (e) {
+                output.innerHTML = `<div class="error-box">✗ Invalid JSON: ${e.message}</div>`;
+            }
+        }
+
+        function checkJSONChallenge() {
+            const code = document.getElementById('jsonChallenge').value;
+            const output = document.getElementById('jsonChallengeOutput');
+            
+            if (code.includes('json.dumps') && code.includes('report') && code.includes('summary')) {
+                output.innerHTML = `<div class="success-box">
+<strong>✓ Great structure!</strong> Your JSON should include:
+- metadata or timestamp
+- summary with total_events, total_success, total_fail, failure_rate
+- top_users list (from Counter.most_common(5))
+- top_ips list (from Counter.most_common(5))
+- Use json.dumps(report, indent=2) for pretty printing
+</div>`;
+            } else {
+                output.innerHTML = `<div class="hint-box">
+<summary>💡 Hint</summary>
+Build a dictionary structure:
+<pre>report = {
+    'summary': {
+        'total_events': len(log_lines),
+        'total_success': total_success,
+        'total_fail': total_fail,
+        'failure_rate': (total_fail / len(log_lines)) * 100
+    },
+    'top_users': [{'username': u, 'count': c} for u, c in failed_by_user.most_common(5)],
+    'top_ips': [{'ip': i, 'count': c} for i, c in failed_by_ip.most_common(5)]
+}</pre>
+</div>`;
+            }
+        }
+
+        // Section 6: Report generation
+        function generateLiveReport() {
+            const report = `==================================================
+     AUTHENTICATION FAILURE ANALYSIS REPORT
+     Generated: ${new Date().toLocaleString()}
+==================================================
+
+[ CRITICAL ALERT ]
+Abnormally high failure rate: 80.0% (baseline: 2-5%)
+Potential BRUTE FORCE ATTACK in progress.
+
+--------------------------------------------------
+SUMMARY STATISTICS
+--------------------------------------------------
+Total Events:        20
+Successful Logins:   4 (20.0%)
+Failed Attempts:     16 (80.0%)
+
+--------------------------------------------------
+TOP 5 TARGETED ACCOUNTS
+--------------------------------------------------
+1. admin            7 attempts  ⚠ CRITICAL
+2. root             3 attempts  ⚠ HIGH
+3. administrator    2 attempts  ⚠ MEDIUM
+4. test             2 attempts  ⚠ MEDIUM
+5. user             2 attempts  ⚠ MEDIUM
+
+--------------------------------------------------
+TOP 5 ATTACKING SOURCE IPs
+--------------------------------------------------
+1. 198.51.100.45     10 attempts  ⚠ BLOCK IMMEDIATELY
+2. 203.0.113.89      4 attempts   ⚠ INVESTIGATE
+3. 192.0.2.15        2 attempts   ⚠ INVESTIGATE
+
+--------------------------------------------------
+RECOMMENDED ACTIONS
+--------------------------------------------------
+[ IMMEDIATE ]
+  • Block IPs 198.51.100.45 at firewall
+  • Lock accounts: admin, root (require password reset)
+  • Enable MFA on all privileged accounts
+  • Escalate to Incident Response team
+
+Report generated by: SOC Automation Platform`;
+            
+            document.getElementById('liveReport').textContent = report;
+        }
+
+        function downloadReport() {
+            const report = document.getElementById('liveReport').textContent;
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'incident_report.txt';
+            a.click();
+        }
+
+        function checkReportChallenge() {
+            const code = document.getElementById('reportChallenge').value;
+            const output = document.getElementById('reportChallengeOutput');
+            
+            if (code.includes('report =') && code.includes('Counter') && (code.includes('\\n') || code.includes('\n'))) {
+                output.innerHTML = `<div class="success-box">
+<strong>✓ Good progress!</strong> Your report should include:
+1. Header with "=" * 50
+2. Total events count
+3. Success and fail counts
+4. Top 3 users from failed_by_user.most_common(3)
+5. Use \\n to create new lines in your string
+</div>`;
+            } else {
+                output.innerHTML = `<div class="hint-box">
+<summary>💡 Structure Example</summary>
+<pre>report = "=" * 50 + "\\n"
+report += "SUMMARY\\n"
+report += "=" * 50 + "\\n"
+report += f"Total: {total_events}\\n"
+# ... add more lines
+for user, count in failed_by_user.most_common(3):
+    report += f"  {{user}}: {{count}} attempts\\n"
+return report</pre>
+</div>`;
+            }
+        }
+
+        // Section 7: Error handling demo
+        function testErrorHandling() {
+            const input = document.getElementById('errorTestInput').value;
+            const lines = input.split('\n');
+            const output = document.getElementById('errorTestOutput');
+            
+            let results = '<span style="color: #ff0000;">Parsing Results:</span>\n\n';
+            let validCount = 0;
+            let errorCount = 0;
+            
+            lines.forEach((line, idx) => {
+                line = line.trim();
+                if (!line) {
+                    results += `Line ${idx + 1}: <span style="color: #666;">EMPTY - Skipped</span>\n`;
+                    return;
+                }
+                
+                const parts = line.split(/\s+/);
+                if (parts.length < 2) {
+                    results += `Line ${idx + 1}: <span style="color: #ff0000;">ERROR - Missing timestamp</span>\n`;
+                    errorCount++;
+                    return;
+                }
+                
+                let hasError = false;
+                parts.slice(2).forEach(pair => {
+                    if (!pair.includes('=')) {
+                        results += `Line ${idx + 1}: <span style="color: #ff0000;">ERROR - Malformed pair: ${{pair}}</span>\n`;
+                        hasError = true;
+                        errorCount++;
+                    }
+                });
+                
+                if (!hasError) {
+                    results += `Line ${idx + 1}: <span style="color: #00ff00;">✓ Valid</span>\n`;
+                    validCount++;
+                }
+            });
+            
+            results += `\n<span style="color: #ffaa00;">Summary:</span>\n`;
+            results += `  Valid: ${{validCount}}\n`;
+            results += `  Errors: ${{errorCount}}\n`;
+            results += `  Success Rate: ${(validCount / (validCount + errorCount) * 100).toFixed(1)}%`;
+            
+            output.innerHTML = results;
+        }
+
+        function clearErrorTest() {
+            document.getElementById('errorTestOutput').textContent = 'Click "Test Parsing" to see results...';
+        }
+
+        function checkRobustChallenge() {
+            const code = document.getElementById('robustChallenge').value;
+            const output = document.getElementById('robustChallengeOutput');
+            
+            if (code.includes('try:') && code.includes('except') && code.includes('return None')) {
+                output.innerHTML = `<div class="success-box">
+<strong>✓ Excellent error handling!</strong> Your robust parser should:
+1. Wrap everything in try/except
+2. Check for empty lines: <code>if not line.strip(): return None</code>
+3. Validate length: <code>if len(parts) < 2: return None</code>
+4. Check for =: <code>if '=' not in pair: continue</code>
+5. Return None on any exception
+</div>`;
+            } else {
+                output.innerHTML = `<div class="hint-box">
+<summary>💡 Error Handling Pattern</summary>
+<pre>def parse_log_robust(line):
+    try:
+        line = line.strip()
+        if not line:
+            return None
+        
+        parts = line.split()
+        if len(parts) < 2:
+            return None
+        
+        # ... rest of parsing
+        
+    except Exception as e:
+        return None</pre>
+</div>`;
+            }
+        }
+
+        // Section 8: Copilot demos
+        function showPromptScenario(num) {
+            const scenarios = {
+                1: `<span style="color: #ff0000;">Scenario 1: Edge Case Discovery</span>
+
+Your Task: Write a Copilot prompt asking for edge cases
+
+<span style="color: #8a2be2;">Example Good Prompt:</span>
+"I've written a log parser that splits on spaces and parses key=value pairs.
+Here's my code: [paste code]
+
+Can you identify 8-10 edge cases that might break this parser? For each edge case:
+1. Show an example log line
+2. Explain why it would fail
+3. Suggest how to handle it
+
+Focus on: missing fields, malformed key=value, special characters, Unicode, and truncated lines."
+
+<span style="color: #00ff00;">Why this works:</span>
+- Specific request (8-10 cases)
+- Code context provided
+- Clear output format requested
+- Focuses on realistic issues`,
+                2: `<span style="color: #ff0000;">Scenario 2: Performance Optimization</span>
+
+Your Task: Ask Copilot about performance improvements
+
+<span style="color: #8a2be2;">Example Good Prompt:</span>
+"I'm processing 500,000 authentication log lines and it takes 45 seconds.
+Current approach: [paste your parsing loop]
+
+How can I optimize this? Consider:
+1. String manipulation efficiency
+2. Dictionary vs Counter performance
+3. File reading strategies (readlines vs iteration)
+4. Memory usage with large files
+
+Suggest 3-5 specific optimizations with code examples."
+
+<span style="color: #00ff00;">Why this works:</span>
+- Quantifies the problem (500k lines, 45 sec)
+- Shows current approach
+- Asks for specific considerations
+- Requests concrete examples`,
+                3: `<span style="color: #ff0000;">Scenario 3: Test Data Generation</span>
+
+Your Task: Generate comprehensive test cases
+
+<span style="color: #8a2be2;">Example Good Prompt:</span>
+"Generate 25 authentication log lines for testing my parser.
+Format: YYYY-MM-DD HH:MM:SS event=LOGIN status=[SUCCESS|FAIL] user=[name] ip=[ip] method=[SSH|WEB]
+
+Include:
+- 8 valid SUCCESS events
+- 8 valid FAIL events (simulate brute force from 2 IPs)
+- 9 malformed lines covering:
+  * Missing = sign
+  * Missing timestamp
+  * Empty username
+  * Invalid status values
+  * Extra spaces
+  * Unicode characters in username
+  * Missing IP field
+
+Make the brute force pattern realistic (same IPs, common usernames like admin/root)."
+
+<span style="color: #00ff00;">Why this works:</span>
+- Specific count requested
+- Format clearly defined
+- Categorized requirements
+- Realistic attack scenario`
+            };
+            
+            document.getElementById('promptScenario').innerHTML = scenarios[num];
+        }
+
+        // Section 9: Final challenge support
+        function downloadStarterCode() {
+            const code = document.getElementById('finalChallenge').value;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'auth_scanner.py';
+            a.click();
+        }
+
+        function downloadTestData() {
+            const testData = document.getElementById('testDataDisplay').textContent;
+            const blob = new Blob([testData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'auth_test.log';
+            a.click();
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            initializeNav();
+        };
+    </script></p></body></html>
