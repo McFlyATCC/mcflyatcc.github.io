@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 14: Core Implementation Sprint - MVP Build</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d0000 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #000000 0%, #330000 100%);
+            border: 2px solid #cc0000;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(204, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #cc0000;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px rgba(204, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .week-info {
+            color: #888;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 1.3em;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            background: #222;
+            border: 1px solid #cc0000;
+            border-radius: 10px;
+            height: 30px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #cc0000 0%, #ff0000 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(204, 0, 0, 0.5);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: #222;
+            color: #888;
+            border: 2px solid #444;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            border-color: #cc0000;
+            color: #cc0000;
+            box-shadow: 0 0 10px rgba(204, 0, 0, 0.3);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #cc0000 0%, #ff0000 100%);
+            color: #fff;
+            border-color: #cc0000;
+            box-shadow: 0 0 15px rgba(204, 0, 0, 0.5);
+        }
+
+        .content-section {
+            display: none;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #444;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #cc0000;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
+            border-bottom: 2px solid #cc0000;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #ff6666;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+
+        .concept-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 4px solid #cc0000;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .concept-box h4 {
+            color: #cc0000;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid #cc0000;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .code-block pre {
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .code-header {
+            color: #cc0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .interactive-exercise {
+            background: rgba(204, 0, 0, 0.1);
+            border: 2px solid #cc0000;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .exercise-title {
+            color: #cc0000;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            background: #1a1a1a;
+            color: #0f0;
+            border: 1px solid #cc0000;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            margin: 10px 0;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(204, 0, 0, 0.5);
+        }
+
+        .button {
+            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            box-shadow: 0 0 15px rgba(204, 0, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: linear-gradient(135deg, #444 0%, #222 100%);
+        }
+
+        .button-secondary:hover {
+            background: linear-gradient(135deg, #555 0%, #333 100%);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .feedback.success {
+            background: rgba(0, 204, 0, 0.2);
+            border: 1px solid #0c0;
+            color: #0f0;
+        }
+
+        .feedback.error {
+            background: rgba(204, 0, 0, 0.2);
+            border: 1px solid #c00;
+            color: #f88;
+        }
+
+        .feedback.info {
+            background: rgba(0, 102, 204, 0.2);
+            border: 1px solid #06c;
+            color: #6cf;
+        }
+
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .checklist li:hover {
+            background: rgba(204, 0, 0, 0.1);
+            border-left-color: #cc0000;
+        }
+
+        .checklist li.completed {
+            border-left-color: #0c0;
+            background: rgba(0, 204, 0, 0.1);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .checklist li:before {
+            content: "☐ ";
+            color: #cc0000;
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+
+        .checklist li.completed:before {
+            content: "☑ ";
+            color: #0c0;
+        }
+
+        .warning-box {
+            background: rgba(204, 102, 0, 0.1);
+            border-left: 4px solid #c60;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box strong {
+            color: #f90;
+        }
+
+        .tip-box {
+            background: rgba(0, 102, 204, 0.1);
+            border-left: 4px solid #06c;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .tip-box strong {
+            color: #6cf;
+        }
+
+        .ai-focus {
+            background: linear-gradient(135deg, rgba(102, 0, 204, 0.2) 0%, rgba(51, 0, 102, 0.2) 100%);
+            border: 2px solid #60c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .ai-focus h4 {
+            color: #90f;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .example-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .example-card:hover {
+            border-color: #cc0000;
+            box-shadow: 0 0 15px rgba(204, 0, 0, 0.3);
+        }
+
+        .example-card h4 {
+            color: #cc0000;
+            margin-bottom: 10px;
+        }
+
+        .terminal-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            border: 1px solid #0f0;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        .file-structure {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            margin: 15px 0;
+        }
+
+        .file-structure .folder {
+            color: #6cf;
+            margin-left: 20px;
+        }
+
+        .file-structure .file {
+            color: #0f0;
+            margin-left: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin: 0 5px;
+            font-weight: bold;
+        }
+
+        .badge-mvp {
+            background: #cc0000;
+            color: #fff;
+        }
+
+        .badge-oop {
+            background: #06c;
+            color: #fff;
+        }
+
+        .badge-ai {
+            background: #60c;
+            color: #fff;
+        }
+
+        .deliverable-section {
+            background: rgba(204, 0, 0, 0.1);
+            border: 2px dashed #cc0000;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .deliverable-section h3 {
+            color: #cc0000;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+            }
+
+            .example-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head><body><div class="container"><header>
+<h1>⚡ Week 14: Core Implementation Sprint</h1>
+<div class="subtitle">From Proposal to Working Code: Building Your MVP</div>
+<div class="week-info">Module Focus: MVP Development | Object-Oriented Design | AI-Assisted Coding</div>
+</header>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+<div class="progress-text" id="progressText">0% Complete</div>
+</div>
+<nav class="nav-tabs"><button class="tab-button active" onclick="showTab('overview')">📋 Overview</button> <button class="tab-button" onclick="showTab('structure')">🗂️ Project Structure</button> <button class="tab-button" onclick="showTab('file-io')">📁 File Input/Output</button> <button class="tab-button" onclick="showTab('processing')">⚙️ Core Logic</button> <button class="tab-button" onclick="showTab('oop')">🎯 OOP Design</button> <button class="tab-button" onclick="showTab('logging')">📝 Logging &amp; Errors</button> <button class="tab-button" onclick="showTab('cli')">💻 CLI Interface</button> <button class="tab-button" onclick="showTab('ai-assistant')">🤖 AI Assistant</button> <button class="tab-button" onclick="showTab('deliverables')">✅ Deliverables</button></nav><!-- Overview Section -->
+<div id="overview" class="content-section active">
+<h2>🎯 Week 14 Mission: Build Your MVP</h2>
+<div class="concept-box">
+<h4>What is an MVP?</h4>
+<p><strong>Minimum Viable Product (MVP)</strong> - The simplest version of your tool that actually works end-to-end. It doesn't need every feature, but it needs to run, process data, and produce output.</p>
+<p style="margin-top: 10px;">Think of it as the skeleton of your tool. Everything is connected and functional, even if it's not fully featured yet.</p>
+</div>
+<h3>This Week's Goals</h3>
+<div class="example-grid">
+<div class="example-card">
+<h4>🔨 Build Working Code</h4>
+<p>Transform your proposal from Week 13 into actual running Python code that processes real data.</p>
+</div>
+<div class="example-card">
+<h4>🏗️ Structure Your Project</h4>
+<p>Organize your code with proper folders, modules, and a clear entry point.</p>
+</div>
+<div class="example-card">
+<h4>🎓 Apply OOP Principles</h4>
+<p>Create at least one meaningful class that encapsulates a clear responsibility.</p>
+</div>
+<div class="example-card">
+<h4>🤖 Leverage AI Smartly</h4>
+<p>Use AI as your coding partner, but stay in control of every decision.</p>
+</div>
+</div>
+<h3>The MVP Development Cycle</h3>
+<div class="code-block">
+<div class="code-header">Development Flow:</div>
+<pre>1. Set up project structure (folders, files)
+   └─&gt; Create main.py entry point
+
+2. Implement file input
+   └─&gt; Read JSON/config files
+   └─&gt; Parse and validate data
+
+3. Build core processing logic
+   └─&gt; Transform, filter, calculate, compare
+   └─&gt; Use classes to organize functionality
+
+4. Add CLI interface
+   └─&gt; Accept command-line arguments
+   └─&gt; Provide helpful usage messages
+
+5. Implement logging &amp; error handling
+   └─&gt; Track what your script is doing
+   └─&gt; Handle errors gracefully
+
+6. Test with real data
+   └─&gt; Run end-to-end tests
+   └─&gt; Fix issues as they arise
+
+7. Document what works (and what doesn't)
+   └─&gt; Implementation checkpoint write-up
+                </pre>
+</div>
+<div class="warning-box"><strong>⚠️ Reality Check:</strong> Your MVP won't be perfect. It won't have all features. It will have bugs. That's okay! The goal is to have something that runs and demonstrates your core concept. You'll improve it in future weeks.</div>
+<div class="ai-focus">
+<h4>🤖 AI Integration This Week</h4>
+<p>This week, you'll learn to use AI tools (like GitHub Copilot, ChatGPT, Claude) as coding assistants. But remember:</p>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li style="margin: 5px 0;">✅ Use AI to generate helper functions</li>
+<li style="margin: 5px 0;">✅ Ask AI for class design suggestions</li>
+<li style="margin: 5px 0;">✅ Get help debugging errors</li>
+<li style="margin: 5px 0;">❌ Don't blindly copy AI-generated code</li>
+<li style="margin: 5px 0;">❌ Don't accept code you don't understand</li>
+<li style="margin: 5px 0;">✅ YOU must be able to explain every line</li>
+</ul>
+</div>
+<h3>Weekly Checklist</h3>
+<ul class="checklist" id="weeklyChecklist">
+<li onclick="toggleChecklistItem(this)">Set up project folder structure</li>
+<li onclick="toggleChecklistItem(this)">Create main.py entry point</li>
+<li onclick="toggleChecklistItem(this)">Implement JSON file reading</li>
+<li onclick="toggleChecklistItem(this)">Build at least one OOP class</li>
+<li onclick="toggleChecklistItem(this)">Add core processing logic</li>
+<li onclick="toggleChecklistItem(this)">Implement CLI argument parsing</li>
+<li onclick="toggleChecklistItem(this)">Add logging/error handling</li>
+<li onclick="toggleChecklistItem(this)">Test with sample data</li>
+<li onclick="toggleChecklistItem(this)">Write implementation checkpoint</li>
+<li onclick="toggleChecklistItem(this)">Document AI usage and learnings</li>
+</ul>
+</div>
+<!-- Project Structure Section -->
+<div id="structure" class="content-section">
+<h2>🗂️ Project Structure: Organizing Your Code</h2>
+<div class="concept-box">
+<h4>Why Structure Matters</h4>
+<p>Good project structure makes your code easier to understand, maintain, and extend. It's like organizing your tools in a workshop - everything has its place.</p>
+</div>
+<h3>Recommended Folder Structure</h3>
+<div class="file-structure">
+<div style="color: #cc0000;">📁 my_capstone_project/</div>
+<div class="folder">├── 📁 src/</div>
+<div class="file">│ ├── 📄 __init__.py</div>
+<div class="file">│ ├── 📄 main.py # Entry point</div>
+<div class="file">│ ├── 📄 classes.py # Your OOP classes</div>
+<div class="file">│ ├── 📄 file_handler.py # File I/O functions</div>
+<div class="file">│ └── 📄 processor.py # Core logic</div>
+<div class="folder">├── 📁 data/</div>
+<div class="file">│ ├── 📄 sample_input.json</div>
+<div class="file">│ └── 📄 test_data.json</div>
+<div class="folder">├── 📁 output/</div>
+<div class="file">│ └── 📄 results.json</div>
+<div class="folder">├── 📁 tests/</div>
+<div class="file">│ └── 📄 test_basic.py</div>
+<div class="file">├── 📄 requirements.txt</div>
+<div class="file">└── 📄 README.md</div>
+</div>
+<h3>Key Files Explained</h3>
+<div class="example-grid">
+<div class="example-card">
+<h4>main.py</h4>
+<p><strong>Purpose:</strong> Entry point - where your program starts</p>
+<p><strong>Contains:</strong> CLI argument parsing, main() function, orchestration logic</p>
+</div>
+<div class="example-card">
+<h4>classes.py</h4>
+<p><strong>Purpose:</strong> Object-oriented class definitions</p>
+<p><strong>Contains:</strong> Classes like Host, Finding, Task, etc.</p>
+</div>
+<div class="example-card">
+<h4>file_handler.py</h4>
+<p><strong>Purpose:</strong> File input/output operations</p>
+<p><strong>Contains:</strong> Functions to read/write JSON, handle file errors</p>
+</div>
+<div class="example-card">
+<h4>processor.py</h4>
+<p><strong>Purpose:</strong> Core business logic</p>
+<p><strong>Contains:</strong> Transform, filter, calculate, compare functions</p>
+</div>
+</div>
+<div class="interactive-exercise">
+<div class="exercise-title">🔨 Exercise 1: Design Your Project Structure</div>
+<p>Based on your capstone project, design an appropriate folder structure. Think about:</p>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>What are the main components of your tool?</li>
+<li>Which parts should be separated into different modules?</li>
+<li>What input/output files will you need?</li>
+</ul>
+<textarea id="structureDesign" placeholder="Describe your project structure here...
+Example:
+my_project/
+├── src/
+│   ├── main.py
+│   ├── scanner.py
+│   └── ..."></textarea> <button class="button" onclick="validateStructure()">💾 Save Design</button> <button class="button button-secondary" onclick="showStructureExample()">💡 Show Example</button>
+<div id="structureFeedback" class="feedback"></div>
+</div>
+<h3>Creating the Basic Structure</h3>
+<div class="code-block">
+<div class="code-header">Bash commands to set up structure:</div>
+<pre># Create main project directory
+mkdir my_capstone_project
+cd my_capstone_project
+
+# Create subdirectories
+mkdir src data output tests
+
+# Create empty Python files
+touch src/__init__.py
+touch src/main.py
+touch src/classes.py
+touch src/file_handler.py
+touch src/processor.py
+
+# Create requirements file
+touch requirements.txt
+
+# Create README
+touch README.md
+                </pre>
+</div>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> The <code>__init__.py</code> file (even if empty) tells Python that the directory is a package and allows you to import modules from it. This is crucial for proper module organization.</div>
+</div>
+<!-- File I/O Section -->
+<div id="file-io" class="content-section">
+<h2>📁 File Input/Output: Reading and Writing Data</h2>
+<div class="concept-box">
+<h4>JSON: The Universal Data Format</h4>
+<p>JSON (JavaScript Object Notation) is the standard format for data exchange in cybersecurity tools. It's human-readable, widely supported, and perfect for configuration files and data storage.</p>
+</div>
+<h3>Reading JSON Files</h3>
+<div class="code-block">
+<div class="code-header">file_handler.py - Basic JSON Reading:</div>
+<pre>import json
+import logging
+
+def read_json_file(filepath):
+    """
+    Read and parse a JSON file.
+    
+    Args:
+        filepath (str): Path to the JSON file
+        
+    Returns:
+        dict: Parsed JSON data
+        
+    Raises:
+        FileNotFoundError: If file doesn't exist
+        json.JSONDecodeError: If file contains invalid JSON
+    """
+    try:
+        logging.info(f"Reading JSON file: {{filepath}}")
+        with open(filepath, 'r') as file:
+            data = json.load(file)
+        logging.info(f"Successfully loaded {len(data)} items")
+        return data
+    except FileNotFoundError:
+        logging.error(f"File not found: {{filepath}}")
+        raise
+    except json.JSONDecodeError as e:
+        logging.error(f"Invalid JSON in {{filepath}}: {{e}}")
+        raise
+    except Exception as e:
+        logging.error(f"Unexpected error reading {{filepath}}: {{e}}")
+        raise
+                </pre>
+</div>
+<h3>Writing JSON Files</h3>
+<div class="code-block">
+<div class="code-header">file_handler.py - Basic JSON Writing:</div>
+<pre>def write_json_file(filepath, data):
+    """
+    Write data to a JSON file.
+    
+    Args:
+        filepath (str): Path to write the JSON file
+        data: Data to write (must be JSON-serializable)
+        
+    Returns:
+        bool: True if successful
+    """
+    try:
+        logging.info(f"Writing JSON file: {{filepath}}")
+        with open(filepath, 'w') as file:
+            json.dump(data, file, indent=4)
+        logging.info(f"Successfully wrote {{filepath}}")
+        return True
+    except TypeError as e:
+        logging.error(f"Data not JSON-serializable: {{e}}")
+        raise
+    except IOError as e:
+        logging.error(f"Error writing file {{filepath}}: {{e}}")
+        raise
+                </pre>
+</div>
+<div class="interactive-exercise">
+<div class="exercise-title">🔨 Exercise 2: Create a JSON File Handler</div>
+<p>Create a complete file handler that reads JSON, validates it has required fields, and handles errors gracefully.</p>
+<p><strong>Requirements:</strong></p>
+<ul style="margin-left: 20px;">
+<li>Function should accept filepath and required_fields list</li>
+<li>Validate that all required fields exist in the JSON</li>
+<li>Return the data if valid, None if invalid</li>
+<li>Log all operations</li>
+</ul>
+<textarea id="fileHandlerCode" placeholder="def read_and_validate_json(filepath, required_fields):
+    # Your code here
+    pass"></textarea> <button class="button" onclick="validateFileHandler()">✅ Check Solution</button> <button class="button button-secondary" onclick="showFileHandlerSolution()">💡 Show Solution</button>
+<div id="fileHandlerFeedback" class="feedback"></div>
+</div>
+<h3>Common JSON Patterns in Cybersecurity</h3>
+<div class="example-grid">
+<div class="example-card">
+<h4>Security Event Log</h4>
+<div class="code-block">
+<pre>{
+  "events": [
+    {
+      "timestamp": "2024-03-15T10:30:00Z",
+      "event_type": "login_failure",
+      "user": "admin",
+      "ip": "192.168.1.100",
+      "severity": "medium"
+    }
+  ]
+}
+                        </pre>
+</div>
+</div>
+<div class="example-card">
+<h4>Host Inventory</h4>
+<div class="code-block">
+<pre>{
+  "hosts": [
+    {
+      "hostname": "web-server-01",
+      "ip": "10.0.1.50",
+      "os": "Ubuntu 22.04",
+      "services": ["nginx", "ssh"],
+      "last_scan": "2024-03-15"
+    }
+  ]
+}
+                        </pre>
+</div>
+</div>
+</div>
+<div class="warning-box"><strong>⚠️ Common Pitfall:</strong> Always validate your input data! Don't assume the JSON file has the structure you expect. Missing fields or unexpected data types can crash your program.</div>
+</div>
+<!-- Core Processing Section -->
+<div id="processing" class="content-section">
+<h2>⚙️ Core Processing Logic: The Heart of Your Tool</h2>
+<div class="concept-box">
+<h4>What is Core Logic?</h4>
+<p>Core processing logic is the "brain" of your tool - it's where you transform, filter, calculate, analyze, or compare data. This is what makes your tool unique and valuable.</p>
+</div>
+<h3>Common Processing Patterns</h3>
+<div class="example-grid">
+<div class="example-card">
+<h4>1️⃣ Transform</h4>
+<p>Convert data from one format to another</p>
+<p><strong>Example:</strong> Convert timestamp strings to datetime objects</p>
+</div>
+<div class="example-card">
+<h4>2️⃣ Filter</h4>
+<p>Select only data that meets criteria</p>
+<p><strong>Example:</strong> Find login failures in the last 24 hours</p>
+</div>
+<div class="example-card">
+<h4>3️⃣ Calculate</h4>
+<p>Compute values based on input data</p>
+<p><strong>Example:</strong> Calculate risk scores</p>
+</div>
+<div class="example-card">
+<h4>4️⃣ Compare</h4>
+<p>Find differences between datasets</p>
+<p><strong>Example:</strong> Detect configuration drift</p>
+</div>
+</div>
+<h3>Example: Security Event Analyzer</h3>
+<div class="code-block">
+<div class="code-header">processor.py - Analyzing Security Events:</div>
+<pre>from datetime import datetime, timedelta
+import logging
+
+def filter_recent_events(events, hours=24):
+    """
+    Filter events that occurred within the last N hours.
+    
+    Args:
+        events (list): List of event dictionaries
+        hours (int): Number of hours to look back
+        
+    Returns:
+        list: Filtered events
+    """
+    cutoff_time = datetime.now() - timedelta(hours=hours)
+    recent_events = []
+    
+    for event in events:
+        try:
+            event_time = datetime.fromisoformat(event['timestamp'].replace('Z', '+00:00'))
+            if event_time &gt;= cutoff_time:
+                recent_events.append(event)
+        except (KeyError, ValueError) as e:
+            logging.warning(f"Skipping malformed event: {{e}}")
+            continue
+    
+    logging.info(f"Found {len(recent_events)} recent events out of {len(events)} total")
+    return recent_events
+
+
+def calculate_risk_score(event):
+    """
+    Calculate a risk score for a security event.
+    
+    Args:
+        event (dict): Security event data
+        
+    Returns:
+        int: Risk score (0-100)
+    """
+    score = 0
+    
+    # Base score by event type
+    risk_weights = {
+        'login_failure': 20,
+        'unauthorized_access': 80,
+        'malware_detected': 90,
+        'config_change': 30,
+        'port_scan': 40
+    }
+    
+    score += risk_weights.get(event.get('event_type', ''), 10)
+    
+    # Increase score for high severity
+    if event.get('severity') == 'critical':
+        score += 30
+    elif event.get('severity') == 'high':
+        score += 20
+    
+    # Cap at 100
+    return min(score, 100)
+
+
+def aggregate_by_user(events):
+    """
+    Group events by user and count occurrences.
+    
+    Args:
+        events (list): List of event dictionaries
+        
+    Returns:
+        dict: User -&gt; event count mapping
+    """
+    user_counts = {}
+    
+    for event in events:
+        user = event.get('user', 'unknown')
+        user_counts[user] = user_counts.get(user, 0) + 1
+    
+    # Sort by count (descending)
+    sorted_users = dict(sorted(user_counts.items(), 
+                              key=lambda x: x[1], 
+                              reverse=True))
+    
+    logging.info(f"Aggregated events for {len(sorted_users)} users")
+    return sorted_users
+                </pre>
+</div>
+<div class="interactive-exercise">
+<div class="exercise-title">🔨 Exercise 3: Build a Data Processor</div>
+<p>Create a function that processes a list of hosts and identifies those with high-risk characteristics.</p>
+<p><strong>Criteria for High Risk:</strong></p>
+<ul style="margin-left: 20px;">
+<li>Has open ports (port 22, 23, 3389, or 445)</li>
+<li>OS is older than 2 years</li>
+<li>Has critical services running</li>
+</ul>
+<textarea id="processorCode" placeholder="def identify_high_risk_hosts(hosts):
+    # Your code here
+    # Return list of high-risk hosts with reasons
+    pass"></textarea> <button class="button" onclick="validateProcessor()">✅ Check Solution</button> <button class="button button-secondary" onclick="showProcessorSolution()">💡 Show Solution</button>
+<div id="processorFeedback" class="feedback"></div>
+</div>
+<div class="tip-box"><strong>💡 Design Tip:</strong> Break complex processing into smaller, single-purpose functions. Each function should do one thing well. This makes testing easier and code more maintainable.</div>
+</div>
+<!-- OOP Section -->
+<div id="oop" class="content-section">
+<h2>🎯 Object-Oriented Programming: Classes with Purpose</h2>
+<div class="concept-box">
+<h4>Why Use Classes?</h4>
+<p>Classes help you organize related data and functions together. Think of a class as a blueprint for creating objects that have both properties (attributes) and behaviors (methods).</p>
+</div>
+<h3>When to Use a Class</h3>
+<div class="example-grid">
+<div class="example-card">
+<h4>✅ Good Reasons</h4>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>Representing a real entity (Host, User, Event)</li>
+<li>Grouping related data and operations</li>
+<li>Need multiple instances with same structure</li>
+<li>Want to encapsulate complex state</li>
+</ul>
+</div>
+<div class="example-card">
+<h4>❌ Avoid Classes For</h4>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>Simple utility functions</li>
+<li>One-off operations</li>
+<li>When a dictionary would suffice</li>
+<li>Over-engineering simple problems</li>
+</ul>
+</div>
+</div>
+<h3>Example: SecurityEvent Class</h3>
+<div class="code-block">
+<div class="code-header">classes.py - A Practical Security Class:</div>
+<pre>from datetime import datetime
+import logging
+
+class SecurityEvent:
+    """
+    Represents a security event with analysis capabilities.
+    """
+    
+    # Class variable - risk weight lookup
+    RISK_WEIGHTS = {
+        'login_failure': 20,
+        'unauthorized_access': 80,
+        'malware_detected': 90,
+        'config_change': 30,
+        'port_scan': 40
+    }
+    
+    def __init__(self, timestamp, event_type, user, ip, severity='low'):
+        """
+        Initialize a SecurityEvent.
+        
+        Args:
+            timestamp (str): ISO format timestamp
+            event_type (str): Type of security event
+            user (str): Username associated with event
+            ip (str): Source IP address
+            severity (str): Event severity level
+        """
+        self.timestamp = self._parse_timestamp(timestamp)
+        self.event_type = event_type
+        self.user = user
+        self.ip = ip
+        self.severity = severity
+        self.risk_score = self._calculate_risk()
+        
+        logging.debug(f"Created SecurityEvent: {event_type} by {{user}}")
+    
+    def _parse_timestamp(self, timestamp_str):
+        """Parse ISO format timestamp string."""
+        try:
+            return datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+        except ValueError:
+            logging.warning(f"Invalid timestamp: {timestamp_str}, using current time")
+            return datetime.now()
+    
+    def _calculate_risk(self):
+        """Calculate risk score for this event."""
+        base_score = self.RISK_WEIGHTS.get(self.event_type, 10)
+        
+        # Severity multiplier
+        severity_bonus = {
+            'low': 0,
+            'medium': 10,
+            'high': 20,
+            'critical': 30
+        }
+        
+        total_score = base_score + severity_bonus.get(self.severity, 0)
+        return min(total_score, 100)
+    
+    def is_high_risk(self):
+        """Check if this event is high risk (score &gt; 50)."""
+        return self.risk_score &gt; 50
+    
+    def age_hours(self):
+        """Get age of event in hours."""
+        age = datetime.now() - self.timestamp
+        return age.total_seconds() / 3600
+    
+    def to_dict(self):
+        """Convert event to dictionary for JSON serialization."""
+        return {
+            'timestamp': self.timestamp.isoformat(),
+            'event_type': self.event_type,
+            'user': self.user,
+            'ip': self.ip,
+            'severity': self.severity,
+            'risk_score': self.risk_score
+        }
+    
+    def __repr__(self):
+        """String representation for debugging."""
+        return (f"SecurityEvent(type={self.event_type}, user={self.user}, "
+                f"risk={self.risk_score})")
+    
+    def __str__(self):
+        """User-friendly string representation."""
+        return (f"[{self.timestamp}] {self.event_type.upper()} by {self.user} "
+                f"from {self.ip} (Risk: {self.risk_score})")
+                </pre>
+</div>
+<h3>Using Your Class</h3>
+<div class="code-block">
+<div class="code-header">Example Usage:</div>
+<pre># Create an event from JSON data
+event_data = {
+    'timestamp': '2024-03-15T10:30:00Z',
+    'event_type': 'login_failure',
+    'user': 'admin',
+    'ip': '192.168.1.100',
+    'severity': 'medium'
+}
+
+event = SecurityEvent(**event_data)
+
+# Use the class methods
+print(event)  # Uses __str__ method
+print(f"High risk? {event.is_high_risk()}")
+print(f"Event age: {event.age_hours():.1f} hours")
+
+# Convert to dictionary for JSON output
+output_data = event.to_dict()
+                </pre>
+</div>
+<div class="interactive-exercise">
+<div class="exercise-title">🔨 Exercise 4: Design Your Own Class</div>
+<p>Create a class relevant to your capstone project. It should have:</p>
+<ul style="margin-left: 20px;">
+<li>At least 3 attributes in __init__</li>
+<li>At least 2 methods that do something useful</li>
+<li>A __str__ method for readable output</li>
+<li>A to_dict() method for JSON serialization</li>
+</ul>
+<textarea id="classCode" placeholder="class MyClass:
+    def __init__(self, ...):
+        # Your code here
+        pass
+    
+    def my_method(self):
+        # Your code here
+        pass"></textarea> <button class="button" onclick="validateClass()">✅ Validate Class Design</button> <button class="button button-secondary" onclick="showClassExample()">💡 Show More Examples</button>
+<div id="classFeedback" class="feedback"></div>
+</div>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> Start simple! Don't try to create a complex class hierarchy. One well-designed class is better than five poorly designed ones. You can always add more classes later as your needs grow.</div>
+</div>
+<!-- Logging Section -->
+<div id="logging" class="content-section">
+<h2>📝 Logging and Error Handling: Know What's Happening</h2>
+<div class="concept-box">
+<h4>Why Logging Matters</h4>
+<p>Logging helps you understand what your program is doing, diagnose problems, and track security events. It's like having a flight recorder for your code.</p>
+</div>
+<h3>Python Logging Basics</h3>
+<div class="code-block">
+<div class="code-header">Setting Up Logging in main.py:</div>
+<pre>import logging
+from datetime import datetime
+
+def setup_logging(log_level='INFO'):
+    """
+    Configure logging for the application.
+    
+    Args:
+        log_level (str): Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    """
+    # Create logs directory if it doesn't exist
+    import os
+    os.makedirs('logs', exist_ok=True)
+    
+    # Generate log filename with timestamp
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    log_file = f'logs/app_{{timestamp}}.log'
+    
+    # Configure logging format
+    log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    
+    # Set up logging to both file and console
+    logging.basicConfig(
+        level=getattr(logging, log_level.upper()),
+        format=log_format,
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler()  # Also print to console
+        ]
+    )
+    
+    logging.info(f"Logging initialized. Log file: {log_file}")
+    return log_file
+                </pre>
+</div>
+<h3>Logging Levels Explained</h3>
+<div class="example-grid">
+<div class="example-card">
+<h4>DEBUG</h4>
+<p>Detailed information for diagnosing problems</p>
+<div class="code-block">
+<pre>logging.debug("Processing item 5 of 100")</pre>
+</div>
+</div>
+<div class="example-card">
+<h4>INFO</h4>
+<p>General informational messages</p>
+<div class="code-block">
+<pre>logging.info("Successfully loaded config")</pre>
+</div>
+</div>
+<div class="example-card">
+<h4>WARNING</h4>
+<p>Something unexpected but not critical</p>
+<div class="code-block">
+<pre>logging.warning("Missing optional field")</pre>
+</div>
+</div>
+<div class="example-card">
+<h4>ERROR</h4>
+<p>Error that prevents operation</p>
+<div class="code-block">
+<pre>logging.error("Failed to parse JSON")</pre>
+</div>
+</div>
+</div>
+<h3>Robust Error Handling</h3>
+<div class="code-block">
+<div class="code-header">Error Handling Pattern:</div>
+<pre>def process_file(filepath):
+    """
+    Process a file with comprehensive error handling.
+    
+    Args:
+        filepath (str): Path to file
+        
+    Returns:
+        dict: Processed data or None if error
+    """
+    try:
+        # Try to open and process the file
+        logging.info(f"Processing file: {{filepath}}")
+        
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        
+        # Validate required fields
+        required_fields = ['hosts', 'timestamp']
+        for field in required_fields:
+            if field not in data:
+                raise ValueError(f"Missing required field: {{field}}")
+        
+        # Process the data
+        results = analyze_data(data)
+        logging.info(f"Successfully processed {len(results)} items")
+        return results
+        
+    except FileNotFoundError:
+        logging.error(f"File not found: {{filepath}}")
+        print(f"ERROR: Cannot find file '{{filepath}}'")
+        return None
+        
+    except json.JSONDecodeError as e:
+        logging.error(f"Invalid JSON in {{filepath}}: {{e}}")
+        print(f"ERROR: File '{{filepath}}' contains invalid JSON")
+        return None
+        
+    except ValueError as e:
+        logging.error(f"Validation error: {{e}}")
+        print(f"ERROR: {{e}}")
+        return None
+        
+    except Exception as e:
+        # Catch-all for unexpected errors
+        logging.error(f"Unexpected error processing {{filepath}}: {{e}}", exc_info=True)
+        print(f"ERROR: An unexpected error occurred: {{e}}")
+        return None
+                </pre>
+</div>
+<div class="interactive-exercise">
+<div class="exercise-title">🔨 Exercise 5: Add Logging and Error Handling</div>
+<p>Take this basic function and add comprehensive logging and error handling:</p>
+<div class="code-block">
+<pre>def load_and_process(filepath):
+    data = json.load(open(filepath))
+    results = []
+    for item in data['items']:
+        results.append(item['value'] * 2)
+    return results
+                    </pre>
+</div>
+<p><strong>Add:</strong> try/except blocks, logging at appropriate levels, user-friendly error messages</p>
+<textarea id="errorHandlingCode" placeholder="def load_and_process(filepath):
+    # Add your improved version here with logging and error handling
+    pass"></textarea> <button class="button" onclick="validateErrorHandling()">✅ Check Solution</button> <button class="button button-secondary" onclick="showErrorHandlingSolution()">💡 Show Solution</button>
+<div id="errorHandlingFeedback" class="feedback"></div>
+</div>
+<div class="warning-box"><strong>⚠️ Common Mistake:</strong> Don't use bare <code>except:</code> clauses. Always catch specific exceptions and handle them appropriately. A bare except can hide bugs and make debugging very difficult.</div>
+<h3>Example Log Output</h3>
+<div class="terminal-output">2024-03-15 10:30:15,123 - main - INFO - Application started<br>2024-03-15 10:30:15,145 - file_handler - INFO - Reading JSON file: data/input.json<br>2024-03-15 10:30:15,156 - file_handler - INFO - Successfully loaded 150 items<br>2024-03-15 10:30:15,234 - processor - INFO - Processing 150 events<br>2024-03-15 10:30:15,245 - processor - WARNING - Skipping malformed event: missing 'user' field<br>2024-03-15 10:30:15,389 - processor - INFO - Found 12 high-risk events<br>2024-03-15 10:30:15,401 - file_handler - INFO - Writing JSON file: output/results.json<br>2024-03-15 10:30:15,412 - main - INFO - Processing complete. Results saved.</div>
+</div>
+<!-- CLI Section -->
+<div id="cli" class="content-section">
+<h2>💻 Command-Line Interface: Making Your Tool Usable</h2>
+<div class="concept-box">
+<h4>Why CLI Matters</h4>
+<p>A good CLI makes your tool professional and easy to use. Users should be able to run your tool with clear arguments and get helpful feedback.</p>
+</div>
+<h3>Using argparse for CLI</h3>
+<div class="code-block">
+<div class="code-header">main.py - Complete CLI Implementation:</div>
+<pre>import argparse
+import logging
+import sys
+from file_handler import read_json_file, write_json_file
+from processor import process_data
+
+def parse_arguments():
+    """
+    Parse command-line arguments.
+    
+    Returns:
+        argparse.Namespace: Parsed arguments
+    """
+    parser = argparse.ArgumentParser(
+        description='Security Event Analyzer - Process and analyze security logs',
+        epilog='Example: python main.py -i data/events.json -o output/results.json'
+    )
+    
+    # Required arguments
+    parser.add_argument(
+        '-i', '--input',
+        required=True,
+        help='Path to input JSON file'
+    )
+    
+    parser.add_argument(
+        '-o', '--output',
+        required=True,
+        help='Path to output JSON file'
+    )
+    
+    # Optional arguments
+    parser.add_argument(
+        '-t', '--threshold',
+        type=int,
+        default=50,
+        help='Risk score threshold (default: 50)'
+    )
+    
+    parser.add_argument(
+        '--hours',
+        type=int,
+        default=24,
+        help='Hours to look back for recent events (default: 24)'
+    )
+    
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='Enable verbose logging (DEBUG level)'
+    )
+    
+    parser.add_argument(
+        '--version',
+        action='version',
+        version='%(prog)s 1.0'
+    )
+    
+    return parser.parse_args()
+
+
+def main():
+    """
+    Main entry point for the application.
+    """
+    # Parse arguments
+    args = parse_arguments()
+    
+    # Set up logging
+    log_level = 'DEBUG' if args.verbose else 'INFO'
+    setup_logging(log_level)
+    
+    logging.info("=" * 60)
+    logging.info("Security Event Analyzer v1.0")
+    logging.info("=" * 60)
+    
+    try:
+        # Load input data
+        logging.info(f"Loading input from: {args.input}")
+        data = read_json_file(args.input)
+        
+        if data is None:
+            logging.error("Failed to load input data")
+            sys.exit(1)
+        
+        # Process data
+        logging.info(f"Processing {len(data)} events...")
+        results = process_data(
+            data,
+            threshold=args.threshold,
+            hours=args.hours
+        )
+        
+        # Write output
+        logging.info(f"Writing results to: {args.output}")
+        write_json_file(args.output, results)
+        
+        # Print summary
+        print("\n" + "=" * 60)
+        print("PROCESSING COMPLETE")
+        print("=" * 60)
+        print(f"Input file:     {args.input}")
+        print(f"Output file:    {args.output}")
+        print(f"Events processed: {len(data)}")
+        print(f"High-risk events: {len(results['high_risk'])}")
+        print("=" * 60)
+        
+        logging.info("Application completed successfully")
+        return 0
+        
+    except Exception as e:
+        logging.error(f"Application error: {{e}}", exc_info=True)
+        print(f"\nFATAL ERROR: {{e}}")
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+                </pre>
+</div>
+<h3>Example Usage</h3>
+<div class="terminal-output"># Basic usage<br>$ python main.py -i data/events.json -o output/results.json<br><br># With custom threshold and verbose logging<br>$ python main.py -i data/events.json -o output/results.json -t 75 -v<br><br># Show help<br>$ python main.py --help<br><br># Check version<br>$ python main.py --version</div>
+<h3>Help Message Output</h3>
+<div class="terminal-output">usage: main.py [-h] -i INPUT -o OUTPUT [-t THRESHOLD] [--hours HOURS] [-v] [--version]<br><br>Security Event Analyzer - Process and analyze security logs<br><br>optional arguments:<br>-h, --help show this help message and exit<br>-i INPUT, --input INPUT<br>Path to input JSON file<br>-o OUTPUT, --output OUTPUT<br>Path to output JSON file<br>-t THRESHOLD, --threshold THRESHOLD<br>Risk score threshold (default: 50)<br>--hours HOURS Hours to look back for recent events (default: 24)<br>-v, --verbose Enable verbose logging (DEBUG level)<br>--version show program's version number and exit<br><br>Example: python main.py -i data/events.json -o output/results.json</div>
+<div class="interactive-exercise">
+<div class="exercise-title">🔨 Exercise 6: Design Your CLI</div>
+<p>Design a command-line interface for your capstone tool. Specify:</p>
+<ul style="margin-left: 20px;">
+<li>Required arguments (at minimum: input and output)</li>
+<li>Optional arguments (configuration options)</li>
+<li>Help text for each argument</li>
+</ul>
+<textarea id="cliDesign" placeholder="Describe your CLI design:
+
+Required Arguments:
+-i, --input: Path to input file
+
+Optional Arguments:
+...
+
+Example usage:
+python main.py -i input.json -o output.json"></textarea> <button class="button" onclick="validateCLI()">💾 Save CLI Design</button> <button class="button button-secondary" onclick="showCLIExample()">💡 Show Example</button>
+<div id="cliFeedback" class="feedback"></div>
+</div>
+<div class="tip-box"><strong>💡 Best Practice:</strong> Always provide clear help messages and examples. Your users shouldn't have to read the code to figure out how to run your tool. Good CLI design makes your tool accessible and professional.</div>
+</div>
+<!-- AI Assistant Section -->
+<div id="ai-assistant" class="content-section">
+<h2>🤖 AI as Your Coding Assistant</h2>
+<div class="ai-focus">
+<h4>This Week's AI Integration Goal</h4>
+<p>Learn to use AI tools effectively while maintaining control and understanding of your code. AI should accelerate your development, not replace your thinking.</p>
+</div>
+<h3>Effective AI Prompting for Code</h3>
+<div class="example-grid">
+<div class="example-card">
+<h4>❌ Poor Prompt</h4>
+<div class="code-block">
+<pre>"Write me a security tool"</pre>
+</div>
+<p style="color: #f88; margin-top: 10px;"><strong>Problem:</strong> Too vague, no context</p>
+</div>
+<div class="example-card">
+<h4>✅ Good Prompt</h4>
+<div class="code-block">
+<pre>"Create a Python function that reads a JSON file containing security events, filters events from the last 24 hours, and returns them as a list. Include error handling for missing files and invalid JSON."</pre>
+</div>
+<p style="color: #0f0; margin-top: 10px;"><strong>Why:</strong> Specific, clear requirements</p>
+</div>
+</div>
+<h3>AI Use Cases This Week</h3>
+<div class="concept-box">
+<h4>1️⃣ Generate Helper Functions</h4>
+<div class="code-block">
+<div class="code-header">Example Prompt:</div>
+<pre>"Create a Python helper function that validates an IP address string 
+and returns True if valid, False if invalid. Use regex for validation 
+and include docstring with examples."
+                    </pre>
+</div>
+<div class="code-block">
+<div class="code-header">AI Generated Code (Review Before Using!):</div>
+<pre>import re
+
+def validate_ip_address(ip_string):
+    """
+    Validate if a string is a valid IPv4 address.
+    
+    Args:
+        ip_string (str): String to validate
+        
+    Returns:
+        bool: True if valid IP, False otherwise
+        
+    Examples:
+        &gt;&gt;&gt; validate_ip_address("192.168.1.1")
+        True
+        &gt;&gt;&gt; validate_ip_address("256.1.1.1")
+        False
+    """
+    pattern = r'^(\d{1,3}\.){{3}}\d{1,3}$'
+    
+    if not re.match(pattern, ip_string):
+        return False
+    
+    # Check each octet is 0-255
+    octets = ip_string.split('.')
+    return all(0 &lt;= int(octet) &lt;= 255 for octet in octets)
+                    </pre>
+</div>
+</div>
+<div class="concept-box">
+<h4>2️⃣ Class Design Suggestions</h4>
+<div class="code-block">
+<div class="code-header">Example Prompt:</div>
+<pre>"I need a Python class to represent a network host with attributes: 
+hostname, IP address, OS, open ports, and last scan date. The class 
+should have methods to calculate risk score based on open ports and 
+OS age. Suggest a class structure with __init__, methods, and docstrings."
+                    </pre>
+</div>
+<p style="margin-top: 10px;"><strong>Review AI Output For:</strong></p>
+<ul style="margin-left: 20px;">
+<li>✓ Clear attribute definitions</li>
+<li>✓ Logical method organization</li>
+<li>✓ Appropriate data types</li>
+<li>✓ Error handling considerations</li>
+</ul>
+</div>
+<div class="concept-box">
+<h4>3️⃣ Debug Errors and Edge Cases</h4>
+<div class="code-block">
+<div class="code-header">Example Prompt:</div>
+<pre>"I'm getting a KeyError when processing this JSON data. Here's my code:
+
+[paste your code]
+
+And here's the error:
+
+[paste error message]
+
+What's causing this and how can I fix it with proper error handling?"
+                    </pre>
+</div>
+</div>
+<h3>Critical: Stay in Control</h3>
+<div class="warning-box"><strong>⚠️ NEVER blindly copy AI code!</strong> Always:
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>Read and understand every line</li>
+<li>Test the code with sample data</li>
+<li>Verify it handles edge cases</li>
+<li>Ensure it follows security best practices</li>
+<li>Be able to explain how it works</li>
+</ul>
+</div>
+<div class="interactive-exercise">
+<div class="exercise-title">🔨 Exercise 7: AI Collaboration Log</div>
+<p>Document your AI usage this week. For each AI interaction, record:</p>
+<ul style="margin-left: 20px;">
+<li>What you asked the AI to help with</li>
+<li>What code/suggestion you got</li>
+<li>What you changed/improved from the AI output</li>
+<li>What you learned from the interaction</li>
+</ul>
+<textarea id="aiLog" placeholder="AI Collaboration Log:
+
+Interaction 1:
+Asked: [Your prompt]
+Got: [Brief description of AI output]
+Changed: [How you modified/improved it]
+Learned: [What you learned]
+
+Interaction 2:
+..."></textarea> <button class="button" onclick="saveAILog()">💾 Save Log</button>
+<div id="aiLogFeedback" class="feedback"></div>
+</div>
+<h3>AI Tool Suggestions</h3>
+<div class="example-grid">
+<div class="example-card">
+<h4>GitHub Copilot</h4>
+<p>IDE integration for real-time code suggestions</p>
+<p><strong>Best for:</strong> Writing functions, completing code patterns</p>
+</div>
+<div class="example-card">
+<h4>ChatGPT / Claude</h4>
+<p>Conversational AI for detailed explanations</p>
+<p><strong>Best for:</strong> Design discussions, debugging help</p>
+</div>
+<div class="example-card">
+<h4>Cursor / VS Code AI</h4>
+<p>AI-powered code editor</p>
+<p><strong>Best for:</strong> Refactoring, code improvements</p>
+</div>
+</div>
+<div class="tip-box"><strong>💡 Remember:</strong> AI is a tool, not a replacement for learning. Use it to accelerate development, but make sure you understand the fundamentals. In a job interview, you won't have AI to help you - you need to know your stuff!</div>
+</div>
+<!-- Deliverables Section -->
+<div id="deliverables" class="content-section">
+<h2>✅ Week 14 Deliverables</h2>
+<div class="deliverable-section">
+<h3>Deliverable 1: MVP Version of Your Capstone Tool</h3>
+<span class="badge badge-mvp">REQUIRED</span>
+<p style="margin-top: 15px;"><strong>Your MVP must:</strong></p>
+<ul class="checklist" id="mvpChecklist">
+<li onclick="toggleChecklistItem(this)">Run from the command line with proper arguments</li>
+<li onclick="toggleChecklistItem(this)">Read real JSON input file</li>
+<li onclick="toggleChecklistItem(this)">Produce real JSON output file</li>
+<li onclick="toggleChecklistItem(this)">Include at least one well-designed class</li>
+<li onclick="toggleChecklistItem(this)">Have visible logging or printed diagnostics</li>
+<li onclick="toggleChecklistItem(this)">Handle basic errors without crashing</li>
+<li onclick="toggleChecklistItem(this)">Include a README with usage instructions</li>
+<li onclick="toggleChecklistItem(this)">Process sample data successfully</li>
+</ul>
+<h4 style="margin-top: 20px;">File Structure to Submit:</h4>
+<div class="file-structure">
+<div style="color: #cc0000;">📁 your_capstone_project/</div>
+<div class="folder">├── 📁 src/</div>
+<div class="file">│ ├── 📄 main.py</div>
+<div class="file">│ ├── 📄 classes.py</div>
+<div class="file">│ ├── 📄 file_handler.py</div>
+<div class="file">│ └── 📄 processor.py</div>
+<div class="folder">├── 📁 data/</div>
+<div class="file">│ └── 📄 sample_input.json</div>
+<div class="folder">├── 📁 output/</div>
+<div class="file">│ └── 📄 (generated by your tool)</div>
+<div class="file">├── 📄 requirements.txt</div>
+<div class="file">└── 📄 README.md</div>
+</div>
+</div>
+<div class="deliverable-section">
+<h3>Deliverable 2: Implementation Checkpoint Write-Up</h3>
+<span class="badge badge-mvp">REQUIRED</span>
+<p style="margin-top: 15px;">Write a 1-2 page document covering:</p>
+<div class="concept-box">
+<h4>Section 1: What Works Now</h4>
+<ul style="margin-left: 20px;">
+<li>Describe implemented features</li>
+<li>Show example input and output</li>
+<li>Explain your class design and why you chose it</li>
+<li>Describe your file I/O approach</li>
+</ul>
+</div>
+<div class="concept-box">
+<h4>Section 2: What's Still Missing</h4>
+<ul style="margin-left: 20px;">
+<li>List features not yet implemented</li>
+<li>Identify known bugs or limitations</li>
+<li>Note areas needing improvement</li>
+</ul>
+</div>
+<div class="concept-box">
+<h4>Section 3: Changes from Original Proposal</h4>
+<ul style="margin-left: 20px;">
+<li>Document any design changes</li>
+<li>Explain why changes were necessary</li>
+<li>Discuss what you learned from implementation</li>
+</ul>
+</div>
+<div class="concept-box">
+<h4>Section 4: AI Usage Documentation</h4>
+<ul style="margin-left: 20px;">
+<li>Describe how you used AI tools</li>
+<li>Give examples of AI-generated code you used (and modified)</li>
+<li>Reflect on AI effectiveness and your learning</li>
+</ul>
+</div>
+</div>
+<div class="interactive-exercise">
+<div class="exercise-title">📝 Write Your Implementation Checkpoint</div>
+<textarea id="checkpointWriteup" style="min-height: 300px;" placeholder="Implementation Checkpoint - Week 14
+
+Student Name: [Your Name]
+Project Title: [Your Capstone Project Title]
+
+1. WHAT WORKS NOW
+   [Describe your implemented features...]
+
+2. WHAT'S STILL MISSING
+   [List incomplete features and known issues...]
+
+3. CHANGES FROM ORIGINAL PROPOSAL
+   [Document any design changes and reasons...]
+
+4. AI USAGE DOCUMENTATION
+   [Describe your AI tool usage and learnings...]
+
+5. TESTING RESULTS
+   [Describe how you tested your MVP...]"></textarea> <button class="button" onclick="saveCheckpoint()">💾 Save Checkpoint</button> <button class="button button-secondary" onclick="downloadCheckpoint()">⬇️ Download as Text</button>
+<div id="checkpointFeedback" class="feedback"></div>
+</div>
+<h3>Submission Checklist</h3>
+<ul class="checklist" id="submissionChecklist">
+<li onclick="toggleChecklistItem(this)">Complete MVP code in organized structure</li>
+<li onclick="toggleChecklistItem(this)">README.md with clear usage instructions</li>
+<li onclick="toggleChecklistItem(this)">Sample input JSON file included</li>
+<li onclick="toggleChecklistItem(this)">Implementation checkpoint write-up</li>
+<li onclick="toggleChecklistItem(this)">AI collaboration log</li>
+<li onclick="toggleChecklistItem(this)">Code runs without errors on sample data</li>
+<li onclick="toggleChecklistItem(this)">All files properly commented</li>
+</ul>
+<div class="tip-box"><strong>💡 Before Submitting:</strong> Run your tool one more time from scratch. Make sure someone else could download your code, read your README, and successfully run your tool. Test it!</div>
+</div>
+</div>
+<p><script>
+        // Progress tracking
+        let completedSections = new Set();
+        const totalSections = 9;
+
+        function updateProgress() {
+            const progress = (completedSections.size / totalSections) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '% Complete';
+            
+            // Save progress to localStorage
+            localStorage.setItem('week14Progress', JSON.stringify(Array.from(completedSections)));
+        }
+
+        function showTab(tabName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Mark section as completed
+            completedSections.add(tabName);
+            updateProgress();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleChecklistItem(item) {
+            item.classList.toggle('completed');
+            saveChecklistState();
+        }
+
+        function saveChecklistState() {
+            const checklists = document.querySelectorAll('.checklist');
+            const states = {};
+            
+            checklists.forEach((list, listIndex) => {
+                const items = list.querySelectorAll('li');
+                states[listIndex] = Array.from(items).map(item => 
+                    item.classList.contains('completed')
+                );
+            });
+            
+            localStorage.setItem('week14Checklists', JSON.stringify(states));
+        }
+
+        function loadChecklistState() {
+            const saved = localStorage.getItem('week14Checklists');
+            if (!saved) return;
+            
+            const states = JSON.parse(saved);
+            const checklists = document.querySelectorAll('.checklist');
+            
+            checklists.forEach((list, listIndex) => {
+                if (states[listIndex]) {
+                    const items = list.querySelectorAll('li');
+                    items.forEach((item, itemIndex) => {
+                        if (states[listIndex][itemIndex]) {
+                            item.classList.add('completed');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Exercise validation functions
+        function showFeedback(elementId, message, type) {
+            const feedback = document.getElementById(elementId);
+            feedback.className = 'feedback ' + type;
+            feedback.textContent = message;
+            feedback.style.display = 'block';
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 5000);
+        }
+
+        function validateStructure() {
+            const design = document.getElementById('structureDesign').value.trim();
+            if (design.length < 50) {
+                showFeedback('structureFeedback', 
+                    'Please provide more detail about your project structure. Include folders, key files, and their purposes.', 
+                    'error');
+            } else {
+                showFeedback('structureFeedback', 
+                    '✓ Structure design saved! Make sure to actually create these directories when you start coding.', 
+                    'success');
+                localStorage.setItem('week14Structure', design);
+            }
+        }
+
+        function showStructureExample() {
+            const example = `security_scanner/
+├── src/
+│   ├── __init__.py
+│   ├── main.py          # CLI entry point
+│   ├── scanner.py       # Core scanning logic
+│   ├── vulnerabilities.py   # Vuln classes & checks
+│   ├── reporter.py      # Generate reports
+│   └── file_handler.py  # JSON I/O
+├── data/
+│   ├── sample_network.json
+│   ├── vulnerability_db.json
+│   └── test_configs.json
+├── output/
+│   └── scan_results/
+├── tests/
+│   └── test_scanner.py
+├── requirements.txt
+└── README.md
+
+Purpose:
+- scanner.py: Network/host scanning functions
+- vulnerabilities.py: Check for common vulnerabilities
+- reporter.py: Create HTML/JSON reports
+- file_handler.py: Handle all file I/O operations`;
+            
+            document.getElementById('structureDesign').value = example;
+            showFeedback('structureFeedback', 
+                'Example loaded! Adapt this to your project needs.', 
+                'info');
+        }
+
+        function validateFileHandler() {
+            const code = document.getElementById('fileHandlerCode').value;
+            const hasFunction = code.includes('def read_and_validate_json');
+            const hasRequiredFields = code.includes('required_fields');
+            const hasErrorHandling = code.includes('try') && code.includes('except');
+            const hasLogging = code.includes('logging');
+            
+            if (!hasFunction) {
+                showFeedback('fileHandlerFeedback', 
+                    'Make sure to define the function: read_and_validate_json(filepath, required_fields)', 
+                    'error');
+            } else if (!hasErrorHandling) {
+                showFeedback('fileHandlerFeedback', 
+                    'Add try/except blocks to handle file and JSON errors!', 
+                    'error');
+            } else if (!hasLogging) {
+                showFeedback('fileHandlerFeedback', 
+                    'Include logging statements to track what the function is doing!', 
+                    'error');
+            } else if (!hasRequiredFields) {
+                showFeedback('fileHandlerFeedback', 
+                    'Don\'t forget to validate the required fields!', 
+                    'error');
+            } else {
+                showFeedback('fileHandlerFeedback', 
+                    '✓ Good structure! Now test it with actual data to ensure it works correctly.', 
+                    'success');
+                localStorage.setItem('week14FileHandler', code);
+            }
+        }
+
+        function showFileHandlerSolution() {
+            const solution = `def read_and_validate_json(filepath, required_fields):
+    """
+    Read JSON file and validate required fields exist.
+    
+    Args:
+        filepath (str): Path to JSON file
+        required_fields (list): List of required field names
+        
+    Returns:
+        dict: Validated data or None if invalid
+    """
+    try:
+        logging.info(f"Reading and validating JSON: {{filepath}}")
+        
+        # Read the file
+        with open(filepath, 'r') as file:
+            data = json.load(file)
+        
+        # Validate required fields
+        missing_fields = []
+        for field in required_fields:
+            if field not in data:
+                missing_fields.append(field)
+        
+        if missing_fields:
+            logging.error(f"Missing required fields: {missing_fields}")
+            return None
+        
+        logging.info(f"Validation passed for {{filepath}}")
+        return data
+        
+    except FileNotFoundError:
+        logging.error(f"File not found: {{filepath}}")
+        return None
+    except json.JSONDecodeError as e:
+        logging.error(f"Invalid JSON: {{e}}")
+        return None
+    except Exception as e:
+        logging.error(f"Unexpected error: {{e}}")
+        return None`;
+            
+            document.getElementById('fileHandlerCode').value = solution;
+            showFeedback('fileHandlerFeedback', 
+                'Solution displayed. Study it and understand each part!', 
+                'info');
+        }
+
+        function validateProcessor() {
+            const code = document.getElementById('processorCode').value;
+            const hasFunction = code.includes('def identify_high_risk_hosts');
+            const hasLogic = code.length > 100;
+            
+            if (!hasFunction) {
+                showFeedback('processorFeedback', 
+                    'Define the function: identify_high_risk_hosts(hosts)', 
+                    'error');
+            } else if (!hasLogic) {
+                showFeedback('processorFeedback', 
+                    'Add logic to check for: open ports, old OS, and critical services', 
+                    'error');
+            } else {
+                showFeedback('processorFeedback', 
+                    '✓ Good start! Test with sample data to verify the risk detection logic.', 
+                    'success');
+                localStorage.setItem('week14Processor', code);
+            }
+        }
+
+        function showProcessorSolution() {
+            const solution = `def identify_high_risk_hosts(hosts):
+    """
+    Identify hosts with high-risk characteristics.
+    
+    Args:
+        hosts (list): List of host dictionaries
+        
+    Returns:
+        list: High-risk hosts with reasons
+    """
+    high_risk_hosts = []
+    risky_ports = [22, 23, 3389, 445]
+    
+    for host in hosts:
+        risk_reasons = []
+        
+        # Check for risky open ports
+        open_ports = host.get('open_ports', [])
+        risky_open = [p for p in open_ports if p in risky_ports]
+        if risky_open:
+            risk_reasons.append(f"Risky ports open: {risky_open}")
+        
+        # Check OS age (simple year check)
+        os_info = host.get('os', '')
+        if any(year in os_info for year in ['2018', '2019', '2020']):
+            risk_reasons.append("Outdated OS version")
+        
+        # Check for critical services
+        critical_services = ['telnet', 'ftp', 'smb']
+        services = host.get('services', [])
+        critical_running = [s for s in services if s in critical_services]
+        if critical_running:
+            risk_reasons.append(f"Critical services: {critical_running}")
+        
+        # Add to high-risk if any reasons found
+        if risk_reasons:
+            high_risk_hosts.append({
+                'hostname': host.get('hostname', 'unknown'),
+                'ip': host.get('ip', 'unknown'),
+                'risk_reasons': risk_reasons
+            })
+    
+    logging.info(f"Identified {len(high_risk_hosts)} high-risk hosts")
+    return high_risk_hosts`;
+            
+            document.getElementById('processorCode').value = solution;
+            showFeedback('processorFeedback', 
+                'Solution displayed. Adapt this pattern to your specific needs!', 
+                'info');
+        }
+
+        function validateClass() {
+            const code = document.getElementById('classCode').value;
+            const hasClass = code.includes('class ');
+            const hasInit = code.includes('def __init__');
+            const hasStr = code.includes('def __str__');
+            const hasToDict = code.includes('def to_dict');
+            const hasMethod = code.split('def ').length > 4; // At least __init__, __str__, to_dict, and one more
+            
+            if (!hasClass) {
+                showFeedback('classFeedback', 
+                    'Define a class using: class MyClassName:', 
+                    'error');
+            } else if (!hasInit) {
+                showFeedback('classFeedback', 
+                    'Add an __init__ method to initialize attributes', 
+                    'error');
+            } else if (!hasStr) {
+                showFeedback('classFeedback', 
+                    'Add a __str__ method for readable string representation', 
+                    'error');
+            } else if (!hasToDict) {
+                showFeedback('classFeedback', 
+                    'Add a to_dict() method for JSON serialization', 
+                    'error');
+            } else if (!hasMethod) {
+                showFeedback('classFeedback', 
+                    'Add at least 2 custom methods that do something useful', 
+                    'error');
+            } else {
+                showFeedback('classFeedback', 
+                    '✓ Class structure looks good! Now test it by creating instances and calling methods.', 
+                    'success');
+                localStorage.setItem('week14Class', code);
+            }
+        }
+
+        function showClassExample() {
+            const example = `# Example: NetworkHost class
+
+class NetworkHost:
+    """Represents a network host with security analysis."""
+    
+    def __init__(self, hostname, ip, os, open_ports):
+        self.hostname = hostname
+        self.ip = ip
+        self.os = os
+        self.open_ports = open_ports
+        self.risk_score = self._calculate_risk()
+    
+    def _calculate_risk(self):
+        """Calculate risk score based on host characteristics."""
+        score = 0
+        risky_ports = [23, 445, 3389]
+        
+        # Points for risky ports
+        for port in self.open_ports:
+            if port in risky_ports:
+                score += 30
+        
+        return min(score, 100)
+    
+    def is_high_risk(self):
+        """Check if host is high risk."""
+        return self.risk_score > 60
+    
+    def to_dict(self):
+        """Convert to dictionary for JSON."""
+        return {
+            'hostname': self.hostname,
+            'ip': self.ip,
+            'os': self.os,
+            'open_ports': self.open_ports,
+            'risk_score': self.risk_score
+        }
+    
+    def __str__(self):
+        return f"Host: {self.hostname} ({self.ip}) - Risk: {self.risk_score}"
+
+# Usage:
+host = NetworkHost('server-01', '10.0.1.50', 'Ubuntu 22.04', [22, 80, 443])
+print(host)
+print(f"High risk? {host.is_high_risk()}")`;
+            
+            alert('Example class shown in console. Check browser console (F12)!');
+            console.log(example);
+            showFeedback('classFeedback', 
+                'Example logged to console! Press F12 to view.', 
+                'info');
+        }
+
+        function validateErrorHandling() {
+            const code = document.getElementById('errorHandlingCode').value;
+            const hasTry = code.includes('try');
+            const hasExcept = code.includes('except');
+            const hasLogging = code.includes('logging');
+            const hasSpecificExcept = code.includes('FileNotFoundError') || code.includes('JSONDecodeError') || code.includes('KeyError');
+            
+            if (!hasTry || !hasExcept) {
+                showFeedback('errorHandlingFeedback', 
+                    'Add try/except blocks to handle errors!', 
+                    'error');
+            } else if (!hasSpecificExcept) {
+                showFeedback('errorHandlingFeedback', 
+                    'Catch specific exceptions like FileNotFoundError, json.JSONDecodeError, KeyError', 
+                    'error');
+            } else if (!hasLogging) {
+                showFeedback('errorHandlingFeedback', 
+                    'Add logging statements to track execution and errors', 
+                    'error');
+            } else {
+                showFeedback('errorHandlingFeedback', 
+                    '✓ Good error handling! Test with invalid inputs to ensure all errors are caught.', 
+                    'success');
+                localStorage.setItem('week14ErrorHandling', code);
+            }
+        }
+
+        function showErrorHandlingSolution() {
+            const solution = `import json
+import logging
+
+def load_and_process(filepath):
+    """
+    Load and process data from JSON file with error handling.
+    
+    Args:
+        filepath (str): Path to JSON file
+        
+    Returns:
+        list: Processed results or empty list if error
+    """
+    try:
+        logging.info(f"Loading data from: {{filepath}}")
+        
+        # Open and parse JSON file
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        
+        # Validate data structure
+        if 'items' not in data:
+            logging.error("Missing 'items' key in JSON data")
+            return []
+        
+        # Process items
+        results = []
+        for i, item in enumerate(data['items']):
+            try:
+                # Validate each item has required field
+                if 'value' not in item:
+                    logging.warning(f"Item {{i}} missing 'value' field, skipping")
+                    continue
+                
+                # Process the value
+                result = item['value'] * 2
+                results.append(result)
+                
+            except (TypeError, ValueError) as e:
+                logging.warning(f"Error processing item {{i}}: {{e}}, skipping")
+                continue
+        
+        logging.info(f"Successfully processed {len(results)} items")
+        return results
+        
+    except FileNotFoundError:
+        logging.error(f"File not found: {{filepath}}")
+        print(f"ERROR: Cannot find file '{{filepath}}'")
+        return []
+        
+    except json.JSONDecodeError as e:
+        logging.error(f"Invalid JSON in {{filepath}}: {{e}}")
+        print(f"ERROR: File contains invalid JSON at line {e.lineno}")
+        return []
+        
+    except Exception as e:
+        logging.error(f"Unexpected error: {{e}}", exc_info=True)
+        print(f"ERROR: An unexpected error occurred: {{e}}")
+        return []`;
+            
+            document.getElementById('errorHandlingCode').value = solution;
+            showFeedback('errorHandlingFeedback', 
+                'Solution displayed. Note how each error type is handled specifically!', 
+                'info');
+        }
+
+        function validateCLI() {
+            const design = document.getElementById('cliDesign').value.trim();
+            if (design.length < 100) {
+                showFeedback('cliFeedback', 
+                    'Please provide more detail: required args, optional args, help text, and example usage', 
+                    'error');
+            } else if (!design.includes('input') && !design.includes('-i')) {
+                showFeedback('cliFeedback', 
+                    'Include an input argument (-i or --input)', 
+                    'error');
+            } else if (!design.includes('output') && !design.includes('-o')) {
+                showFeedback('cliFeedback', 
+                    'Include an output argument (-o or --output)', 
+                    'error');
+            } else {
+                showFeedback('cliFeedback', 
+                    '✓ CLI design saved! Use argparse to implement this interface.', 
+                    'success');
+                localStorage.setItem('week14CLI', design);
+            }
+        }
+
+        function showCLIExample() {
+            const example = `CLI Design for Security Scanner
+
+Required Arguments:
+-i, --input PATH       Path to input JSON file containing hosts to scan
+-o, --output PATH      Path to output JSON file for scan results
+
+Optional Arguments:
+-t, --threads NUM      Number of concurrent scan threads (default: 4)
+--timeout SECONDS      Scan timeout in seconds (default: 10)
+-v, --verbose          Enable verbose logging (DEBUG level)
+--ports PORTS          Comma-separated list of ports to scan (default: common ports)
+--format FORMAT        Output format: json, html, or csv (default: json)
+
+Example Usage:
+# Basic scan
+python scanner.py -i hosts.json -o results.json
+
+# Verbose scan with custom ports
+python scanner.py -i hosts.json -o results.json -v --ports 22,80,443,8080
+
+# Fast scan with multiple threads
+python scanner.py -i hosts.json -o results.json -t 10 --timeout 5`;
+            
+            document.getElementById('cliDesign').value = example;
+            showFeedback('cliFeedback', 
+                'Example loaded! Customize it for your specific tool.', 
+                'info');
+        }
+
+        function saveAILog() {
+            const log = document.getElementById('aiLog').value;
+            if (log.trim().length < 50) {
+                showFeedback('aiLogFeedback', 
+                    'Please document at least one AI interaction with details.', 
+                    'error');
+            } else {
+                localStorage.setItem('week14AILog', log);
+                showFeedback('aiLogFeedback', 
+                    '✓ AI collaboration log saved! Keep adding to it throughout the week.', 
+                    'success');
+            }
+        }
+
+        function saveCheckpoint() {
+            const writeup = document.getElementById('checkpointWriteup').value;
+            if (writeup.trim().length < 100) {
+                showFeedback('checkpointFeedback', 
+                    'Please write a more detailed implementation checkpoint covering all 5 sections.', 
+                    'error');
+            } else {
+                localStorage.setItem('week14Checkpoint', writeup);
+                showFeedback('checkpointFeedback', 
+                    '✓ Implementation checkpoint saved to browser! Use Download button to save as file.', 
+                    'success');
+            }
+        }
+
+        function downloadCheckpoint() {
+            const writeup = document.getElementById('checkpointWriteup').value;
+            if (writeup.trim().length < 50) {
+                showFeedback('checkpointFeedback', 
+                    'Write your checkpoint before downloading!', 
+                    'error');
+                return;
+            }
+            
+            const blob = new Blob([writeup], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'week14_implementation_checkpoint.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showFeedback('checkpointFeedback', 
+                '✓ Checkpoint downloaded! Include this in your submission.', 
+                'success');
+        }
+
+        // Load saved progress and data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load progress
+            const savedProgress = localStorage.getItem('week14Progress');
+            if (savedProgress) {
+                completedSections = new Set(JSON.parse(savedProgress));
+                updateProgress();
+            }
+            
+            // Load checklist states
+            loadChecklistState();
+            
+            // Load saved text inputs
+            const savedStructure = localStorage.getItem('week14Structure');
+            if (savedStructure) {
+                document.getElementById('structureDesign').value = savedStructure;
+            }
+            
+            const savedFileHandler = localStorage.getItem('week14FileHandler');
+            if (savedFileHandler) {
+                document.getElementById('fileHandlerCode').value = savedFileHandler;
+            }
+            
+            const savedProcessor = localStorage.getItem('week14Processor');
+            if (savedProcessor) {
+                document.getElementById('processorCode').value = savedProcessor;
+            }
+            
+            const savedClass = localStorage.getItem('week14Class');
+            if (savedClass) {
+                document.getElementById('classCode').value = savedClass;
+            }
+            
+            const savedErrorHandling = localStorage.getItem('week14ErrorHandling');
+            if (savedErrorHandling) {
+                document.getElementById('errorHandlingCode').value = savedErrorHandling;
+            }
+            
+            const savedCLI = localStorage.getItem('week14CLI');
+            if (savedCLI) {
+                document.getElementById('cliDesign').value = savedCLI;
+            }
+            
+            const savedAILog = localStorage.getItem('week14AILog');
+            if (savedAILog) {
+                document.getElementById('aiLog').value = savedAILog;
+            }
+            
+            const savedCheckpoint = localStorage.getItem('week14Checkpoint');
+            if (savedCheckpoint) {
+                document.getElementById('checkpointWriteup').value = savedCheckpoint;
+            }
+        });
+    </script></p></body></html>
