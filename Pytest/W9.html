@@ -1,0 +1,3216 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 8: System Inventory &amp; Patch Status Tracker | Cybersecurity Python Course</title>
+    <style>
+        /* ========== CSS RESET & BASE ========== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-red: #dc2626;
+            --dark-red: #991b1b;
+            --accent-red: #ef4444;
+            --light-red: #fca5a5;
+            --bg-black: #0a0a0a;
+            --bg-dark: #111111;
+            --bg-panel: #1a1a1a;
+            --bg-elevated: #242424;
+            --border-gray: #333333;
+            --text-primary: #f5f5f5;
+            --text-secondary: #a3a3a3;
+            --text-muted: #737373;
+            --success-green: #22c55e;
+            --warning-yellow: #eab308;
+            --info-blue: #3b82f6;
+            --critical-orange: #f97316;
+            --font-mono: 'Courier New', Consolas, monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+            --glow-red: 0 0 20px rgba(220, 38, 38, 0.3);
+            --glow-success: 0 0 15px rgba(34, 197, 94, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-black);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ========== SCROLLBAR STYLING ========== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-gray);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* ========== HEADER ========== */
+        .main-header {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-panel) 100%);
+            border-bottom: 2px solid var(--primary-red);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--glow-red);
+        }
+
+        .logo-text h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-size: 0.85rem;
+            color: var(--primary-red);
+            font-family: var(--font-mono);
+        }
+
+        .progress-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .progress-bar-container {
+            width: 200px;
+        }
+
+        .progress-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-elevated);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-gray);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-red));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .time-estimate {
+            background: var(--bg-elevated);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-gray);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .time-estimate span {
+            color: var(--primary-red);
+        }
+
+        /* ========== NAVIGATION ========== */
+        .nav-tabs {
+            background: var(--bg-dark);
+            border-bottom: 1px solid var(--border-gray);
+            padding: 0 2rem;
+            overflow-x: auto;
+        }
+
+        .nav-tabs-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-panel);
+        }
+
+        .nav-tab.active {
+            color: var(--primary-red);
+            border-bottom-color: var(--primary-red);
+            background: var(--bg-panel);
+        }
+
+        .nav-tab .tab-number {
+            width: 22px;
+            height: 22px;
+            background: var(--bg-elevated);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .nav-tab.active .tab-number {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        .nav-tab.completed .tab-number {
+            background: var(--success-green);
+            color: white;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== PANELS ========== */
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: var(--bg-elevated);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title .icon {
+            color: var(--primary-red);
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        .panel-badge {
+            background: var(--primary-red);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* ========== TERMINAL STYLE CODE BLOCKS ========== */
+        .terminal {
+            background: #0d0d0d;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: var(--font-mono);
+            margin: 1rem 0;
+        }
+
+        .terminal-header {
+            background: var(--bg-elevated);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27ca40; }
+
+        .terminal-title {
+            margin-left: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .terminal-body {
+            padding: 1rem;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .terminal-body pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .terminal-body code {
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        /* Syntax highlighting */
+        .code-keyword { color: #ff79c6; }
+        .code-string { color: #f1fa8c; }
+        .code-number { color: #bd93f9; }
+        .code-comment { color: #6272a4; }
+        .code-function { color: #50fa7b; }
+        .code-variable { color: #8be9fd; }
+        .code-operator { color: #ff79c6; }
+
+        /* ========== CODE EDITOR ========== */
+        .code-editor-container {
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .code-editor-header {
+            background: var(--bg-elevated);
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .code-editor-title {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .code-editor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-editor {
+            width: 100%;
+            min-height: 200px;
+            background: #0d0d0d;
+            border: none;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .code-editor:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px var(--primary-red);
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            font-family: var(--font-sans);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            color: white;
+            box-shadow: 0 2px 10px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-gray);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-gray);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-green), #16a34a);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--glow-success);
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ========== CHALLENGE CARDS ========== */
+        .challenge-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all var(--transition-normal);
+        }
+
+        .challenge-card:hover {
+            border-color: var(--primary-red);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .challenge-card.completed {
+            border-color: var(--success-green);
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .challenge-number {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .challenge-card.completed .challenge-number {
+            background: var(--success-green);
+        }
+
+        .difficulty-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .difficulty-foundation { background: var(--info-blue); color: white; }
+        .difficulty-intermediate { background: var(--warning-yellow); color: black; }
+        .difficulty-advanced { background: var(--critical-orange); color: white; }
+        .difficulty-boss { background: linear-gradient(135deg, var(--primary-red), #7c2d12); color: white; }
+
+        .challenge-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .challenge-objectives {
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-objectives h4 {
+            font-size: 0.9rem;
+            color: var(--primary-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .challenge-objectives ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .challenge-objectives li {
+            padding: 0.35rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .challenge-objectives li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--primary-red);
+        }
+
+        /* ========== SAMPLE DATA VIEWER ========== */
+        .data-viewer {
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .data-viewer-tabs {
+            display: flex;
+            background: var(--bg-dark);
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .data-viewer-tab {
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            transition: all var(--transition-fast);
+        }
+
+        .data-viewer-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-panel);
+        }
+
+        .data-viewer-tab.active {
+            color: var(--primary-red);
+            background: var(--bg-elevated);
+            border-bottom: 2px solid var(--primary-red);
+        }
+
+        .data-viewer-content {
+            padding: 1rem;
+            max-height: 350px;
+            overflow: auto;
+        }
+
+        /* ========== DATA TABLE ========== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .data-table th {
+            background: var(--bg-dark);
+            color: var(--primary-red);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tr:hover {
+            background: rgba(220, 38, 38, 0.05);
+        }
+
+        .data-table .status-critical {
+            color: var(--primary-red);
+            font-weight: 600;
+        }
+
+        .data-table .status-high {
+            color: var(--critical-orange);
+        }
+
+        .data-table .status-medium {
+            color: var(--warning-yellow);
+        }
+
+        .data-table .status-low {
+            color: var(--success-green);
+        }
+
+        /* ========== RISK SCORE DISPLAY ========== */
+        .risk-meter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .risk-score {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+
+        .risk-critical { background: linear-gradient(135deg, var(--primary-red), var(--dark-red)); color: white; }
+        .risk-high { background: linear-gradient(135deg, var(--critical-orange), #c2410c); color: white; }
+        .risk-medium { background: linear-gradient(135deg, var(--warning-yellow), #ca8a04); color: black; }
+        .risk-low { background: linear-gradient(135deg, var(--success-green), #16a34a); color: white; }
+
+        .risk-details {
+            flex: 1;
+        }
+
+        .risk-details h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .risk-details p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ========== AI PROMPT TEMPLATES ========== */
+        .ai-prompt-card {
+            background: linear-gradient(135deg, var(--bg-panel), var(--bg-elevated));
+            border: 1px solid var(--border-gray);
+            border-left: 4px solid var(--info-blue);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .ai-prompt-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .ai-prompt-header h4 {
+            color: var(--info-blue);
+            font-size: 0.95rem;
+        }
+
+        .ai-prompt-header .copilot-icon {
+            font-size: 1.2rem;
+        }
+
+        .ai-prompt-template {
+            background: #0d0d0d;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+
+        .ai-prompt-template::before {
+            content: "💡 Prompt:";
+            display: block;
+            color: var(--warning-yellow);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .copy-prompt-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-gray);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .copy-prompt-btn:hover {
+            background: var(--border-gray);
+            color: var(--text-primary);
+        }
+
+        /* ========== VALIDATION OUTPUT ========== */
+        .validation-output {
+            background: #0d0d0d;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .validation-success {
+            color: var(--success-green);
+        }
+
+        .validation-error {
+            color: var(--primary-red);
+        }
+
+        .validation-info {
+            color: var(--info-blue);
+        }
+
+        .validation-warning {
+            color: var(--warning-yellow);
+        }
+
+        /* ========== HINT SYSTEM ========== */
+        .hint-container {
+            margin-top: 1rem;
+        }
+
+        .hint-toggle {
+            background: transparent;
+            border: 1px dashed var(--border-gray);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all var(--transition-fast);
+        }
+
+        .hint-toggle:hover {
+            border-color: var(--warning-yellow);
+            color: var(--warning-yellow);
+        }
+
+        .hint-content {
+            display: none;
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .hint-content.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .hint-content h5 {
+            color: var(--warning-yellow);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ========== ACCORDION ========== */
+        .accordion {
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+
+        .accordion-header {
+            background: var(--bg-elevated);
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition-fast);
+        }
+
+        .accordion-header:hover {
+            background: var(--border-gray);
+        }
+
+        .accordion-header h4 {
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .accordion-icon {
+            transition: transform var(--transition-fast);
+        }
+
+        .accordion-item.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 2000px;
+        }
+
+        .accordion-body {
+            padding: 1.25rem;
+            background: var(--bg-panel);
+        }
+
+        /* ========== TABS WITHIN CONTENT ========== */
+        .content-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .content-tab {
+            padding: 0.5rem 1rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all var(--transition-fast);
+        }
+
+        .content-tab:hover {
+            border-color: var(--primary-red);
+            color: var(--text-primary);
+        }
+
+        .content-tab.active {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: white;
+        }
+
+        .tab-content-panel {
+            display: none;
+        }
+
+        .tab-content-panel.active {
+            display: block;
+        }
+
+        /* ========== REFERENCE CARDS ========== */
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .reference-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 1.25rem;
+            transition: all var(--transition-fast);
+        }
+
+        .reference-card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .reference-card h4 {
+            color: var(--primary-red);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .reference-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .reference-card code {
+            background: var(--bg-dark);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--accent-red);
+        }
+
+        /* ========== CIS BENCHMARK BOX ========== */
+        .cis-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-left: 4px solid var(--info-blue);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .cis-box h4 {
+            color: var(--info-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .cis-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .cis-box li {
+            padding: 0.35rem 0;
+            padding-left: 1.25rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .cis-box li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--info-blue);
+        }
+
+        /* ========== CHECKLIST ========== */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            background: var(--bg-elevated);
+            transition: all var(--transition-fast);
+        }
+
+        .checklist-item:hover {
+            background: var(--border-gray);
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-gray);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+
+        .checklist-checkbox.checked {
+            background: var(--success-green);
+            border-color: var(--success-green);
+        }
+
+        .checklist-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        .checklist-text {
+            flex: 1;
+        }
+
+        .checklist-text.completed {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* ========== ALERT BOXES ========== */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .alert-content h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-content p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .alert-warning {
+            background: rgba(234, 179, 8, 0.15);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            color: var(--warning-yellow);
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--info-blue);
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--success-green);
+        }
+
+        .alert-danger {
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: var(--primary-red);
+        }
+
+        /* ========== OVERVIEW STATS ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-gray);
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all var(--transition-fast);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-red);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--primary-red);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* ========== COMPLETION MODAL ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-panel);
+            border: 2px solid var(--success-green);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            text-align: center;
+            animation: modalPop 0.3s ease;
+            box-shadow: 0 0 50px rgba(34, 197, 94, 0.3);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--success-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-message {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* ========== FOOTER ========== */
+        .main-footer {
+            background: var(--bg-dark);
+            border-top: 1px solid var(--border-gray);
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-info {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color var(--transition-fast);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-red);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .progress-section {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .progress-bar-container {
+                flex: 1;
+                min-width: 150px;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .nav-tabs {
+                padding: 0 1rem;
+            }
+
+            .nav-tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .reference-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* ========== PRINT STYLES ========== */
+        @media print {
+            .main-header, .nav-tabs, .main-footer {
+                display: none;
+            }
+
+            .section {
+                display: block !important;
+                page-break-inside: avoid;
+            }
+
+            .panel {
+                break-inside: avoid;
+            }
+        }
+
+        /* ========== LOADING ANIMATION ========== */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-gray);
+            border-top-color: var(--primary-red);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== JSON OUTPUT STYLING ========== */
+        .json-output {
+            background: #0d0d0d;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            overflow-x: auto;
+            border: 1px solid var(--border-gray);
+        }
+
+        .json-key { color: #8be9fd; }
+        .json-string { color: #f1fa8c; }
+        .json-number { color: #bd93f9; }
+        .json-boolean { color: #ff79c6; }
+        .json-null { color: #6272a4; }
+    </style>
+</head><body><header class="main-header">
+<div class="header-content">
+<div class="logo-section">
+<div class="logo-icon">🛡️</div>
+<div class="logo-text">
+<h1>Week 9: System Inventory &amp; Patch Tracker</h1>
+<span>CYB-201 // Nested Data &amp; Risk Scoring</span></div>
+</div>
+<div class="progress-section">
+<div class="progress-bar-container">
+<div class="progress-label"><span>Progress</span> <span id="progressPercent">0%</span></div>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+</div>
+<div class="time-estimate"><span>⏱️</span> Est: 2-3 hours</div>
+</div>
+</div>
+</header><!-- ========== NAVIGATION ========== --><nav class="nav-tabs">
+<div class="nav-tabs-inner"><button class="nav-tab active" data-section="overview"> <span class="tab-number">1</span> Overview </button> <button class="nav-tab" data-section="concepts"> <span class="tab-number">2</span> Concepts </button> <button class="nav-tab" data-section="data"> <span class="tab-number">3</span> Sample Data </button> <button class="nav-tab" data-section="challenges"> <span class="tab-number">4</span> Challenges </button> <button class="nav-tab" data-section="ai-workshop"> <span class="tab-number">5</span> AI Workshop </button> <button class="nav-tab" data-section="reference"> <span class="tab-number">6</span> Reference </button></div>
+</nav><!-- ========== MAIN CONTENT ========== --><main class="main-content"><!-- ==================== SECTION 1: OVERVIEW ==================== -->
+<section id="overview" class="section active">
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">🎯</span> Mission Briefing</h2>
+<span class="panel-badge">Week 9</span></div>
+<div class="panel-body">
+<p style="font-size: 1.1rem; margin-bottom: 1.5rem;">Welcome to the <strong>System Inventory &amp; Patch Status Tracker</strong> project! As a Security Operations Center (SOC) analyst, you'll build Python tools to analyze your organization's patch compliance, identify vulnerable systems, and generate actionable reports for IT management.</p>
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-value">4</div>
+<div class="stat-label">Challenge Levels</div>
+</div>
+<div class="stat-card">
+<div class="stat-value">20</div>
+<div class="stat-label">Host Systems</div>
+</div>
+<div class="stat-card">
+<div class="stat-value">CIS</div>
+<div class="stat-label">Benchmark Standard</div>
+</div>
+<div class="stat-card">
+<div class="stat-value">3</div>
+<div class="stat-label">Output Formats</div>
+</div>
+</div>
+<div class="cis-box">
+<h4>📋 CIS Critical Security Controls Reference</h4>
+<p style="margin-bottom: 0.75rem; color: var(--text-secondary);">This project aligns with CIS Control 7: Continuous Vulnerability Management</p>
+<ul>
+<li><strong>7.1:</strong> Establish and maintain a vulnerability management process</li>
+<li><strong>7.2:</strong> Establish and maintain a remediation process</li>
+<li><strong>7.3:</strong> Perform automated operating system patch management</li>
+<li><strong>7.4:</strong> Perform automated application patch management</li>
+<li><strong>7.5:</strong> Perform automated vulnerability scans of internal assets</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">📚</span> Learning Objectives</h2>
+</div>
+<div class="panel-body">
+<div class="reference-grid">
+<div class="reference-card">
+<h4>🗂️ Structured Data</h4>
+<p>Parse JSON/CSV host inventories into Python dictionaries and lists of dictionaries</p>
+</div>
+<div class="reference-card">
+<h4>🔍 Nested Operations</h4>
+<p>Filter, search, and manipulate multi-level data structures efficiently</p>
+</div>
+<div class="reference-card">
+<h4>📊 Risk Scoring</h4>
+<p>Implement point-based scoring algorithms to prioritize remediation</p>
+</div>
+<div class="reference-card">
+<h4>📝 Reporting</h4>
+<p>Generate JSON, text, and HTML reports for different stakeholders</p>
+</div>
+<div class="reference-card">
+<h4>🤖 AI-Assisted Development</h4>
+<p>Use GitHub Copilot to generate scoring rules and improve code quality</p>
+</div>
+<div class="reference-card">
+<h4>🏢 Real-World Context</h4>
+<p>Apply CIS benchmarks and understand SOC analyst workflows</p>
+</div>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">🗺️</span> Project Roadmap</h2>
+</div>
+<div class="panel-body">
+<ul class="checklist" id="roadmapChecklist">
+<li class="checklist-item">
+<div class="checklist-checkbox" data-task="task1"></div>
+<div class="checklist-text"><strong>Foundation:</strong> Load and explore the host inventory data structure</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-task="task2"></div>
+<div class="checklist-text"><strong>Intermediate:</strong> Build filtering functions and calculate derived values</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-task="task3"></div>
+<div class="checklist-text"><strong>Advanced:</strong> Implement risk scoring algorithm and flag high-risk hosts</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-task="task4"></div>
+<div class="checklist-text"><strong>Boss Challenge:</strong> Full pipeline with multi-format reporting</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-task="task5"></div>
+<div class="checklist-text"><strong>AI Workshop:</strong> Use Copilot for scoring rules and code review</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- ==================== SECTION 2: CONCEPTS ==================== -->
+<section id="concepts" class="section">
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">🧠</span> Core Concepts</h2>
+</div>
+<div class="panel-body">
+<div class="accordion">
+<div class="accordion-item">
+<div class="accordion-header" onclick="toggleAccordion(this)">
+<h4>📦 Structured Host Data</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<div class="accordion-body">
+<p>In enterprise environments, system inventories are typically stored as structured data (JSON, CSV, or databases). Each record represents a host with key attributes:</p>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">host_record.json</span></div>
+<div class="terminal-body">
+<pre><code>{
+    <span class="code-string">"hostname"</span>: <span class="code-string">"FIN-WKS-042"</span>,
+    <span class="code-string">"ip_address"</span>: <span class="code-string">"10.20.30.42"</span>,
+    <span class="code-string">"os"</span>: <span class="code-string">"Windows 11 Pro"</span>,
+    <span class="code-string">"os_version"</span>: <span class="code-string">"23H2"</span>,
+    <span class="code-string">"last_patch_date"</span>: <span class="code-string">"2024-09-15"</span>,
+    <span class="code-string">"criticality"</span>: <span class="code-string">"high"</span>,
+    <span class="code-string">"environment"</span>: <span class="code-string">"production"</span>,
+    <span class="code-string">"department"</span>: <span class="code-string">"Finance"</span>,
+    <span class="code-string">"owner"</span>: <span class="code-string">"jsmith@company.com"</span>,
+    <span class="code-string">"tags"</span>: [<span class="code-string">"pci-scope"</span>, <span class="code-string">"internet-facing"</span>]
+}</code></pre>
+</div>
+</div>
+<h5 style="margin-top: 1rem; color: var(--primary-red);">Key Fields Explained:</h5>
+<ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+<li><strong>hostname:</strong> Unique identifier for the system</li>
+<li><strong>criticality:</strong> Business importance (critical, high, medium, low)</li>
+<li><strong>last_patch_date:</strong> When security updates were last applied</li>
+<li><strong>environment:</strong> production, staging, development, test</li>
+<li><strong>tags:</strong> Compliance scope and special attributes</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header" onclick="toggleAccordion(this)">
+<h4>🔄 Converting Data Formats</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<div class="accordion-body">
+<p>Python makes it easy to convert between common data formats:</p>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">data_conversion.py</span></div>
+<div class="terminal-body">
+<pre><code><span class="code-keyword">import</span> json
+<span class="code-keyword">import</span> csv
+<span class="code-keyword">from</span> datetime <span class="code-keyword">import</span> datetime
+
+<span class="code-comment"># Load JSON inventory</span>
+<span class="code-keyword">with</span> <span class="code-function">open</span>(<span class="code-string">'inventory.json'</span>, <span class="code-string">'r'</span>) <span class="code-keyword">as</span> f:
+    hosts = json.<span class="code-function">load</span>(f)
+
+<span class="code-comment"># Load CSV inventory</span>
+<span class="code-keyword">with</span> <span class="code-function">open</span>(<span class="code-string">'inventory.csv'</span>, <span class="code-string">'r'</span>) <span class="code-keyword">as</span> f:
+    reader = csv.<span class="code-function">DictReader</span>(f)
+    hosts = <span class="code-function">list</span>(reader)
+
+<span class="code-comment"># Access nested data</span>
+<span class="code-keyword">for</span> host <span class="code-keyword">in</span> hosts:
+    <span class="code-function">print</span>(f<span class="code-string">"Host: {host['hostname']}"</span>)
+    <span class="code-function">print</span>(f<span class="code-string">"  OS: {host['os']}"</span>)
+    <span class="code-function">print</span>(f<span class="code-string">"  Last Patched: {host['last_patch_date']}"</span>)
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header" onclick="toggleAccordion(this)">
+<h4>🔍 Filtering &amp; Derived Values</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<div class="accordion-body">
+<p>Filter hosts by attributes and calculate useful metrics:</p>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">filtering.py</span></div>
+<div class="terminal-body">
+<pre><code><span class="code-keyword">from</span> datetime <span class="code-keyword">import</span> datetime, timedelta
+
+<span class="code-keyword">def</span> <span class="code-function">days_since_patch</span>(host):
+    <span class="code-string">"""Calculate days since last patch."""</span>
+    last_patch = datetime.<span class="code-function">strptime</span>(
+        host[<span class="code-string">'last_patch_date'</span>], <span class="code-string">'%Y-%m-%d'</span>
+    )
+    <span class="code-keyword">return</span> (datetime.<span class="code-function">now</span>() - last_patch).days
+
+<span class="code-keyword">def</span> <span class="code-function">filter_by_os</span>(hosts, os_type):
+    <span class="code-string">"""Filter hosts by operating system."""</span>
+    <span class="code-keyword">return</span> [h <span class="code-keyword">for</span> h <span class="code-keyword">in</span> hosts <span class="code-keyword">if</span> os_type.<span class="code-function">lower</span>() <span class="code-keyword">in</span> h[<span class="code-string">'os'</span>].<span class="code-function">lower</span>()]
+
+<span class="code-keyword">def</span> <span class="code-function">filter_critical_production</span>(hosts):
+    <span class="code-string">"""Find critical hosts in production."""</span>
+    <span class="code-keyword">return</span> [
+        h <span class="code-keyword">for</span> h <span class="code-keyword">in</span> hosts 
+        <span class="code-keyword">if</span> h[<span class="code-string">'criticality'</span>] == <span class="code-string">'critical'</span> 
+        <span class="code-keyword">and</span> h[<span class="code-string">'environment'</span>] == <span class="code-string">'production'</span>
+    ]
+
+<span class="code-comment"># Add derived field to each host</span>
+<span class="code-keyword">for</span> host <span class="code-keyword">in</span> hosts:
+    host[<span class="code-string">'days_since_patch'</span>] = <span class="code-function">days_since_patch</span>(host)
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header" onclick="toggleAccordion(this)">
+<h4>⚠️ Risk Scoring Algorithm</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<div class="accordion-body">
+<p>A simple point-based risk scoring system helps prioritize remediation efforts:</p>
+<div class="risk-meter">
+<div class="risk-score risk-critical">85</div>
+<div class="risk-details">
+<h4>Critical Risk Example</h4>
+<p>Critical server, 120 days since patch, production environment, PCI scope</p>
+</div>
+</div>
+<h5 style="color: var(--primary-red); margin: 1rem 0 0.5rem;">Scoring Factors:</h5>
+<table class="data-table">
+<thead>
+<tr>
+<th>Factor</th>
+<th>Condition</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Criticality</td>
+<td>critical / high / medium / low</td>
+<td>40 / 25 / 10 / 5</td>
+</tr>
+<tr>
+<td>Patch Age</td>
+<td>&gt;90 days / &gt;60 days / &gt;30 days</td>
+<td>30 / 20 / 10</td>
+</tr>
+<tr>
+<td>Environment</td>
+<td>production / staging / dev</td>
+<td>15 / 8 / 3</td>
+</tr>
+<tr>
+<td>Compliance Tag</td>
+<td>pci-scope or hipaa</td>
+<td>+10 each</td>
+</tr>
+<tr>
+<td>Internet Facing</td>
+<td>internet-facing tag</td>
+<td>+15</td>
+</tr>
+</tbody>
+</table>
+<div class="terminal" style="margin-top: 1rem;">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">risk_scoring.py</span></div>
+<div class="terminal-body">
+<pre><code><span class="code-keyword">def</span> <span class="code-function">calculate_risk_score</span>(host):
+    <span class="code-string">"""Calculate risk score based on multiple factors."""</span>
+    score = <span class="code-number">0</span>
+    
+    <span class="code-comment"># Criticality points</span>
+    criticality_scores = {
+        <span class="code-string">'critical'</span>: <span class="code-number">40</span>, <span class="code-string">'high'</span>: <span class="code-number">25</span>, 
+        <span class="code-string">'medium'</span>: <span class="code-number">10</span>, <span class="code-string">'low'</span>: <span class="code-number">5</span>
+    }
+    score += criticality_scores.<span class="code-function">get</span>(host[<span class="code-string">'criticality'</span>], <span class="code-number">0</span>)
+    
+    <span class="code-comment"># Patch age points</span>
+    days = host.<span class="code-function">get</span>(<span class="code-string">'days_since_patch'</span>, <span class="code-number">0</span>)
+    <span class="code-keyword">if</span> days &gt; <span class="code-number">90</span>:
+        score += <span class="code-number">30</span>
+    <span class="code-keyword">elif</span> days &gt; <span class="code-number">60</span>:
+        score += <span class="code-number">20</span>
+    <span class="code-keyword">elif</span> days &gt; <span class="code-number">30</span>:
+        score += <span class="code-number">10</span>
+    
+    <span class="code-comment"># Environment points</span>
+    env_scores = {<span class="code-string">'production'</span>: <span class="code-number">15</span>, <span class="code-string">'staging'</span>: <span class="code-number">8</span>, <span class="code-string">'development'</span>: <span class="code-number">3</span>}
+    score += env_scores.<span class="code-function">get</span>(host[<span class="code-string">'environment'</span>], <span class="code-number">0</span>)
+    
+    <span class="code-comment"># Compliance and exposure tags</span>
+    tags = host.<span class="code-function">get</span>(<span class="code-string">'tags'</span>, [])
+    <span class="code-keyword">if</span> <span class="code-string">'pci-scope'</span> <span class="code-keyword">in</span> tags:
+        score += <span class="code-number">10</span>
+    <span class="code-keyword">if</span> <span class="code-string">'internet-facing'</span> <span class="code-keyword">in</span> tags:
+        score += <span class="code-number">15</span>
+    
+    <span class="code-keyword">return</span> score
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header" onclick="toggleAccordion(this)">
+<h4>📊 CIS Patch Timeline Standards</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<div class="accordion-body">
+<div class="cis-box">
+<h4>🏛️ CIS Control 7 - Patch Timelines</h4>
+<p style="color: var(--text-secondary); margin-bottom: 1rem;">The Center for Internet Security provides guidance on remediation timelines:</p>
+<table class="data-table">
+<thead>
+<tr>
+<th>Vulnerability Severity</th>
+<th>Remediation Timeline</th>
+<th>Our Risk Score Threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="status-critical">Critical (CVSS 9.0+)</td>
+<td>Within 15 days</td>
+<td>≥70 points</td>
+</tr>
+<tr>
+<td class="status-high">High (CVSS 7.0-8.9)</td>
+<td>Within 30 days</td>
+<td>50-69 points</td>
+</tr>
+<tr>
+<td class="status-medium">Medium (CVSS 4.0-6.9)</td>
+<td>Within 90 days</td>
+<td>25-49 points</td>
+</tr>
+<tr>
+<td class="status-low">Low (CVSS &lt;4.0)</td>
+<td>Next patch cycle</td>
+<td>&lt;25 points</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ==================== SECTION 3: SAMPLE DATA ==================== -->
+<section id="data" class="section">
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">🗄️</span> Host Inventory Dataset</h2>
+<div><button class="btn btn-secondary btn-small" onclick="downloadJSON()">📥 Download JSON</button> <button class="btn btn-secondary btn-small" onclick="downloadCSV()">📥 Download CSV</button></div>
+</div>
+<div class="panel-body">
+<p style="margin-bottom: 1rem;">This dataset simulates a mid-sized organization's system inventory with 20 hosts across multiple departments, operating systems, and environments.</p>
+<div class="data-viewer">
+<div class="data-viewer-tabs"><button class="data-viewer-tab active" onclick="showDataView('table')">📊 Table View</button> <button class="data-viewer-tab" onclick="showDataView('json')">{ } JSON</button> <button class="data-viewer-tab" onclick="showDataView('csv')">📄 CSV</button> <button class="data-viewer-tab" onclick="showDataView('stats')">📈 Statistics</button></div>
+<div class="data-viewer-content" id="dataViewerContent"><!-- Content populated by JavaScript --></div>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">🔬</span> Data Exploration Sandbox</h2>
+</div>
+<div class="panel-body">
+<p>Use this interactive Python console to explore the data. The <code>hosts</code> variable is pre-loaded with the inventory.</p>
+<div class="code-editor-container">
+<div class="code-editor-header"><span class="code-editor-title">🐍 sandbox.py</span>
+<div class="code-editor-actions"><button class="btn btn-small btn-secondary" onclick="resetSandbox()">↺ Reset</button> <button class="btn btn-small btn-primary" onclick="runSandbox()">▶ Run</button></div>
+</div>
+<textarea class="code-editor" id="sandboxEditor"># Explore the host inventory data
+# The 'hosts' list is already loaded
+
+# Example: Count hosts by OS
+os_counts = {}
+for host in hosts:
+    os_type = host['os']
+    os_counts[os_type] = os_counts.get(os_type, 0) + 1
+
+print("Hosts by Operating System:")
+for os_name, count in os_counts.items():
+    print(f"  {os_name}: {{count}}")
+
+# Try your own queries below!
+</textarea></div>
+<div class="validation-output" id="sandboxOutput"><span class="validation-info">Output will appear here...</span></div>
+</div>
+</div>
+</section>
+<!-- ==================== SECTION 4: CHALLENGES ==================== -->
+<section id="challenges" class="section"><!-- CHALLENGE 1: FOUNDATION -->
+<div class="challenge-card" id="challenge1">
+<div class="challenge-header">
+<div class="challenge-title"><span class="challenge-number">1</span> Data Loading &amp; Exploration</div>
+<span class="difficulty-badge difficulty-foundation">Foundation</span></div>
+<div class="challenge-description">Load the host inventory from JSON format, convert each record into a Python dictionary, and explore the data structure to understand available fields.</div>
+<div class="challenge-objectives">
+<h4>🎯 Objectives</h4>
+<ul>
+<li>Load JSON data using Python's <code>json</code> module</li>
+<li>Iterate through the list of host dictionaries</li>
+<li>Print a summary of total hosts and unique OS types</li>
+<li>Access nested fields like <code>tags</code> array</li>
+</ul>
+</div>
+<div class="code-editor-container">
+<div class="code-editor-header"><span class="code-editor-title">🐍 challenge_1_data_loading.py</span>
+<div class="code-editor-actions"><button class="btn btn-small btn-secondary" onclick="loadStarterCode(1)">📋 Starter Code</button> <button class="btn btn-small btn-primary" onclick="validateChallenge(1)">✓ Validate</button></div>
+</div>
+<textarea class="code-editor" id="challenge1Editor" placeholder="Write your code here..."></textarea></div>
+<div class="validation-output" id="challenge1Output"></div>
+<div class="hint-container"><button class="hint-toggle" onclick="toggleHint('hint1')">💡 Need a hint?</button>
+<div class="hint-content" id="hint1">
+<h5>Hint: Loading JSON</h5>
+<p>Use <code>json.loads(json_string)</code> to parse the JSON data. Once loaded, you can iterate with <code>for host in hosts:</code> and access fields like <code>host['hostname']</code>.</p>
+</div>
+</div>
+</div>
+<!-- CHALLENGE 2: INTERMEDIATE -->
+<div class="challenge-card" id="challenge2">
+<div class="challenge-header">
+<div class="challenge-title"><span class="challenge-number">2</span> Filtering &amp; Derived Values</div>
+<span class="difficulty-badge difficulty-intermediate">Intermediate</span></div>
+<div class="challenge-description">Build filtering functions to find hosts matching specific criteria and calculate derived values like "days since last patch" for each host.</div>
+<div class="challenge-objectives">
+<h4>🎯 Objectives</h4>
+<ul>
+<li>Create <code>filter_by_os(hosts, os_type)</code> function</li>
+<li>Create <code>filter_by_criticality(hosts, level)</code> function</li>
+<li>Create <code>filter_by_environment(hosts, env)</code> function</li>
+<li>Create <code>calculate_days_since_patch(host)</code> function</li>
+<li>Add <code>days_since_patch</code> field to each host</li>
+</ul>
+</div>
+<div class="code-editor-container">
+<div class="code-editor-header"><span class="code-editor-title">🐍 challenge_2_filtering.py</span>
+<div class="code-editor-actions"><button class="btn btn-small btn-secondary" onclick="loadStarterCode(2)">📋 Starter Code</button> <button class="btn btn-small btn-primary" onclick="validateChallenge(2)">✓ Validate</button></div>
+</div>
+<textarea class="code-editor" id="challenge2Editor" placeholder="Write your code here..."></textarea></div>
+<div class="validation-output" id="challenge2Output"></div>
+<div class="hint-container"><button class="hint-toggle" onclick="toggleHint('hint2')">💡 Need a hint?</button>
+<div class="hint-content" id="hint2">
+<h5>Hint: Date Calculations</h5>
+<p>Use <code>datetime.strptime(date_string, '%Y-%m-%d')</code> to parse dates. Then subtract from <code>datetime.now()</code> and access <code>.days</code> attribute.</p>
+</div>
+</div>
+</div>
+<!-- CHALLENGE 3: ADVANCED -->
+<div class="challenge-card" id="challenge3">
+<div class="challenge-header">
+<div class="challenge-title"><span class="challenge-number">3</span> Risk Scoring Algorithm</div>
+<span class="difficulty-badge difficulty-advanced">Advanced</span></div>
+<div class="challenge-description">Implement a point-based risk scoring algorithm that considers criticality, patch age, environment, and compliance tags. Flag hosts exceeding thresholds.</div>
+<div class="challenge-objectives">
+<h4>🎯 Objectives</h4>
+<ul>
+<li>Create <code>calculate_risk_score(host)</code> using the scoring table</li>
+<li>Assign <code>risk_level</code> based on score thresholds (critical ≥70, high 50-69, medium 25-49, low &lt;25)</li>
+<li>Create <code>get_high_risk_hosts(hosts, threshold=50)</code> to filter flagged hosts</li>
+<li>Sort results by risk score descending</li>
+</ul>
+</div>
+<div class="code-editor-container">
+<div class="code-editor-header"><span class="code-editor-title">🐍 challenge_3_risk_scoring.py</span>
+<div class="code-editor-actions"><button class="btn btn-small btn-secondary" onclick="loadStarterCode(3)">📋 Starter Code</button> <button class="btn btn-small btn-primary" onclick="validateChallenge(3)">✓ Validate</button></div>
+</div>
+<textarea class="code-editor" id="challenge3Editor" placeholder="Write your code here..."></textarea></div>
+<div class="validation-output" id="challenge3Output"></div>
+<div class="hint-container"><button class="hint-toggle" onclick="toggleHint('hint3')">💡 Need a hint?</button>
+<div class="hint-content" id="hint3">
+<h5>Hint: Dictionary Lookups</h5>
+<p>Use dictionaries for score mappings: <code>scores = {'critical': 40, 'high': 25}</code>. Access with <code>scores.get(value, default)</code> to handle missing keys.</p>
+</div>
+</div>
+</div>
+<!-- CHALLENGE 4: BOSS CHALLENGE -->
+<div class="challenge-card" id="challenge4">
+<div class="challenge-header">
+<div class="challenge-title"><span class="challenge-number">🏆</span> Full Pipeline &amp; Reporting</div>
+<span class="difficulty-badge difficulty-boss">Boss Challenge</span></div>
+<div class="challenge-description">Build the complete patch compliance analysis pipeline: load data, calculate all derived values, score risks, and generate reports in JSON, text summary, and HTML table formats.</div>
+<div class="challenge-objectives">
+<h4>🎯 Objectives</h4>
+<ul>
+<li>Create <code>analyze_inventory(hosts)</code> - main pipeline function</li>
+<li>Create <code>generate_json_report(high_risk_hosts)</code> - structured JSON output</li>
+<li>Create <code>generate_text_summary(hosts, high_risk_hosts)</code> - readable summary for SOC manager</li>
+<li>Create <code>generate_html_report(hosts)</code> - formatted HTML table (BONUS)</li>
+<li>Include executive summary statistics and action items</li>
+</ul>
+</div>
+<div class="code-editor-container">
+<div class="code-editor-header"><span class="code-editor-title">🐍 challenge_4_full_pipeline.py</span>
+<div class="code-editor-actions"><button class="btn btn-small btn-secondary" onclick="loadStarterCode(4)">📋 Starter Code</button> <button class="btn btn-small btn-primary" onclick="validateChallenge(4)">✓ Validate</button></div>
+</div>
+<textarea class="code-editor" id="challenge4Editor" placeholder="Write your code here..." style="min-height: 350px;"></textarea></div>
+<div class="validation-output" id="challenge4Output"></div>
+<div class="hint-container"><button class="hint-toggle" onclick="toggleHint('hint4')">💡 Need a hint?</button>
+<div class="hint-content" id="hint4">
+<h5>Hint: Report Structure</h5>
+<p>For the text summary, include: total hosts, hosts by risk level, top 5 highest risk hosts, and recommended actions. Use f-strings for clean formatting.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ==================== SECTION 5: AI WORKSHOP ==================== -->
+<section id="ai-workshop" class="section">
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">🤖</span> GitHub Copilot Workshop</h2>
+<span class="panel-badge">AI-Assisted Development</span></div>
+<div class="panel-body">
+<div class="alert alert-info"><span class="alert-icon">💡</span>
+<div class="alert-content">
+<h4>Learning Objective</h4>
+<p>Learn to effectively prompt AI assistants for generating scoring rules, test cases, and code improvements. Critically evaluate AI suggestions before incorporating them.</p>
+</div>
+</div>
+<p style="margin-bottom: 1.5rem;">In professional cybersecurity work, AI tools like GitHub Copilot can accelerate development. This workshop teaches you to craft effective prompts and critically evaluate AI-generated code.</p>
+</div>
+</div>
+<!-- Workshop Activity 1 -->
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">1️⃣</span> Generating Scoring Rules</h2>
+</div>
+<div class="panel-body">
+<p>Use Copilot to suggest alternative risk scoring approaches. Compare AI suggestions with the baseline algorithm.</p>
+<div class="ai-prompt-card">
+<div class="ai-prompt-header"><span class="copilot-icon">🤖</span>
+<h4>Prompt Template: Scoring Rule Generation</h4>
+</div>
+<div class="ai-prompt-template" id="prompt1"><button class="copy-prompt-btn" onclick="copyPrompt('prompt1')">📋 Copy</button> I need to create a risk scoring function for a patch management system. The function should: 1. Take a host dictionary with fields: hostname, os, last_patch_date, criticality (critical/high/medium/low), environment (production/staging/development), and tags (list of strings like 'pci-scope', 'internet-facing') 2. Return a numeric risk score (0-100) based on: - Asset criticality (weight: 40%) - Days since last patch (weight: 30%) - Environment type (weight: 15%) - Compliance tags present (weight: 15%) 3. Include docstring explaining the scoring logic 4. Handle edge cases (missing fields, invalid dates) Please provide the Python function with CIS benchmark-aligned thresholds.</div>
+</div>
+<div class="code-editor-container">
+<div class="code-editor-header"><span class="code-editor-title">🐍 Paste Copilot's suggestion here</span></div>
+<textarea class="code-editor" id="copilotSuggestion1" placeholder="Paste the AI-generated code here, then evaluate it below..."></textarea></div>
+<h4 style="margin-top: 1.5rem; color: var(--primary-red);">📝 Critical Evaluation Checklist</h4>
+<ul class="checklist">
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Does the function handle missing or None values gracefully?</span></li>
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Are the scoring weights appropriate for your organization's risk profile?</span></li>
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Does the docstring accurately describe what the function does?</span></li>
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Would this code be readable to a teammate unfamiliar with the project?</span></li>
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Are the CIS benchmark thresholds correctly applied?</span></li>
+</ul>
+</div>
+</div>
+<!-- Workshop Activity 2 -->
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">2️⃣</span> Generating Test Cases</h2>
+</div>
+<div class="panel-body">
+<p>Ask Copilot to generate test cases for your risk scoring function. Good tests should cover edge cases and boundary conditions.</p>
+<div class="ai-prompt-card">
+<div class="ai-prompt-header"><span class="copilot-icon">🤖</span>
+<h4>Prompt Template: Test Case Generation</h4>
+</div>
+<div class="ai-prompt-template" id="prompt2"><button class="copy-prompt-btn" onclick="copyPrompt('prompt2')">📋 Copy</button> Generate pytest test cases for the calculate_risk_score() function that: 1. Tests a critical production server with patches 120 days old → should score ≥70 (critical) 2. Tests a low-criticality dev server with recent patches → should score &lt;25 (low) 3. Tests boundary conditions at 30, 60, and 90 day thresholds 4. Tests hosts with compliance tags (pci-scope, hipaa, internet-facing) 5. Tests edge cases: empty tags list, missing fields, invalid date format Include descriptive test names and assertions with expected values.</div>
+</div>
+<div class="code-editor-container">
+<div class="code-editor-header"><span class="code-editor-title">🐍 Paste Copilot's test cases here</span></div>
+<textarea class="code-editor" id="copilotSuggestion2" placeholder="Paste the AI-generated test cases here..."></textarea></div>
+</div>
+</div>
+<!-- Workshop Activity 3 -->
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">3️⃣</span> Code Review &amp; Improvement</h2>
+</div>
+<div class="panel-body">
+<p>Have Copilot critique and improve your filtering code for readability and efficiency.</p>
+<div class="ai-prompt-card">
+<div class="ai-prompt-header"><span class="copilot-icon">🤖</span>
+<h4>Prompt Template: Code Review</h4>
+</div>
+<div class="ai-prompt-template" id="prompt3"><button class="copy-prompt-btn" onclick="copyPrompt('prompt3')">📋 Copy</button> Review this Python filtering code for a patch management system and suggest improvements for: 1. Readability (variable names, structure) 2. Error handling 3. Performance with large datasets 4. Pythonic patterns (list comprehensions, generators) 5. Type hints and documentation Current code: ```python def get_risky_hosts(data): result = [] for i in range(len(data)): if data[i]['criticality'] == 'critical' or data[i]['criticality'] == 'high': if data[i]['environment'] == 'production': d = data[i]['last_patch_date'] from datetime import datetime days = (datetime.now() - datetime.strptime(d, '%Y-%m-%d')).days if days &gt; 30: result.append(data[i]) return result ``` Provide the improved version with explanations.</div>
+</div>
+<div class="code-editor-container">
+<div class="code-editor-header"><span class="code-editor-title">🐍 Paste Copilot's improved version here</span></div>
+<textarea class="code-editor" id="copilotSuggestion3" placeholder="Paste the AI-improved code here..."></textarea></div>
+<h4 style="margin-top: 1.5rem; color: var(--primary-red);">🔍 Compare: What Did Copilot Improve?</h4>
+<ul class="checklist">
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Replaced <code>for i in range(len(data))</code> with <code>for host in data</code></span></li>
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Moved imports to top of file</span></li>
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Used list comprehension or generator expression</span></li>
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Added type hints (e.g., <code>def get_risky_hosts(data: list[dict]) -&gt; list[dict]:</code>)</span></li>
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Added docstring explaining the function</span></li>
+<li class="checklist-item">
+<div class="checklist-checkbox" onclick="toggleCheck(this)"></div>
+<span class="checklist-text">Used <code>criticality in ('critical', 'high')</code> instead of multiple OR conditions</span></li>
+</ul>
+</div>
+</div>
+<!-- Workshop Activity 4 -->
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">4️⃣</span> AI Collaboration Best Practices</h2>
+</div>
+<div class="panel-body">
+<div class="reference-grid">
+<div class="reference-card">
+<h4>✅ DO: Be Specific</h4>
+<p>Include context, expected inputs/outputs, and constraints. "Generate a function that..." is better than "Write code for..."</p>
+</div>
+<div class="reference-card">
+<h4>✅ DO: Iterate</h4>
+<p>Refine prompts based on initial results. Ask follow-up questions to improve the output.</p>
+</div>
+<div class="reference-card">
+<h4>✅ DO: Verify</h4>
+<p>Always test AI-generated code. Run it with your actual data and edge cases.</p>
+</div>
+<div class="reference-card">
+<h4>❌ DON'T: Trust Blindly</h4>
+<p>AI can hallucinate APIs, use deprecated patterns, or miss security considerations.</p>
+</div>
+<div class="reference-card">
+<h4>❌ DON'T: Skip Understanding</h4>
+<p>Don't use code you don't understand. If you can't explain it, don't deploy it.</p>
+</div>
+<div class="reference-card">
+<h4>❌ DON'T: Share Secrets</h4>
+<p>Never include real credentials, PII, or sensitive data in prompts.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ==================== SECTION 6: REFERENCE ==================== -->
+<section id="reference" class="section">
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">📖</span> Python Quick Reference</h2>
+</div>
+<div class="panel-body">
+<div class="content-tabs"><button class="content-tab active" onclick="showRefTab('ref-json')">JSON</button> <button class="content-tab" onclick="showRefTab('ref-datetime')">Datetime</button> <button class="content-tab" onclick="showRefTab('ref-dict')">Dictionaries</button> <button class="content-tab" onclick="showRefTab('ref-list')">List Comprehensions</button> <button class="content-tab" onclick="showRefTab('ref-sort')">Sorting</button></div>
+<div class="tab-content-panel active" id="ref-json">
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">json_operations.py</span></div>
+<div class="terminal-body">
+<pre><code><span class="code-keyword">import</span> json
+
+<span class="code-comment"># Parse JSON string to Python object</span>
+json_string = <span class="code-string">'{"name": "host1", "os": "Windows"}'</span>
+data = json.<span class="code-function">loads</span>(json_string)
+
+<span class="code-comment"># Load JSON from file</span>
+<span class="code-keyword">with</span> <span class="code-function">open</span>(<span class="code-string">'inventory.json'</span>, <span class="code-string">'r'</span>) <span class="code-keyword">as</span> f:
+    hosts = json.<span class="code-function">load</span>(f)
+
+<span class="code-comment"># Convert Python object to JSON string</span>
+output = json.<span class="code-function">dumps</span>(data, indent=<span class="code-number">2</span>)
+
+<span class="code-comment"># Write JSON to file</span>
+<span class="code-keyword">with</span> <span class="code-function">open</span>(<span class="code-string">'output.json'</span>, <span class="code-string">'w'</span>) <span class="code-keyword">as</span> f:
+    json.<span class="code-function">dump</span>(data, f, indent=<span class="code-number">2</span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="tab-content-panel" id="ref-datetime">
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">datetime_operations.py</span></div>
+<div class="terminal-body">
+<pre><code><span class="code-keyword">from</span> datetime <span class="code-keyword">import</span> datetime, timedelta
+
+<span class="code-comment"># Current date/time</span>
+now = datetime.<span class="code-function">now</span>()
+today = datetime.<span class="code-function">today</span>().<span class="code-function">date</span>()
+
+<span class="code-comment"># Parse date string</span>
+date_str = <span class="code-string">"2024-09-15"</span>
+parsed = datetime.<span class="code-function">strptime</span>(date_str, <span class="code-string">'%Y-%m-%d'</span>)
+
+<span class="code-comment"># Calculate difference in days</span>
+diff = now - parsed
+days_ago = diff.days
+
+<span class="code-comment"># Format date to string</span>
+formatted = now.<span class="code-function">strftime</span>(<span class="code-string">'%Y-%m-%d %H:%M:%S'</span>)
+
+<span class="code-comment"># Add/subtract time</span>
+next_week = now + timedelta(days=<span class="code-number">7</span>)
+last_month = now - timedelta(days=<span class="code-number">30</span>)</code></pre>
+</div>
+</div>
+</div>
+<div class="tab-content-panel" id="ref-dict">
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">dictionary_operations.py</span></div>
+<div class="terminal-body">
+<pre><code><span class="code-comment"># Dictionary basics</span>
+host = {<span class="code-string">'name'</span>: <span class="code-string">'srv01'</span>, <span class="code-string">'os'</span>: <span class="code-string">'Linux'</span>}
+
+<span class="code-comment"># Access with default value (avoids KeyError)</span>
+os_type = host.<span class="code-function">get</span>(<span class="code-string">'os'</span>, <span class="code-string">'Unknown'</span>)
+tags = host.<span class="code-function">get</span>(<span class="code-string">'tags'</span>, [])
+
+<span class="code-comment"># Check if key exists</span>
+<span class="code-keyword">if</span> <span class="code-string">'criticality'</span> <span class="code-keyword">in</span> host:
+    <span class="code-function">print</span>(host[<span class="code-string">'criticality'</span>])
+
+<span class="code-comment"># Iterate keys and values</span>
+<span class="code-keyword">for</span> key, value <span class="code-keyword">in</span> host.<span class="code-function">items</span>():
+    <span class="code-function">print</span>(f<span class="code-string">"{{key}}: {{value}}"</span>)
+
+<span class="code-comment"># Update/add fields</span>
+host[<span class="code-string">'risk_score'</span>] = <span class="code-number">75</span>
+host.<span class="code-function">update</span>({<span class="code-string">'status'</span>: <span class="code-string">'active'</span>, <span class="code-string">'location'</span>: <span class="code-string">'DC1'</span>})</code></pre>
+</div>
+</div>
+</div>
+<div class="tab-content-panel" id="ref-list">
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">list_comprehensions.py</span></div>
+<div class="terminal-body">
+<pre><code><span class="code-comment"># Basic list comprehension</span>
+hostnames = [h[<span class="code-string">'hostname'</span>] <span class="code-keyword">for</span> h <span class="code-keyword">in</span> hosts]
+
+<span class="code-comment"># With filter condition</span>
+critical = [h <span class="code-keyword">for</span> h <span class="code-keyword">in</span> hosts <span class="code-keyword">if</span> h[<span class="code-string">'criticality'</span>] == <span class="code-string">'critical'</span>]
+
+<span class="code-comment"># Multiple conditions</span>
+high_risk = [
+    h <span class="code-keyword">for</span> h <span class="code-keyword">in</span> hosts 
+    <span class="code-keyword">if</span> h[<span class="code-string">'criticality'</span>] <span class="code-keyword">in</span> (<span class="code-string">'critical'</span>, <span class="code-string">'high'</span>)
+    <span class="code-keyword">and</span> h[<span class="code-string">'environment'</span>] == <span class="code-string">'production'</span>
+]
+
+<span class="code-comment"># Transform values</span>
+os_upper = [h[<span class="code-string">'os'</span>].<span class="code-function">upper</span>() <span class="code-keyword">for</span> h <span class="code-keyword">in</span> hosts]
+
+<span class="code-comment"># Nested: check if any tag matches</span>
+pci_hosts = [
+    h <span class="code-keyword">for</span> h <span class="code-keyword">in</span> hosts 
+    <span class="code-keyword">if</span> <span class="code-string">'pci-scope'</span> <span class="code-keyword">in</span> h.<span class="code-function">get</span>(<span class="code-string">'tags'</span>, [])
+]</code></pre>
+</div>
+</div>
+</div>
+<div class="tab-content-panel" id="ref-sort">
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">sorting.py</span></div>
+<div class="terminal-body">
+<pre><code><span class="code-comment"># Sort list of dicts by key</span>
+by_hostname = <span class="code-function">sorted</span>(hosts, key=<span class="code-keyword">lambda</span> h: h[<span class="code-string">'hostname'</span>])
+
+<span class="code-comment"># Sort descending (highest first)</span>
+by_risk = <span class="code-function">sorted</span>(hosts, key=<span class="code-keyword">lambda</span> h: h[<span class="code-string">'risk_score'</span>], reverse=<span class="code-keyword">True</span>)
+
+<span class="code-comment"># Sort by multiple keys</span>
+by_crit_then_name = <span class="code-function">sorted</span>(
+    hosts, 
+    key=<span class="code-keyword">lambda</span> h: (h[<span class="code-string">'criticality'</span>], h[<span class="code-string">'hostname'</span>])
+)
+
+<span class="code-comment"># In-place sorting</span>
+hosts.<span class="code-function">sort</span>(key=<span class="code-keyword">lambda</span> h: h[<span class="code-string">'last_patch_date'</span>])
+
+<span class="code-comment"># Get top N items</span>
+top_5_risky = <span class="code-function">sorted</span>(hosts, key=<span class="code-keyword">lambda</span> h: h[<span class="code-string">'risk_score'</span>], reverse=<span class="code-keyword">True</span>)[:<span class="code-number">5</span>]</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">🛡️</span> CIS Benchmark Quick Reference</h2>
+</div>
+<div class="panel-body">
+<div class="cis-box">
+<h4>📋 CIS Control 7: Continuous Vulnerability Management</h4>
+<table class="data-table">
+<thead>
+<tr>
+<th>Sub-Control</th>
+<th>Description</th>
+<th>Relevance to This Project</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7.1</td>
+<td>Establish vulnerability management process</td>
+<td>Our scoring algorithm is the foundation</td>
+</tr>
+<tr>
+<td>7.2</td>
+<td>Establish remediation process</td>
+<td>Reports identify action items by priority</td>
+</tr>
+<tr>
+<td>7.3</td>
+<td>Automate OS patch management</td>
+<td>Tracking last_patch_date enables automation</td>
+</tr>
+<tr>
+<td>7.4</td>
+<td>Automate application patch management</td>
+<td>Can be extended with app version tracking</td>
+</tr>
+<tr>
+<td>7.5</td>
+<td>Automated vulnerability scans</td>
+<td>Integrates with scanner output (future)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h4 style="margin-top: 1.5rem; color: var(--primary-red);">Patch Timeline Guidelines</h4>
+<div class="reference-grid">
+<div class="reference-card" style="border-left: 4px solid var(--primary-red);">
+<h4 style="color: var(--primary-red);">Critical Vulnerabilities</h4>
+<p>CVSS 9.0+: Remediate within <strong>15 calendar days</strong></p>
+<p><code>days_since_patch &gt; 15 → CRITICAL</code></p>
+</div>
+<div class="reference-card" style="border-left: 4px solid var(--critical-orange);">
+<h4 style="color: var(--critical-orange);">High Vulnerabilities</h4>
+<p>CVSS 7.0-8.9: Remediate within <strong>30 calendar days</strong></p>
+<p><code>days_since_patch &gt; 30 → HIGH</code></p>
+</div>
+<div class="reference-card" style="border-left: 4px solid var(--warning-yellow);">
+<h4 style="color: var(--warning-yellow);">Medium Vulnerabilities</h4>
+<p>CVSS 4.0-6.9: Remediate within <strong>90 calendar days</strong></p>
+<p><code>days_since_patch &gt; 90 → MEDIUM</code></p>
+</div>
+<div class="reference-card" style="border-left: 4px solid var(--success-green);">
+<h4 style="color: var(--success-green);">Low Vulnerabilities</h4>
+<p>CVSS &lt;4.0: Remediate in <strong>next patch cycle</strong></p>
+<p><code>Regular maintenance window</code></p>
+</div>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h2 class="panel-title"><span class="icon">🔗</span> Additional Resources</h2>
+</div>
+<div class="panel-body">
+<div class="reference-grid">
+<div class="reference-card">
+<h4>📚 CIS Controls v8</h4>
+<p>Official documentation for the Center for Internet Security Critical Security Controls</p>
+<a href="https://www.cisecurity.org/controls" target="_blank" style="color: var(--info-blue);" rel="noopener">cisecurity.org/controls →</a></div>
+<div class="reference-card">
+<h4>🐍 Python json Module</h4>
+<p>Official Python documentation for JSON encoding and decoding</p>
+<a href="https://docs.python.org/3/library/json.html" target="_blank" style="color: var(--info-blue);" rel="noopener">docs.python.org →</a></div>
+<div class="reference-card">
+<h4>📅 Python datetime</h4>
+<p>Working with dates and times in Python</p>
+<a href="https://docs.python.org/3/library/datetime.html" target="_blank" style="color: var(--info-blue);" rel="noopener">docs.python.org →</a></div>
+<div class="reference-card">
+<h4>🤖 GitHub Copilot</h4>
+<p>Getting started with AI-assisted coding</p>
+<a href="https://github.com/features/copilot" target="_blank" style="color: var(--info-blue);" rel="noopener">github.com/features/copilot →</a></div>
+</div>
+</div>
+</div>
+</section>
+</main><!-- ========== COMPLETION MODAL ========== -->
+<div class="modal-overlay" id="completionModal">
+<div class="modal-content">
+<div class="modal-icon">🎉</div>
+<h2 class="modal-title">Challenge Complete!</h2>
+<p class="modal-message" id="modalMessage">Great work! You've successfully completed this challenge.</p>
+<button class="btn btn-success" onclick="closeModal()">Continue →</button></div>
+</div>
+<!-- ========== FOOTER ========== --><footer class="main-footer">
+<div class="footer-content">
+<div class="footer-info">
+<p>Week 9: System Inventory &amp; Patch Status Tracker | CVNP2646</p>
+<p style="margin-top: 0.25rem; color: var(--text-muted);">© 2024 Cybersecurity Department</p>
+</div>
+<div class="footer-links"><a href="#overview">Overview</a> <a href="#concepts">Concepts</a> <a href="#challenges">Challenges</a> <a href="#reference">Reference</a></div>
+</div>
+</footer><!-- ========== JAVASCRIPT ========== -->
+<p><script>
+        // ==================== SAMPLE HOST DATA ====================
+        const hostInventory = [
+            {
+                "hostname": "FIN-WKS-001",
+                "ip_address": "10.10.10.11",
+                "os": "Windows 11 Pro",
+                "os_version": "23H2",
+                "last_patch_date": "2024-08-15",
+                "criticality": "high",
+                "environment": "production",
+                "department": "Finance",
+                "owner": "jsmith@company.com",
+                "tags": ["pci-scope", "internet-facing"]
+            },
+            {
+                "hostname": "FIN-WKS-002",
+                "ip_address": "10.10.10.12",
+                "os": "Windows 11 Pro",
+                "os_version": "23H2",
+                "last_patch_date": "2024-10-01",
+                "criticality": "high",
+                "environment": "production",
+                "department": "Finance",
+                "owner": "mjohnson@company.com",
+                "tags": ["pci-scope"]
+            },
+            {
+                "hostname": "HR-WKS-001",
+                "ip_address": "10.10.20.11",
+                "os": "Windows 10 Enterprise",
+                "os_version": "22H2",
+                "last_patch_date": "2024-07-20",
+                "criticality": "medium",
+                "environment": "production",
+                "department": "Human Resources",
+                "owner": "klee@company.com",
+                "tags": ["hipaa"]
+            },
+            {
+                "hostname": "IT-SRV-DC01",
+                "ip_address": "10.10.1.10",
+                "os": "Windows Server 2022",
+                "os_version": "21H2",
+                "last_patch_date": "2024-06-01",
+                "criticality": "critical",
+                "environment": "production",
+                "department": "IT",
+                "owner": "sysadmin@company.com",
+                "tags": ["domain-controller", "tier-0"]
+            },
+            {
+                "hostname": "IT-SRV-DC02",
+                "ip_address": "10.10.1.11",
+                "os": "Windows Server 2022",
+                "os_version": "21H2",
+                "last_patch_date": "2024-09-15",
+                "criticality": "critical",
+                "environment": "production",
+                "department": "IT",
+                "owner": "sysadmin@company.com",
+                "tags": ["domain-controller", "tier-0"]
+            },
+            {
+                "hostname": "WEB-SRV-001",
+                "ip_address": "10.10.50.10",
+                "os": "Ubuntu 22.04 LTS",
+                "os_version": "22.04.3",
+                "last_patch_date": "2024-05-10",
+                "criticality": "critical",
+                "environment": "production",
+                "department": "IT",
+                "owner": "webteam@company.com",
+                "tags": ["internet-facing", "pci-scope", "dmz"]
+            },
+            {
+                "hostname": "WEB-SRV-002",
+                "ip_address": "10.10.50.11",
+                "os": "Ubuntu 22.04 LTS",
+                "os_version": "22.04.3",
+                "last_patch_date": "2024-09-28",
+                "criticality": "critical",
+                "environment": "production",
+                "department": "IT",
+                "owner": "webteam@company.com",
+                "tags": ["internet-facing", "pci-scope", "dmz"]
+            },
+            {
+                "hostname": "DB-SRV-001",
+                "ip_address": "10.10.30.10",
+                "os": "Red Hat Enterprise Linux 8",
+                "os_version": "8.8",
+                "last_patch_date": "2024-04-15",
+                "criticality": "critical",
+                "environment": "production",
+                "department": "IT",
+                "owner": "dba@company.com",
+                "tags": ["pci-scope", "database", "tier-1"]
+            },
+            {
+                "hostname": "DB-SRV-002",
+                "ip_address": "10.10.30.11",
+                "os": "Red Hat Enterprise Linux 8",
+                "os_version": "8.8",
+                "last_patch_date": "2024-10-05",
+                "criticality": "critical",
+                "environment": "production",
+                "department": "IT",
+                "owner": "dba@company.com",
+                "tags": ["pci-scope", "database", "tier-1"]
+            },
+            {
+                "hostname": "DEV-WKS-001",
+                "ip_address": "10.10.100.11",
+                "os": "macOS Sonoma",
+                "os_version": "14.1",
+                "last_patch_date": "2024-10-10",
+                "criticality": "low",
+                "environment": "development",
+                "department": "Engineering",
+                "owner": "dev1@company.com",
+                "tags": []
+            },
+            {
+                "hostname": "DEV-WKS-002",
+                "ip_address": "10.10.100.12",
+                "os": "Ubuntu 23.10",
+                "os_version": "23.10",
+                "last_patch_date": "2024-10-08",
+                "criticality": "low",
+                "environment": "development",
+                "department": "Engineering",
+                "owner": "dev2@company.com",
+                "tags": []
+            },
+            {
+                "hostname": "STAGE-WEB-001",
+                "ip_address": "10.10.60.10",
+                "os": "Ubuntu 22.04 LTS",
+                "os_version": "22.04.3",
+                "last_patch_date": "2024-08-01",
+                "criticality": "medium",
+                "environment": "staging",
+                "department": "IT",
+                "owner": "webteam@company.com",
+                "tags": ["staging"]
+            },
+            {
+                "hostname": "STAGE-DB-001",
+                "ip_address": "10.10.60.20",
+                "os": "Red Hat Enterprise Linux 8",
+                "os_version": "8.8",
+                "last_patch_date": "2024-07-15",
+                "criticality": "medium",
+                "environment": "staging",
+                "department": "IT",
+                "owner": "dba@company.com",
+                "tags": ["staging", "database"]
+            },
+            {
+                "hostname": "SALES-WKS-001",
+                "ip_address": "10.10.40.11",
+                "os": "Windows 11 Pro",
+                "os_version": "23H2",
+                "last_patch_date": "2024-09-20",
+                "criticality": "medium",
+                "environment": "production",
+                "department": "Sales",
+                "owner": "sales1@company.com",
+                "tags": ["crm-access"]
+            },
+            {
+                "hostname": "SALES-WKS-002",
+                "ip_address": "10.10.40.12",
+                "os": "Windows 11 Pro",
+                "os_version": "23H2",
+                "last_patch_date": "2024-06-10",
+                "criticality": "medium",
+                "environment": "production",
+                "department": "Sales",
+                "owner": "sales2@company.com",
+                "tags": ["crm-access"]
+            },
+            {
+                "hostname": "EXEC-WKS-001",
+                "ip_address": "10.10.5.11",
+                "os": "macOS Sonoma",
+                "os_version": "14.1",
+                "last_patch_date": "2024-03-01",
+                "criticality": "critical",
+                "environment": "production",
+                "department": "Executive",
+                "owner": "ceo@company.com",
+                "tags": ["vip", "executive"]
+            },
+            {
+                "hostname": "MAIL-SRV-001",
+                "ip_address": "10.10.2.10",
+                "os": "Windows Server 2019",
+                "os_version": "1809",
+                "last_patch_date": "2024-08-20",
+                "criticality": "critical",
+                "environment": "production",
+                "department": "IT",
+                "owner": "sysadmin@company.com",
+                "tags": ["internet-facing", "email"]
+            },
+            {
+                "hostname": "BACKUP-SRV-001",
+                "ip_address": "10.10.3.10",
+                "os": "Windows Server 2022",
+                "os_version": "21H2",
+                "last_patch_date": "2024-09-01",
+                "criticality": "high",
+                "environment": "production",
+                "department": "IT",
+                "owner": "sysadmin@company.com",
+                "tags": ["backup", "tier-1"]
+            },
+            {
+                "hostname": "VPN-SRV-001",
+                "ip_address": "10.10.1.50",
+                "os": "pfSense",
+                "os_version": "2.7.0",
+                "last_patch_date": "2024-02-15",
+                "criticality": "critical",
+                "environment": "production",
+                "department": "IT",
+                "owner": "netadmin@company.com",
+                "tags": ["internet-facing", "perimeter", "vpn"]
+            },
+            {
+                "hostname": "TEST-VM-001",
+                "ip_address": "10.10.200.11",
+                "os": "Windows 10 Pro",
+                "os_version": "22H2",
+                "last_patch_date": "2024-01-01",
+                "criticality": "low",
+                "environment": "development",
+                "department": "IT",
+                "owner": "testteam@company.com",
+                "tags": ["test", "isolated"]
+            }
+        ];
+
+        // ==================== STARTER CODE TEMPLATES ====================
+        const starterCodes = {
+            1: `import json
+from datetime import datetime
+
+# Sample JSON data (in real scenario, load from file)
+json_data = '''${JSON.stringify(hostInventory.slice(0, 5), null, 2)}'''
+
+# TODO: Parse the JSON data
+hosts = None  # Replace with json.loads()
+
+# TODO: Print total number of hosts
+print(f"Total hosts: ???")
+
+# TODO: Find and print unique operating systems
+os_types = set()
+# Your code here...
+
+print(f"Unique OS types: {os_types}")
+
+# TODO: Print each hostname with its criticality
+for host in hosts:
+    # Your code here...
+    pass`,
+
+            2: `from datetime import datetime
+
+# Assume hosts list is already loaded
+# Today's date for calculations
+TODAY = datetime.now()
+
+def calculate_days_since_patch(host):
+    """Calculate the number of days since the host was last patched.
+    
+    Args:
+        host: Dictionary containing host information with 'last_patch_date' key
+        
+    Returns:
+        int: Number of days since last patch
+    """
+    # TODO: Parse the last_patch_date and calculate days
+    pass
+
+def filter_by_os(hosts, os_type):
+    """Filter hosts by operating system (case-insensitive partial match).
+    
+    Args:
+        hosts: List of host dictionaries
+        os_type: String to match against OS field
+        
+    Returns:
+        list: Hosts matching the OS type
+    """
+    # TODO: Return filtered list using list comprehension
+    pass
+
+def filter_by_criticality(hosts, level):
+    """Filter hosts by criticality level.
+    
+    Args:
+        hosts: List of host dictionaries
+        level: Criticality level (critical, high, medium, low)
+        
+    Returns:
+        list: Hosts matching the criticality level
+    """
+    # TODO: Implement filter
+    pass
+
+def filter_by_environment(hosts, env):
+    """Filter hosts by environment type.
+    
+    Args:
+        hosts: List of host dictionaries
+        env: Environment type (production, staging, development)
+        
+    Returns:
+        list: Hosts matching the environment
+    """
+    # TODO: Implement filter
+    pass
+
+# Test your functions
+# windows_hosts = filter_by_os(hosts, 'windows')
+# print(f"Windows hosts: {len(windows_hosts)}")`,
+
+            3: `from datetime import datetime
+
+def calculate_risk_score(host):
+    """Calculate a risk score (0-100) based on multiple factors.
+    
+    Scoring factors:
+    - Criticality: critical=40, high=25, medium=10, low=5
+    - Patch age: >90 days=30, >60 days=20, >30 days=10
+    - Environment: production=15, staging=8, development=3
+    - Tags: pci-scope=+10, hipaa=+10, internet-facing=+15
+    
+    Args:
+        host: Dictionary containing host information
+        
+    Returns:
+        int: Risk score between 0 and 100
+    """
+    score = 0
+    
+    # TODO: Add criticality points
+    criticality_scores = {
+        'critical': 40,
+        'high': 25,
+        'medium': 10,
+        'low': 5
+    }
+    
+    # TODO: Add patch age points
+    
+    # TODO: Add environment points
+    
+    # TODO: Add tag-based points
+    
+    return min(score, 100)  # Cap at 100
+
+def get_risk_level(score):
+    """Convert numeric score to risk level string.
+    
+    Args:
+        score: Numeric risk score
+        
+    Returns:
+        str: Risk level (critical, high, medium, low)
+    """
+    # TODO: Implement threshold logic
+    pass
+
+def get_high_risk_hosts(hosts, threshold=50):
+    """Get all hosts with risk score at or above threshold.
+    
+    Args:
+        hosts: List of host dictionaries
+        threshold: Minimum risk score to include
+        
+    Returns:
+        list: High-risk hosts sorted by score descending
+    """
+    # TODO: Filter and sort hosts
+    pass
+
+# Test scoring
+# for host in hosts[:3]:
+#     score = calculate_risk_score(host)
+#     print(f"{host['hostname']}: {{score}} ({get_risk_level(score)})")`,
+
+            4: `import json
+from datetime import datetime
+
+def analyze_inventory(hosts):
+    """Main analysis pipeline - process all hosts and add derived fields.
+    
+    Args:
+        hosts: List of host dictionaries
+        
+    Returns:
+        list: Enriched host data with risk scores and levels
+    """
+    for host in hosts:
+        # TODO: Add days_since_patch
+        # TODO: Add risk_score
+        # TODO: Add risk_level
+        pass
+    return hosts
+
+def generate_json_report(high_risk_hosts):
+    """Generate JSON report of high-risk hosts.
+    
+    Args:
+        high_risk_hosts: List of flagged host dictionaries
+        
+    Returns:
+        str: JSON formatted report
+    """
+    report = {
+        "report_date": datetime.now().isoformat(),
+        "report_type": "High Risk Host Assessment",
+        "total_flagged": len(high_risk_hosts),
+        "hosts": []
+    }
+    
+    # TODO: Add relevant fields for each high-risk host
+    
+    return json.dumps(report, indent=2)
+
+def generate_text_summary(hosts, high_risk_hosts):
+    """Generate text summary for SOC/IT manager.
+    
+    Args:
+        hosts: All hosts
+        high_risk_hosts: Flagged hosts
+        
+    Returns:
+        str: Formatted text report
+    """
+    summary = []
+    summary.append("=" * 60)
+    summary.append("PATCH COMPLIANCE SUMMARY REPORT")
+    summary.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    summary.append("=" * 60)
+    
+    # TODO: Add executive summary statistics
+    # TODO: Add breakdown by risk level
+    # TODO: Add top 5 highest risk hosts
+    # TODO: Add recommended actions
+    
+    return "\\n".join(summary)
+
+def generate_html_report(hosts):
+    """BONUS: Generate HTML table report.
+    
+    Args:
+        hosts: All hosts with risk data
+        
+    Returns:
+        str: HTML formatted report
+    """
+    # TODO: Create HTML table with styling
+    html = "<html><head><style>...</style></head><body>"
+    # Build table...
+    html += "</body></html>"
+    return html
+
+# Main execution
+# enriched_hosts = analyze_inventory(hosts)
+# high_risk = get_high_risk_hosts(enriched_hosts)
+# print(generate_text_summary(enriched_hosts, high_risk))`
+        };
+
+        // ==================== STATE MANAGEMENT ====================
+        let completedChallenges = new Set();
+        let currentDataView = 'table';
+
+        // ==================== NAVIGATION ====================
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const section = tab.dataset.section;
+                
+                // Update active tab
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update active section
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById(section).classList.add('active');
+            });
+        });
+
+        // ==================== ACCORDION ====================
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            item.classList.toggle('open');
+        }
+
+        // ==================== HINTS ====================
+        function toggleHint(hintId) {
+            const hint = document.getElementById(hintId);
+            hint.classList.toggle('visible');
+        }
+
+        // ==================== CHECKLIST ====================
+        function toggleCheck(checkbox) {
+            checkbox.classList.toggle('checked');
+            const textSpan = checkbox.nextElementSibling;
+            textSpan.classList.toggle('completed');
+        }
+
+        // ==================== DATA VIEWER ====================
+        function showDataView(view) {
+            currentDataView = view;
+            
+            // Update tabs
+            document.querySelectorAll('.data-viewer-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent.toLowerCase().includes(view)) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            const content = document.getElementById('dataViewerContent');
+            
+            switch(view) {
+                case 'table':
+                    content.innerHTML = generateTableView();
+                    break;
+                case 'json':
+                    content.innerHTML = `<pre class="json-output">${syntaxHighlightJSON(JSON.stringify(hostInventory, null, 2))}</pre>`;
+                    break;
+                case 'csv':
+                    content.innerHTML = `<pre style="color: var(--text-primary); font-size: 0.8rem;">${generateCSV()}</pre>`;
+                    break;
+                case 'stats':
+                    content.innerHTML = generateStatsView();
+                    break;
+            }
+        }
+
+        function generateTableView() {
+            let html = '<table class="data-table"><thead><tr>';
+            html += '<th>Hostname</th><th>OS</th><th>Last Patch</th><th>Criticality</th><th>Environment</th><th>Department</th><th>Tags</th>';
+            html += '</tr></thead><tbody>';
+            
+            hostInventory.forEach(host => {
+                const critClass = `status-${host.criticality === 'critical' ? 'critical' : host.criticality}`;
+                html += `<tr>
+                    <td><code>${host.hostname}</code></td>
+                    <td>${host.os}</td>
+                    <td>${host.last_patch_date}</td>
+                    <td class="${{critClass}}">${host.criticality}</td>
+                    <td>${host.environment}</td>
+                    <td>${host.department}</td>
+                    <td>${host.tags.join(', ') || '-'}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function generateCSV() {
+            let csv = 'hostname,ip_address,os,os_version,last_patch_date,criticality,environment,department,owner,tags\n';
+            hostInventory.forEach(host => {
+                csv += `${host.hostname},${host.ip_address},"${host.os}",${host.os_version},${host.last_patch_date},${host.criticality},${host.environment},${host.department},${host.owner},"${host.tags.join(';')}"\n`;
+            });
+            return csv;
+        }
+
+        function generateStatsView() {
+            const stats = {
+                total: hostInventory.length,
+                byOS: {},
+                byCriticality: { critical: 0, high: 0, medium: 0, low: 0 },
+                byEnvironment: { production: 0, staging: 0, development: 0 },
+                byDepartment: {}
+            };
+            
+            hostInventory.forEach(host => {
+                // OS counts
+                const osKey = host.os.split(' ')[0];
+                stats.byOS[osKey] = (stats.byOS[osKey] || 0) + 1;
+                
+                // Criticality
+                stats.byCriticality[host.criticality]++;
+                
+                // Environment
+                stats.byEnvironment[host.environment]++;
+                
+                // Department
+                stats.byDepartment[host.department] = (stats.byDepartment[host.department] || 0) + 1;
+            });
+            
+            let html = '<div class="reference-grid">';
+            
+            // Total
+            html += `<div class="reference-card"><h4>Total Hosts</h4><p style="font-size: 2rem; color: var(--primary-red); font-weight: 700;">${stats.total}</p></div>`;
+            
+            // Criticality breakdown
+            html += `<div class="reference-card"><h4>By Criticality</h4>`;
+            Object.entries(stats.byCriticality).forEach(([level, count]) => {
+                html += `<p><span class="status-${{level}}">${{level}}:</span> ${{count}}</p>`;
+            });
+            html += '</div>';
+            
+            // Environment breakdown
+            html += `<div class="reference-card"><h4>By Environment</h4>`;
+            Object.entries(stats.byEnvironment).forEach(([env, count]) => {
+                html += `<p>${{env}}: ${{count}}</p>`;
+            });
+            html += '</div>';
+            
+            // OS breakdown
+            html += `<div class="reference-card"><h4>By OS Family</h4>`;
+            Object.entries(stats.byOS).forEach(([os, count]) => {
+                html += `<p>${{os}}: ${{count}}</p>`;
+            });
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        function syntaxHighlightJSON(json) {
+            return json
+                .replace(/("[\w_-]+")\s*:/g, '<span class="json-key">$1</span>:')
+                .replace(/:\s*"([^"]+)"/g, ': <span class="json-string">"$1"</span>')
+                .replace(/:\s*(\d+)/g, ': <span class="json-number">$1</span>')
+                .replace(/:\s*(true|false)/g, ': <span class="json-boolean">$1</span>')
+                .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>');
+        }
+
+        // ==================== DOWNLOAD FUNCTIONS ====================
+        function downloadJSON() {
+            const blob = new Blob([JSON.stringify(hostInventory, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'host_inventory.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadCSV() {
+            const csv = generateCSV();
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'host_inventory.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ==================== SANDBOX ====================
+        function runSandbox() {
+            const code = document.getElementById('sandboxEditor').value;
+            const output = document.getElementById('sandboxOutput');
+            
+            try {
+                // Create a mock Python-like environment for demo
+                output.innerHTML = '<span class="validation-info">⚙️ Simulating Python execution...</span>\n\n';
+                
+                // Simulate output based on the default code
+                if (code.includes('os_counts')) {
+                    const osCounts = {};
+                    hostInventory.forEach(h => {
+                        osCounts[h.os] = (osCounts[h.os] || 0) + 1;
+                    });
+                    
+                    output.innerHTML += '<span class="validation-success">Hosts by Operating System:</span>\n';
+                    Object.entries(osCounts).forEach(([os, count]) => {
+                        output.innerHTML += `  ${{os}}: ${{count}}\n`;
+                    });
+                }
+                
+                output.innerHTML += '\n<span class="validation-success">✓ Execution complete</span>';
+            } catch (e) {
+                output.innerHTML = `<span class="validation-error">Error: ${e.message}</span>`;
+            }
+        }
+
+        function resetSandbox() {
+            document.getElementById('sandboxEditor').value = `# Explore the host inventory data
+# The 'hosts' list is already loaded
+
+# Example: Count hosts by OS
+os_counts = {}
+for host in hosts:
+    os_type = host['os']
+    os_counts[os_type] = os_counts.get(os_type, 0) + 1
+
+print("Hosts by Operating System:")
+for os_name, count in os_counts.items():
+    print(f"  {os_name}: {{count}}")
+
+# Try your own queries below!
+`;
+            document.getElementById('sandboxOutput').innerHTML = '<span class="validation-info">Output will appear here...</span>';
+        }
+
+        // ==================== CHALLENGE FUNCTIONS ====================
+        function loadStarterCode(challengeNum) {
+            const editor = document.getElementById(`challenge${{challengeNum}}Editor`);
+            editor.value = starterCodes[challengeNum];
+        }
+
+        function validateChallenge(challengeNum) {
+            const editor = document.getElementById(`challenge${{challengeNum}}Editor`);
+            const output = document.getElementById(`challenge${{challengeNum}}Output`);
+            const code = editor.value;
+            
+            output.innerHTML = '<span class="validation-info">🔍 Validating your code...</span>\n\n';
+            
+            let passed = true;
+            let messages = [];
+            
+            switch(challengeNum) {
+                case 1:
+                    // Check for json.loads
+                    if (!code.includes('json.loads')) {
+                        messages.push('❌ Missing: Use json.loads() to parse the JSON data');
+                        passed = false;
+                    } else {
+                        messages.push('✓ Found json.loads() for parsing');
+                    }
+                    
+                    // Check for iteration
+                    if (!code.includes('for host in') && !code.includes('for h in')) {
+                        messages.push('❌ Missing: Iterate through hosts with a for loop');
+                        passed = false;
+                    } else {
+                        messages.push('✓ Found host iteration loop');
+                    }
+                    
+                    // Check for set() or unique logic
+                    if (code.includes('set(') || code.includes('set()') || code.includes('unique')) {
+                        messages.push('✓ Found unique OS detection logic');
+                    } else {
+                        messages.push('⚠️ Consider using set() for unique OS types');
+                    }
+                    break;
+                    
+                case 2:
+                    // Check for datetime parsing
+                    if (!code.includes('strptime')) {
+                        messages.push('❌ Missing: Use datetime.strptime() to parse dates');
+                        passed = false;
+                    } else {
+                        messages.push('✓ Found datetime parsing');
+                    }
+                    
+                    // Check for filter functions
+                    if (!code.includes('def filter_by_os')) {
+                        messages.push('❌ Missing: Define filter_by_os function');
+                        passed = false;
+                    } else {
+                        messages.push('✓ Found filter_by_os function');
+                    }
+                    
+                    // Check for list comprehension
+                    if (code.includes('[') && code.includes('for') && code.includes('if')) {
+                        messages.push('✓ Found list comprehension pattern');
+                    } else {
+                        messages.push('⚠️ Consider using list comprehensions for filtering');
+                    }
+                    break;
+                    
+                case 3:
+                    // Check for scoring logic
+                    if (!code.includes('criticality_scores') && !code.includes("'critical':")) {
+                        messages.push('❌ Missing: Define criticality scoring dictionary');
+                        passed = false;
+                    } else {
+                        messages.push('✓ Found criticality scoring');
+                    }
+                    
+                    // Check for patch age logic
+                    if (!code.includes('> 90') && !code.includes('>90')) {
+                        messages.push('❌ Missing: Check for 90-day patch threshold');
+                        passed = false;
+                    } else {
+                        messages.push('✓ Found patch age thresholds');
+                    }
+                    
+                    // Check for tag handling
+                    if (code.includes('tags') && (code.includes('pci-scope') || code.includes('internet-facing'))) {
+                        messages.push('✓ Found compliance tag scoring');
+                    } else {
+                        messages.push('⚠️ Remember to add points for compliance tags');
+                    }
+                    
+                    // Check for sorting
+                    if (code.includes('sorted(') || code.includes('.sort(')) {
+                        messages.push('✓ Found sorting logic');
+                    } else {
+                        messages.push('⚠️ Remember to sort results by risk score');
+                    }
+                    break;
+                    
+                case 4:
+                    // Check for JSON report
+                    if (!code.includes('json.dumps')) {
+                        messages.push('❌ Missing: Use json.dumps() for JSON report');
+                        passed = false;
+                    } else {
+                        messages.push('✓ Found JSON report generation');
+                    }
+                    
+                    // Check for text summary
+                    if (!code.includes('summary') && !code.includes('SUMMARY')) {
+                        messages.push('⚠️ Consider adding executive summary section');
+                    } else {
+                        messages.push('✓ Found text summary generation');
+                    }
+                    
+                    // Check for datetime in report
+                    if (code.includes('datetime.now()') || code.includes('strftime')) {
+                        messages.push('✓ Found timestamp in report');
+                    } else {
+                        messages.push('⚠️ Add report generation timestamp');
+                    }
+                    
+                    // Bonus: HTML
+                    if (code.includes('<html') || code.includes('<table')) {
+                        messages.push('🌟 BONUS: Found HTML report generation!');
+                    }
+                    break;
+            }
+            
+            messages.forEach(msg => {
+                const className = msg.startsWith('✓') ? 'validation-success' : 
+                                 msg.startsWith('❌') ? 'validation-error' :
+                                 msg.startsWith('🌟') ? 'validation-success' : 'validation-warning';
+                output.innerHTML += `<span class="${{className}}">${{msg}}</span>\n`;
+            });
+            
+            if (passed) {
+                output.innerHTML += '\n<span class="validation-success">🎉 Challenge validation passed!</span>';
+                markChallengeComplete(challengeNum);
+            } else {
+                output.innerHTML += '\n<span class="validation-error">Some requirements not met. Keep working!</span>';
+            }
+        }
+
+        function markChallengeComplete(num) {
+            completedChallenges.add(num);
+            const card = document.getElementById(`challenge${{num}}`);
+            card.classList.add('completed');
+            
+            updateProgress();
+            
+            // Show modal
+            const modal = document.getElementById('completionModal');
+            const message = document.getElementById('modalMessage');
+            
+            const messages = {
+                1: "You've mastered JSON parsing and data exploration!",
+                2: "Excellent filtering and date calculation skills!",
+                3: "Your risk scoring algorithm is ready for production!",
+                4: "🏆 You've built a complete patch management pipeline!"
+            };
+            
+            message.textContent = messages[num];
+            modal.classList.add('visible');
+        }
+
+        function closeModal() {
+            document.getElementById('completionModal').classList.remove('visible');
+        }
+
+        function updateProgress() {
+            const total = 4; // Total challenges
+            const completed = completedChallenges.size;
+            const percent = Math.round((completed / total) * 100);
+            
+            document.getElementById('progressPercent').textContent = `${{percent}}%`;
+            document.getElementById('progressFill').style.width = `${{percent}}%`;
+            
+            // Update nav tabs
+            completedChallenges.forEach(num => {
+                const tabs = document.querySelectorAll('.nav-tab');
+                if (tabs[3]) { // Challenges tab
+                    tabs[3].classList.add('completed');
+                }
+            });
+        }
+
+        // ==================== REFERENCE TABS ====================
+        function showRefTab(tabId) {
+            document.querySelectorAll('.content-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent.toLowerCase().includes(tabId.replace('ref-', ''))) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll('.tab-content-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Fix reference tab clicks
+        document.querySelectorAll('.content-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabText = this.textContent.toLowerCase().trim();
+                const tabMap = {
+                    'json': 'ref-json',
+                    'datetime': 'ref-datetime',
+                    'dictionaries': 'ref-dict',
+                    'list comprehensions': 'ref-list',
+                    'sorting': 'ref-sort'
+                };
+                
+                if (tabMap[tabText]) {
+                    document.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    document.querySelectorAll('.tab-content-panel').forEach(p => p.classList.remove('active'));
+                    document.getElementById(tabMap[tabText]).classList.add('active');
+                }
+            });
+        });
+
+        // ==================== COPY PROMPTS ====================
+        function copyPrompt(promptId) {
+            const promptEl = document.getElementById(promptId);
+            const text = promptEl.textContent.replace('📋 Copy', '').trim();
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = promptEl.querySelector('.copy-prompt-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize data viewer
+            showDataView('table');
+            
+            // Initialize sandbox
+            resetSandbox();
+            
+            // Open first accordion by default
+            const firstAccordion = document.querySelector('.accordion-item');
+            if (firstAccordion) {
+                firstAccordion.classList.add('open');
+            }
+        });
+    </script></p></body></html>
