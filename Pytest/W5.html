@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Downloads Organizer - Cybersecurity Python Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Orbitron:wght@700;900&amp;display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cyber-red: #ff0040;
+            --cyber-red-glow: rgba(255, 0, 64, 0.4);
+            --dark-bg: #0a0a0a;
+            --panel-bg: #1a1a1a;
+            --code-bg: #121212;
+            --border-color: #333;
+            --text-primary: #e0e0e0;
+            --text-secondary: #999;
+            --success-green: #00ff88;
+            --warning-yellow: #ffaa00;
+            --grid-line: rgba(255, 0, 64, 0.1);
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridScroll 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridScroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 2px solid var(--cyber-red);
+            background: linear-gradient(180deg, rgba(26, 26, 26, 0.95) 0%, rgba(10, 10, 10, 0.95) 100%);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--cyber-red);
+            box-shadow: 0 0 20px var(--cyber-red-glow);
+            animation: scanline 3s ease-in-out infinite;
+        }
+
+        @keyframes scanline {
+            0%, 100% { transform: translateX(-100%); opacity: 0; }
+            50% { transform: translateX(100%); opacity: 1; }
+        }
+
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5em;
+            font-weight: 900;
+            color: var(--cyber-red);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px var(--cyber-red-glow);
+            margin-bottom: 10px;
+            animation: glitchTitle 5s infinite;
+        }
+
+        @keyframes glitchTitle {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-1px, 1px); }
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+        }
+
+        .progress-bar {
+            background: var(--panel-bg);
+            height: 30px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyber-red) 0%, #ff4466 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            position: relative;
+            box-shadow: 0 0 20px var(--cyber-red-glow);
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 700;
+            font-size: 0.9em;
+            color: var(--text-primary);
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        nav {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '>';
+            position: absolute;
+            left: 10px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--border-color);
+            border-color: var(--cyber-red);
+            padding-left: 25px;
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.2);
+        }
+
+        .nav-btn:hover::before {
+            opacity: 1;
+            left: 15px;
+        }
+
+        .nav-btn.active {
+            background: var(--cyber-red);
+            color: var(--dark-bg);
+            border-color: var(--cyber-red);
+            box-shadow: 0 0 20px var(--cyber-red-glow);
+            font-weight: 700;
+        }
+
+        .section {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--cyber-red);
+            border-radius: 8px 0 0 8px;
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--cyber-red);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 5px;
+            right: 80px;
+            font-size: 0.7em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: var(--border-color);
+            border: 1px solid var(--cyber-red);
+            color: var(--cyber-red);
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.7em;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .code-block:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: var(--cyber-red);
+            color: var(--dark-bg);
+        }
+
+        .copy-btn.copied {
+            background: var(--success-green);
+            color: var(--dark-bg);
+            border-color: var(--success-green);
+        }
+
+        .code-line {
+            color: var(--text-primary);
+        }
+
+        .code-comment {
+            color: #666;
+        }
+
+        .code-keyword {
+            color: var(--cyber-red);
+        }
+
+        .code-string {
+            color: var(--success-green);
+        }
+
+        .code-function {
+            color: #00aaff;
+        }
+
+        .terminal {
+            background: var(--code-bg);
+            border: 2px solid var(--cyber-red);
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 0.9em;
+            min-height: 200px;
+            margin: 15px 0;
+            box-shadow: 0 0 30px var(--cyber-red-glow);
+            position: relative;
+        }
+
+        .terminal::before {
+            content: 'TERMINAL';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--code-bg);
+            padding: 0 10px;
+            color: var(--cyber-red);
+            font-size: 0.8em;
+            font-weight: 700;
+        }
+
+        .terminal-line {
+            margin: 5px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .terminal-prompt {
+            color: var(--cyber-red);
+            margin-right: 10px;
+        }
+
+        .terminal-output {
+            color: var(--success-green);
+        }
+
+        .terminal-error {
+            color: var(--cyber-red);
+        }
+
+        .file-system {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .file-list {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-item:hover {
+            border-color: var(--cyber-red);
+            box-shadow: 0 0 10px rgba(255, 0, 64, 0.2);
+            transform: translateX(5px);
+        }
+
+        .file-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .folder-structure {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .folder-item {
+            margin-left: 20px;
+            padding: 8px;
+            border-left: 2px solid var(--border-color);
+            margin: 5px 0;
+        }
+
+        .folder-name {
+            color: var(--cyber-red);
+            font-weight: 700;
+        }
+
+        .code-editor {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            min-height: 300px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+        }
+
+        .editor-textarea:focus {
+            outline: none;
+            border-color: var(--cyber-red);
+            box-shadow: 0 0 20px var(--cyber-red-glow);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            background: var(--code-bg);
+            border: 1px solid var(--cyber-red);
+            color: var(--cyber-red);
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--cyber-red);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover {
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--cyber-red-glow);
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-success {
+            border-color: var(--success-green);
+            color: var(--success-green);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-success::before {
+            background: var(--success-green);
+        }
+
+        .challenge-box {
+            background: linear-gradient(135deg, var(--panel-bg) 0%, var(--code-bg) 100%);
+            border: 2px solid var(--cyber-red);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .challenge-box::before {
+            content: '⚡ CHALLENGE';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--panel-bg);
+            padding: 0 10px;
+            color: var(--cyber-red);
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+
+        .hint-box {
+            background: rgba(255, 170, 0, 0.1);
+            border-left: 4px solid var(--warning-yellow);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .hint-box strong {
+            color: var(--warning-yellow);
+        }
+
+        .success-message {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid var(--success-green);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .concept-card {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            border-color: var(--cyber-red);
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .concept-card h3 {
+            color: var(--cyber-red);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .ai-prompt-box {
+            background: linear-gradient(135deg, #1a0a1a 0%, #0a0a1a 100%);
+            border: 1px solid #663399;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .ai-prompt-box::before {
+            content: '🤖 AI ASSISTANT';
+            display: block;
+            color: #9966ff;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--cyber-red);
+            border-bottom-color: var(--cyber-red);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--success-green);
+            font-size: 0.9em;
+        }
+
+        .checkpoint {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .checkpoint.completed {
+            background: var(--success-green);
+            border-color: var(--success-green);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .file-system {
+                grid-template-columns: 1fr;
+            }
+
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            nav {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Help Modal */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .help-modal.show {
+            display: flex;
+        }
+
+        .help-content {
+            background: var(--panel-bg);
+            border: 2px solid var(--cyber-red);
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 50px var(--cyber-red-glow);
+        }
+
+        .help-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--cyber-red);
+            font-size: 2em;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .help-close:hover {
+            color: var(--text-primary);
+        }
+
+        .keyboard-shortcut {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .key {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-size: 0.8em;
+            color: var(--cyber-red);
+        }
+
+        .help-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--cyber-red);
+            border: 2px solid var(--dark-bg);
+            color: var(--dark-bg);
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--cyber-red-glow);
+            transition: all 0.3s ease;
+        }
+
+        .help-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--cyber-red-glow);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--panel-bg), var(--code-bg));
+            border: 2px solid var(--success-green);
+            border-radius: 8px;
+            padding: 15px 20px;
+            min-width: 300px;
+            z-index: 1001;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+            animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 2.5s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast-icon {
+            font-size: 2em;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            color: var(--success-green);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .toast-message {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--code-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cyber-red);
+        }
+    </style>
+</head><body><div class="container"><header>
+<h1>Smart Downloads Organizer</h1>
+<p class="subtitle">File Management &amp; JSON Reports | Week 5 Lab</p>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+<div class="progress-text"><span id="progressText">0%</span> Complete</div>
+</div>
+</header><nav id="navigation"><button class="nav-btn active" data-section="review">Python Review</button> <button class="nav-btn" data-section="concepts">Core Concepts</button> <button class="nav-btn" data-section="simulator">File Simulator</button> <button class="nav-btn" data-section="challenges">Challenges</button> <button class="nav-btn" data-section="ai">AI Integration</button> <button class="nav-btn" data-section="final">Final Project</button></nav><!-- Section 1: Python Review -->
+<div class="section active" id="review">
+<div class="panel">
+<h2 class="panel-title">Python Fundamentals Review</h2>
+<p>Before we dive into file organization, let's quickly review the Python concepts you'll need.</p>
+<div class="tabs"><button class="tab active" data-tab="loops">Loops</button> <button class="tab" data-tab="dictionaries">Dictionaries</button> <button class="tab" data-tab="functions">Functions</button> <button class="tab" data-tab="file-io">File I/O</button></div>
+<div class="tab-content active" id="loops">
+<h3 style="color: var(--cyber-red); margin: 15px 0;">Iterating with For Loops</h3>
+<p>You'll use loops extensively to walk through directories and process files.</p>
+<div class="code-block" data-lang="python"><span class="code-comment"># Basic iteration</span> <span class="code-keyword">for</span> <span class="code-line">file</span> <span class="code-keyword">in</span> <span class="code-line">files:</span> <span class="code-function">print</span>(<span class="code-line">file</span>) <span class="code-comment"># Enumerate for index and value</span> <span class="code-keyword">for</span> <span class="code-line">index, file</span> <span class="code-keyword">in</span> <span class="code-function">enumerate</span>(<span class="code-line">files</span>): <span class="code-function">print</span>(<span class="code-string">f"File {{index}}: {{file}}"</span>) <span class="code-comment"># Iterating over dictionary items</span> <span class="code-keyword">for</span> <span class="code-line">category, count</span> <span class="code-keyword">in</span> <span class="code-line">file_counts.items()</span>: <span class="code-function">print</span>(<span class="code-string">f"{{category}}: {{count}}"</span>)</div>
+</div>
+<div class="tab-content" id="dictionaries">
+<h3 style="color: var(--cyber-red); margin: 15px 0;">Using Dictionaries for Counting</h3>
+<p>Dictionaries are perfect for aggregating file statistics by category.</p>
+<div class="code-block" data-lang="python"><span class="code-comment"># Initialize a counter dictionary</span> <span class="code-line">file_counts</span> = { <span class="code-string">"documents"</span>: <span class="code-line">0</span>, <span class="code-string">"images"</span>: <span class="code-line">0</span>, <span class="code-string">"archives"</span>: <span class="code-line">0</span>, <span class="code-string">"executables"</span>: <span class="code-line">0</span>, <span class="code-string">"other"</span>: <span class="code-line">0</span> } <span class="code-comment"># Increment counts</span> <span class="code-line">file_counts</span>[<span class="code-string">"documents"</span>] += <span class="code-line">1</span> <span class="code-comment"># Get with default value</span> <span class="code-line">count</span> = <span class="code-line">file_counts</span>.<span class="code-function">get</span>(<span class="code-string">"videos"</span>, <span class="code-line">0</span>)</div>
+</div>
+<div class="tab-content" id="functions">
+<h3 style="color: var(--cyber-red); margin: 15px 0;">Breaking Code into Functions</h3>
+<p>Functions help organize your code into reusable, testable components.</p>
+<div class="code-block" data-lang="python"><span class="code-comment"># Function to categorize files</span> <span class="code-keyword">def</span> <span class="code-function">get_file_category</span>(<span class="code-line">filename</span>): <span class="code-line">extension</span> = <span class="code-line">filename</span>.<span class="code-function">split</span>(<span class="code-string">"."</span>)[<span class="code-line">-1</span>].<span class="code-function">lower</span>() <span class="code-keyword">if</span> <span class="code-line">extension</span> <span class="code-keyword">in</span> [<span class="code-string">"pdf"</span>, <span class="code-string">"docx"</span>, <span class="code-string">"txt"</span>]: <span class="code-keyword">return</span> <span class="code-string">"documents"</span> <span class="code-keyword">elif</span> <span class="code-line">extension</span> <span class="code-keyword">in</span> [<span class="code-string">"jpg"</span>, <span class="code-string">"png"</span>, <span class="code-string">"gif"</span>]: <span class="code-keyword">return</span> <span class="code-string">"images"</span> <span class="code-keyword">else</span>: <span class="code-keyword">return</span> <span class="code-string">"other"</span> <span class="code-comment"># Using the function</span> <span class="code-line">category</span> = <span class="code-function">get_file_category</span>(<span class="code-string">"report.pdf"</span>)</div>
+</div>
+<div class="tab-content" id="file-io">
+<h3 style="color: var(--cyber-red); margin: 15px 0;">Writing Reports to Files</h3>
+<p>You'll write both JSON and text reports summarizing the organization.</p>
+<div class="code-block" data-lang="python"><span class="code-keyword">import</span> <span class="code-line">json</span> <span class="code-comment"># Writing JSON</span> <span class="code-line">data</span> = {<span class="code-string">"total_files"</span>: <span class="code-line">42</span>, <span class="code-string">"organized"</span>: <span class="code-line">38</span>} <span class="code-keyword">with</span> <span class="code-function">open</span>(<span class="code-string">"report.json"</span>, <span class="code-string">"w"</span>) <span class="code-keyword">as</span> <span class="code-line">f</span>: <span class="code-line">json</span>.<span class="code-function">dump</span>(<span class="code-line">data</span>, <span class="code-line">f</span>, <span class="code-line">indent=4</span>) <span class="code-comment"># Writing text report</span> <span class="code-keyword">with</span> <span class="code-function">open</span>(<span class="code-string">"report.txt"</span>, <span class="code-string">"w"</span>) <span class="code-keyword">as</span> <span class="code-line">f</span>: <span class="code-line">f</span>.<span class="code-function">write</span>(<span class="code-string">"File Organization Report\n"</span>) <span class="code-line">f</span>.<span class="code-function">write</span>(<span class="code-string">f"Total files: {data['total_files']}\n"</span>)</div>
+</div>
+</div>
+<div class="panel">
+<h2 class="panel-title">Quick Check</h2>
+<p>Test your understanding before moving forward:</p>
+<div class="challenge-box">
+<p><strong>Question:</strong> What data structure would you use to count files by category?</p>
+<div class="btn-group"><button class="btn" onclick="checkAnswer(1, false)"><span>List</span></button> <button class="btn" onclick="checkAnswer(1, true)"><span>Dictionary</span></button> <button class="btn" onclick="checkAnswer(1, false)"><span>Tuple</span></button></div>
+<div class="success-message" id="success1">✓ Correct! Dictionaries let you map categories (keys) to counts (values).</div>
+</div>
+</div>
+</div>
+<!-- Section 2: Core Concepts -->
+<div class="section" id="concepts">
+<div class="panel">
+<h2 class="panel-title">File System Operations</h2>
+<div class="concept-grid">
+<div class="concept-card">
+<h3>📁 os Module</h3>
+<p>Legacy module for file operations. Still widely used.</p>
+<div class="code-block" data-lang="python"><span class="code-keyword">import</span> <span class="code-line">os</span> <span class="code-comment"># List files</span> <span class="code-line">files</span> = <span class="code-line">os</span>.<span class="code-function">listdir</span>(<span class="code-string">"downloads"</span>) <span class="code-comment"># Check if path exists</span> <span class="code-keyword">if</span> <span class="code-line">os</span>.<span class="code-function">path</span>.<span class="code-function">exists</span>(<span class="code-string">"folder"</span>): <span class="code-function">print</span>(<span class="code-string">"Found it!"</span>) <span class="code-comment"># Create directory</span> <span class="code-line">os</span>.<span class="code-function">makedirs</span>(<span class="code-string">"organized"</span>, <span class="code-line">exist_ok=True</span>)</div>
+</div>
+<div class="concept-card">
+<h3>🛤️ pathlib Module</h3>
+<p>Modern, object-oriented path handling (recommended).</p>
+<div class="code-block" data-lang="python"><span class="code-keyword">from</span> <span class="code-line">pathlib</span> <span class="code-keyword">import</span> <span class="code-line">Path</span> <span class="code-comment"># Create Path object</span> <span class="code-line">downloads</span> = <span class="code-function">Path</span>(<span class="code-string">"downloads"</span>) <span class="code-comment"># Iterate over files</span> <span class="code-keyword">for</span> <span class="code-line">file</span> <span class="code-keyword">in</span> <span class="code-line">downloads</span>.<span class="code-function">iterdir</span>(): <span class="code-function">print</span>(<span class="code-line">file</span>.<span class="code-line">name</span>) <span class="code-comment"># Get extension</span> <span class="code-line">ext</span> = <span class="code-line">file</span>.<span class="code-line">suffix</span> <span class="code-comment"># Returns ".pdf"</span></div>
+</div>
+<div class="concept-card">
+<h3>🔄 Moving Files Safely</h3>
+<p>Use shutil for reliable file operations.</p>
+<div class="code-block" data-lang="python"><span class="code-keyword">import</span> <span class="code-line">shutil</span> <span class="code-keyword">from</span> <span class="code-line">pathlib</span> <span class="code-keyword">import</span> <span class="code-line">Path</span> <span class="code-line">source</span> = <span class="code-function">Path</span>(<span class="code-string">"downloads/file.pdf"</span>) <span class="code-line">dest</span> = <span class="code-function">Path</span>(<span class="code-string">"documents/file.pdf"</span>) <span class="code-comment"># Move file</span> <span class="code-line">shutil</span>.<span class="code-function">move</span>(<span class="code-function">str</span>(<span class="code-line">source</span>), <span class="code-function">str</span>(<span class="code-line">dest</span>)) <span class="code-comment"># Copy instead</span> <span class="code-line">shutil</span>.<span class="code-function">copy2</span>(<span class="code-function">str</span>(<span class="code-line">source</span>), <span class="code-function">str</span>(<span class="code-line">dest</span>))</div>
+</div>
+<div class="concept-card">
+<h3>🎯 Extension Handling</h3>
+<p>Handle edge cases: uppercase, no extension, multiple dots.</p>
+<div class="code-block" data-lang="python"><span class="code-keyword">from</span> <span class="code-line">pathlib</span> <span class="code-keyword">import</span> <span class="code-line">Path</span> <span class="code-keyword">def</span> <span class="code-function">get_extension</span>(<span class="code-line">filename</span>): <span class="code-line">path</span> = <span class="code-function">Path</span>(<span class="code-line">filename</span>) <span class="code-line">ext</span> = <span class="code-line">path</span>.<span class="code-line">suffix</span>.<span class="code-function">lower</span>() <span class="code-comment"># .PDF -&gt; .pdf</span> <span class="code-keyword">return</span> <span class="code-line">ext</span>[<span class="code-line">1</span>:] <span class="code-keyword">if</span> <span class="code-line">ext</span> <span class="code-keyword">else</span> <span class="code-string">""</span> <span class="code-comment"># Examples</span> <span class="code-function">get_extension</span>(<span class="code-string">"report.PDF"</span>) <span class="code-comment"># "pdf"</span> <span class="code-function">get_extension</span>(<span class="code-string">"README"</span>) <span class="code-comment"># ""</span> <span class="code-function">get_extension</span>(<span class="code-string">"file.tar.gz"</span>) <span class="code-comment"># "gz"</span></div>
+</div>
+</div>
+</div>
+<div class="panel">
+<h2 class="panel-title">Categorization Strategy</h2>
+<p>Design your mapping from file extensions to categories:</p>
+<div class="code-block" data-lang="python"><span class="code-comment"># Category mapping dictionary</span> <span class="code-line">CATEGORIES</span> = { <span class="code-string">"documents"</span>: [<span class="code-string">"pdf"</span>, <span class="code-string">"doc"</span>, <span class="code-string">"docx"</span>, <span class="code-string">"txt"</span>, <span class="code-string">"rtf"</span>, <span class="code-string">"odt"</span>], <span class="code-string">"images"</span>: [<span class="code-string">"jpg"</span>, <span class="code-string">"jpeg"</span>, <span class="code-string">"png"</span>, <span class="code-string">"gif"</span>, <span class="code-string">"bmp"</span>, <span class="code-string">"svg"</span>, <span class="code-string">"webp"</span>], <span class="code-string">"archives"</span>: [<span class="code-string">"zip"</span>, <span class="code-string">"tar"</span>, <span class="code-string">"gz"</span>, <span class="code-string">"rar"</span>, <span class="code-string">"7z"</span>], <span class="code-string">"executables"</span>: [<span class="code-string">"exe"</span>, <span class="code-string">"msi"</span>, <span class="code-string">"bat"</span>, <span class="code-string">"sh"</span>, <span class="code-string">"app"</span>], <span class="code-string">"videos"</span>: [<span class="code-string">"mp4"</span>, <span class="code-string">"avi"</span>, <span class="code-string">"mkv"</span>, <span class="code-string">"mov"</span>, <span class="code-string">"wmv"</span>], <span class="code-string">"audio"</span>: [<span class="code-string">"mp3"</span>, <span class="code-string">"wav"</span>, <span class="code-string">"flac"</span>, <span class="code-string">"aac"</span>, <span class="code-string">"ogg"</span>] } <span class="code-keyword">def</span> <span class="code-function">categorize_file</span>(<span class="code-line">filename</span>): <span class="code-line">ext</span> = <span class="code-function">get_extension</span>(<span class="code-line">filename</span>) <span class="code-keyword">for</span> <span class="code-line">category, extensions</span> <span class="code-keyword">in</span> <span class="code-line">CATEGORIES</span>.<span class="code-function">items</span>(): <span class="code-keyword">if</span> <span class="code-line">ext</span> <span class="code-keyword">in</span> <span class="code-line">extensions</span>: <span class="code-keyword">return</span> <span class="code-line">category</span> <span class="code-keyword">return</span> <span class="code-string">"other"</span> <span class="code-comment"># Default for unknown types</span></div>
+<div class="hint-box"><strong>💡 Security Consideration:</strong> In a real-world scenario, be extra careful with executables. Consider quarantining suspicious files or adding hash verification. As cybersecurity professionals, always validate file types beyond just extensions!</div>
+</div>
+<div class="panel">
+<h2 class="panel-title">JSON Report Generation</h2>
+<p>Create structured reports that can be parsed by other tools:</p>
+<div class="code-block" data-lang="python"><span class="code-keyword">import</span> <span class="code-line">json</span> <span class="code-keyword">from</span> <span class="code-line">datetime</span> <span class="code-keyword">import</span> <span class="code-line">datetime</span> <span class="code-keyword">def</span> <span class="code-function">generate_json_report</span>(<span class="code-line">file_counts, total_files, source_dir</span>): <span class="code-line">report</span> = { <span class="code-string">"timestamp"</span>: <span class="code-line">datetime</span>.<span class="code-function">now</span>().<span class="code-function">isoformat</span>(), <span class="code-string">"source_directory"</span>: <span class="code-line">source_dir</span>, <span class="code-string">"total_files"</span>: <span class="code-line">total_files</span>, <span class="code-string">"categories"</span>: <span class="code-line">file_counts</span>, <span class="code-string">"organized"</span>: <span class="code-function">sum</span>(<span class="code-line">file_counts</span>.<span class="code-function">values</span>()) } <span class="code-keyword">with</span> <span class="code-function">open</span>(<span class="code-string">"organization_report.json"</span>, <span class="code-string">"w"</span>) <span class="code-keyword">as</span> <span class="code-line">f</span>: <span class="code-line">json</span>.<span class="code-function">dump</span>(<span class="code-line">report</span>, <span class="code-line">f</span>, <span class="code-line">indent=4</span>) <span class="code-keyword">return</span> <span class="code-line">report</span> <span class="code-comment"># Example output</span> <span class="code-string">""" { "timestamp": "2024-01-15T10:30:00", "source_directory": "/home/user/downloads", "total_files": 142, "categories": { "documents": 45, "images": 67, "archives": 12, "executables": 3, "other": 15 }, "organized": 142 } """</span></div>
+</div>
+</div>
+<!-- Section 3: File Simulator -->
+<div class="section" id="simulator">
+<div class="panel">
+<h2 class="panel-title">Interactive File System Simulator</h2>
+<p>Practice organizing files in a safe, simulated environment. Click "Generate Files" to start!</p>
+<div class="btn-group"><button class="btn" onclick="generateFiles()"><span>🎲 Generate Files</span></button> <button class="btn btn-success" onclick="organizeFiles()"><span>📁 Organize Files</span></button> <button class="btn" onclick="resetSimulator()"><span>🔄 Reset</span></button></div>
+<div class="file-system">
+<div>
+<h3 style="color: var(--cyber-red); margin-bottom: 10px;">📥 Downloads Folder</h3>
+<div class="file-list" id="downloadsList">
+<p style="color: var(--text-secondary);">Click "Generate Files" to populate</p>
+</div>
+</div>
+<div>
+<h3 style="color: var(--cyber-red); margin-bottom: 10px;">📂 Organized Structure</h3>
+<div class="folder-structure" id="organizedStructure">
+<p style="color: var(--text-secondary);">Click "Organize Files" to see results</p>
+</div>
+</div>
+</div>
+<div class="terminal" id="simulatorTerminal">
+<div class="terminal-line"><span class="terminal-prompt">&gt;&gt;&gt;</span> <span>Simulator ready. Awaiting commands...</span></div>
+</div>
+</div>
+<div class="panel">
+<h2 class="panel-title">Try It Yourself</h2>
+<p>Write code to categorize a file based on its extension:</p>
+<div class="code-editor"><textarea class="editor-textarea" id="categorizerCode" placeholder="# Write your categorize_file() function here...
+def categorize_file(filename):
+    # Your code here
+    pass">def categorize_file(filename):
+    # Extract extension
+    ext = filename.split('.')[-1].lower()
+    
+    # Define categories
+    if ext in ['pdf', 'doc', 'docx', 'txt']:
+        return 'documents'
+    elif ext in ['jpg', 'jpeg', 'png', 'gif']:
+        return 'images'
+    elif ext in ['zip', 'tar', 'gz', 'rar']:
+        return 'archives'
+    elif ext in ['exe', 'msi', 'bat']:
+        return 'executables'
+    else:
+        return 'other'</textarea>
+<div class="btn-group"><button class="btn btn-success" onclick="testCategorizer()"><span>▶ Test Code</span></button></div>
+</div>
+<div class="terminal" id="categorizerOutput">
+<div class="terminal-line"><span class="terminal-prompt">&gt;&gt;&gt;</span> <span>Test output will appear here...</span></div>
+</div>
+</div>
+</div>
+<!-- Section 4: Challenges -->
+<div class="section" id="challenges">
+<div class="panel">
+<h2 class="panel-title">Coding Challenges</h2>
+<div class="challenge-box">
+<h3 style="color: var(--text-primary); margin: 15px 0;">Challenge 1: Extension Handler</h3>
+<p>Write a function that safely extracts file extensions, handling edge cases:</p>
+<ul>
+<li>Uppercase extensions (FILE.PDF → pdf)</li>
+<li>No extension (README → "")</li>
+<li>Multiple dots (archive.tar.gz → gz)</li>
+</ul>
+<div class="code-editor"><textarea class="editor-textarea" id="challenge1Code" placeholder="def get_extension(filename):
+    # Your code here
+    pass"># Write your solution here
+def get_extension(filename):
+    if '.' not in filename:
+        return ""
+    return filename.split('.')[-1].lower()</textarea>
+<div class="btn-group"><button class="btn btn-success" onclick="testChallenge(1)"><span>▶ Test Solution</span></button></div>
+</div>
+<div class="terminal" id="challenge1Output"></div>
+<div class="success-message" id="challenge1Success">🎉 Challenge 1 Complete! You've mastered extension handling.</div>
+</div>
+<div class="challenge-box">
+<h3 style="color: var(--text-primary); margin: 15px 0;">Challenge 2: File Counter</h3>
+<p>Create a function that counts files by category from a list of filenames:</p>
+<div class="code-editor"><textarea class="editor-textarea" id="challenge2Code" placeholder="def count_by_category(filenames):
+    # Your code here
+    pass"># Write your solution here
+def count_by_category(filenames):
+    counts = {
+        "documents": 0,
+        "images": 0,
+        "archives": 0,
+        "executables": 0,
+        "other": 0
+    }
+    
+    for filename in filenames:
+        category = categorize_file(filename)
+        counts[category] += 1
+    
+    return counts</textarea>
+<div class="btn-group"><button class="btn btn-success" onclick="testChallenge(2)"><span>▶ Test Solution</span></button></div>
+</div>
+<div class="terminal" id="challenge2Output"></div>
+<div class="success-message" id="challenge2Success">🎉 Challenge 2 Complete! You've mastered file counting with dictionaries.</div>
+</div>
+<div class="challenge-box">
+<h3 style="color: var(--text-primary); margin: 15px 0;">Challenge 3: Report Generator</h3>
+<p>Generate a formatted text report from file statistics:</p>
+<div class="hint-box"><strong>💡 Hint:</strong> Use string formatting and loops to create a clean, readable report. Consider calculating percentages for each category.</div>
+<div class="code-editor"><textarea class="editor-textarea" id="challenge3Code" placeholder="def generate_text_report(file_counts, total_files):
+    # Your code here
+    pass"># Write your solution here
+def generate_text_report(file_counts, total_files):
+    report = "FILE ORGANIZATION REPORT\n"
+    report += "=" * 40 + "\n\n"
+    report += f"Total Files: {total_files}\n\n"
+    
+    for category, count in file_counts.items():
+        percentage = (count / total_files * 100) if total_files &gt; 0 else 0
+        report += f"{category.upper()}: {{count}} ({percentage:.1f}%)\n"
+    
+    return report</textarea>
+<div class="btn-group"><button class="btn btn-success" onclick="testChallenge(3)"><span>▶ Test Solution</span></button></div>
+</div>
+<div class="terminal" id="challenge3Output"></div>
+<div class="success-message" id="challenge3Success">🎉 Challenge 3 Complete! You've mastered report generation.</div>
+</div>
+</div>
+</div>
+<!-- Section 5: AI Integration -->
+<div class="section" id="ai">
+<div class="panel">
+<h2 class="panel-title">Using AI as Your Coding Partner</h2>
+<p>Learn how to effectively use AI tools to enhance your development workflow.</p>
+<div class="concept-grid">
+<div class="concept-card">
+<h3>🤖 Brainstorming Algorithms</h3>
+<p><strong>Prompt Template:</strong></p>
+<div class="ai-prompt-box">"I need to organize downloaded files into categories. Can you help me break down the algorithm step by step? The script should:
+<ul>
+<li>Read files from a directory</li>
+<li>Categorize by extension</li>
+<li>Create organized folders</li>
+<li>Move files safely</li>
+<li>Generate a report</li>
+</ul>
+What's the best approach?"</div>
+</div>
+<div class="concept-card">
+<h3>🔍 Code Review &amp; Refactoring</h3>
+<p><strong>Prompt Template:</strong></p>
+<div class="ai-prompt-box">"Please review this file organization code and suggest improvements for:
+<ul>
+<li>Error handling (missing files, permissions)</li>
+<li>Edge cases (weird filenames, no extensions)</li>
+<li>Code organization (breaking into functions)</li>
+<li>Performance (handling large directories)</li>
+</ul>
+[Paste your code here]"</div>
+</div>
+<div class="concept-card">
+<h3>🐛 Debugging Assistance</h3>
+<p><strong>Prompt Template:</strong></p>
+<div class="ai-prompt-box">"I'm getting this error when organizing files: <code>[Error message]</code> Here's my code: [Paste relevant code] Context: I'm trying to [what you're attempting to do] What's causing this and how can I fix it?"</div>
+</div>
+<div class="concept-card">
+<h3>💡 Best Practices</h3>
+<p><strong>Prompt Template:</strong></p>
+<div class="ai-prompt-box">"What are the security best practices for a Python script that:
+<ul>
+<li>Accesses user directories</li>
+<li>Moves/renames files</li>
+<li>Handles executables</li>
+</ul>
+What validation and error handling should I implement?"</div>
+</div>
+</div>
+</div>
+<div class="panel">
+<h2 class="panel-title">AI Workflow Exercise</h2>
+<p>Practice using AI to improve your directory-walking logic:</p>
+<div class="code-block" data-lang="python"><span class="code-comment"># Original code (has issues)</span> <span class="code-keyword">def</span> <span class="code-function">organize_downloads</span>(): <span class="code-keyword">for</span> <span class="code-line">file</span> <span class="code-keyword">in</span> <span class="code-line">os</span>.<span class="code-function">listdir</span>(<span class="code-string">"downloads"</span>): <span class="code-line">ext</span> = <span class="code-line">file</span>.<span class="code-function">split</span>(<span class="code-string">"."</span>)[<span class="code-line">1</span>] <span class="code-line">category</span> = <span class="code-function">get_category</span>(<span class="code-line">ext</span>) <span class="code-line">os</span>.<span class="code-function">rename</span>(<span class="code-line">file</span>, <span class="code-string">f"{{category}}/{{file}}"</span>)</div>
+<div class="challenge-box">
+<h3 style="color: var(--text-primary); margin: 15px 0;">Task: Use AI to Identify Issues</h3>
+<p>Copy the code above and ask an AI assistant to critique it. What problems does it identify?</p>
+<div class="hint-box"><strong>Issues to look for:</strong>
+<ul>
+<li>No error handling for files without extensions</li>
+<li>Doesn't check if category folder exists</li>
+<li>Hardcoded directory path</li>
+<li>Will fail on files in subdirectories</li>
+<li>No validation before moving files</li>
+</ul>
+</div>
+</div>
+<h3 style="color: var(--cyber-red); margin: 20px 0;">Improved Version:</h3>
+<div class="code-block" data-lang="python"><span class="code-keyword">from</span> <span class="code-line">pathlib</span> <span class="code-keyword">import</span> <span class="code-line">Path</span> <span class="code-keyword">import</span> <span class="code-line">shutil</span> <span class="code-keyword">def</span> <span class="code-function">organize_downloads</span>(<span class="code-line">source_dir</span>): <span class="code-line">source</span> = <span class="code-function">Path</span>(<span class="code-line">source_dir</span>) <span class="code-comment"># Validate source directory exists</span> <span class="code-keyword">if</span> <span class="code-keyword">not</span> <span class="code-line">source</span>.<span class="code-function">exists</span>(): <span class="code-keyword">raise</span> <span class="code-function">FileNotFoundError</span>(<span class="code-string">f"Directory {source_dir} not found"</span>) <span class="code-keyword">for</span> <span class="code-line">file_path</span> <span class="code-keyword">in</span> <span class="code-line">source</span>.<span class="code-function">iterdir</span>(): <span class="code-comment"># Skip directories</span> <span class="code-keyword">if</span> <span class="code-keyword">not</span> <span class="code-line">file_path</span>.<span class="code-function">is_file</span>(): <span class="code-keyword">continue</span> <span class="code-comment"># Get category safely</span> <span class="code-line">category</span> = <span class="code-function">categorize_file</span>(<span class="code-line">file_path</span>.<span class="code-line">name</span>) <span class="code-comment"># Create category folder if needed</span> <span class="code-line">category_dir</span> = <span class="code-line">source</span> / <span class="code-line">category</span> <span class="code-line">category_dir</span>.<span class="code-function">mkdir</span>(<span class="code-line">exist_ok=True</span>) <span class="code-comment"># Move file safely</span> <span class="code-line">destination</span> = <span class="code-line">category_dir</span> / <span class="code-line">file_path</span>.<span class="code-line">name</span> <span class="code-keyword">try</span>: <span class="code-line">shutil</span>.<span class="code-function">move</span>(<span class="code-function">str</span>(<span class="code-line">file_path</span>), <span class="code-function">str</span>(<span class="code-line">destination</span>)) <span class="code-function">print</span>(<span class="code-string">f"Moved: {file_path.name} → {{category}}/"</span>) <span class="code-keyword">except</span> <span class="code-function">Exception</span> <span class="code-keyword">as</span> <span class="code-line">e</span>: <span class="code-function">print</span>(<span class="code-string">f"Error moving {file_path.name}: {{e}}"</span>)</div>
+</div>
+<div class="panel">
+<h2 class="panel-title">Interactive AI Practice</h2>
+<p>Formulate a prompt to get AI help with a specific problem:</p>
+<div class="code-editor"><textarea class="editor-textarea" id="aiPrompt" placeholder="Write your AI prompt here..." style="min-height: 150px;">I'm building a downloads organizer that categorizes files by extension. 
+Can you help me handle these edge cases:
+1. Files with multiple extensions like 'archive.tar.gz'
+2. Files with no extension
+3. Hidden files starting with '.'
+4. Files with special characters in names
+
+Please provide example code with error handling.</textarea>
+<div class="btn-group"><button class="btn" onclick="analyzePrompt()"><span>✨ Analyze Prompt Quality</span></button></div>
+</div>
+<div class="terminal" id="promptFeedback"></div>
+</div>
+</div>
+<!-- Section 6: Final Project -->
+<div class="section" id="final">
+<div class="panel">
+<h2 class="panel-title">Final Project: Complete Organizer</h2>
+<p>Build the complete Smart Downloads Organizer with all features:</p>
+<h3 style="color: var(--cyber-red); margin: 20px 0;">Requirements:</h3>
+<ul>
+<li><span class="checkpoint" id="req1"></span> Use pathlib for all file operations</li>
+<li><span class="checkpoint" id="req2"></span> Categorize files by extension (documents, images, archives, executables, other)</li>
+<li><span class="checkpoint" id="req3"></span> Handle edge cases (no extension, uppercase, multiple dots)</li>
+<li><span class="checkpoint" id="req4"></span> Create category folders if they don't exist</li>
+<li><span class="checkpoint" id="req5"></span> Safely move files with error handling</li>
+<li><span class="checkpoint" id="req6"></span> Generate JSON report with statistics</li>
+<li><span class="checkpoint" id="req7"></span> Generate human-readable text report</li>
+<li><span class="checkpoint" id="req8"></span> Accept directory path as command-line argument</li>
+</ul>
+<h3 style="color: var(--cyber-red); margin: 20px 0;">Starter Template:</h3>
+<div class="code-block" data-lang="python"><span class="code-comment">#!/usr/bin/env python3</span> <span class="code-string">""" Smart Downloads Organizer Automatically categorizes and organizes files by type Generates JSON and text reports """</span> <span class="code-keyword">from</span> <span class="code-line">pathlib</span> <span class="code-keyword">import</span> <span class="code-line">Path</span> <span class="code-keyword">import</span> <span class="code-line">shutil</span> <span class="code-keyword">import</span> <span class="code-line">json</span> <span class="code-keyword">from</span> <span class="code-line">datetime</span> <span class="code-keyword">import</span> <span class="code-line">datetime</span> <span class="code-keyword">import</span> <span class="code-line">sys</span> <span class="code-comment"># Define category mappings</span> <span class="code-line">CATEGORIES</span> = { <span class="code-string">"documents"</span>: [<span class="code-string">"pdf"</span>, <span class="code-string">"doc"</span>, <span class="code-string">"docx"</span>, <span class="code-string">"txt"</span>, <span class="code-string">"rtf"</span>, <span class="code-string">"odt"</span>], <span class="code-string">"images"</span>: [<span class="code-string">"jpg"</span>, <span class="code-string">"jpeg"</span>, <span class="code-string">"png"</span>, <span class="code-string">"gif"</span>, <span class="code-string">"bmp"</span>, <span class="code-string">"svg"</span>], <span class="code-string">"archives"</span>: [<span class="code-string">"zip"</span>, <span class="code-string">"tar"</span>, <span class="code-string">"gz"</span>, <span class="code-string">"rar"</span>, <span class="code-string">"7z"</span>], <span class="code-string">"executables"</span>: [<span class="code-string">"exe"</span>, <span class="code-string">"msi"</span>, <span class="code-string">"bat"</span>, <span class="code-string">"sh"</span>], <span class="code-string">"videos"</span>: [<span class="code-string">"mp4"</span>, <span class="code-string">"avi"</span>, <span class="code-string">"mkv"</span>, <span class="code-string">"mov"</span>], <span class="code-string">"audio"</span>: [<span class="code-string">"mp3"</span>, <span class="code-string">"wav"</span>, <span class="code-string">"flac"</span>, <span class="code-string">"aac"</span>] } <span class="code-keyword">def</span> <span class="code-function">get_extension</span>(<span class="code-line">filename</span>): <span class="code-string">"""Extract and normalize file extension"""</span> <span class="code-comment"># TODO: Implement this function</span> <span class="code-keyword">pass</span> <span class="code-keyword">def</span> <span class="code-function">categorize_file</span>(<span class="code-line">filename</span>): <span class="code-string">"""Determine file category based on extension"""</span> <span class="code-comment"># TODO: Implement this function</span> <span class="code-keyword">pass</span> <span class="code-keyword">def</span> <span class="code-function">organize_directory</span>(<span class="code-line">source_dir</span>): <span class="code-string">"""Main organization logic"""</span> <span class="code-comment"># TODO: Implement file organization</span> <span class="code-keyword">pass</span> <span class="code-keyword">def</span> <span class="code-function">generate_json_report</span>(<span class="code-line">stats, source_dir</span>): <span class="code-string">"""Generate JSON report"""</span> <span class="code-comment"># TODO: Implement JSON report generation</span> <span class="code-keyword">pass</span> <span class="code-keyword">def</span> <span class="code-function">generate_text_report</span>(<span class="code-line">stats</span>): <span class="code-string">"""Generate human-readable text report"""</span> <span class="code-comment"># TODO: Implement text report generation</span> <span class="code-keyword">pass</span> <span class="code-keyword">def</span> <span class="code-function">main</span>(): <span class="code-comment"># Get directory from command line or use default</span> <span class="code-line">source_dir</span> = <span class="code-line">sys</span>.<span class="code-line">argv</span>[<span class="code-line">1</span>] <span class="code-keyword">if</span> <span class="code-function">len</span>(<span class="code-line">sys</span>.<span class="code-line">argv</span>) &gt; <span class="code-line">1</span> <span class="code-keyword">else</span> <span class="code-string">"downloads"</span> <span class="code-function">print</span>(<span class="code-string">f"Organizing files in: {source_dir}"</span>) <span class="code-comment"># TODO: Call your functions here</span> <span class="code-keyword">if</span> <span class="code-line">__name__</span> == <span class="code-string">"__main__"</span>: <span class="code-function">main</span>()</div>
+<div class="hint-box"><strong>💡 Development Tips:</strong>
+<ul>
+<li>Start by implementing and testing each function individually</li>
+<li>Use print statements to debug your file-walking logic</li>
+<li>Test with a small directory first before running on your real downloads</li>
+<li>Use AI to brainstorm your algorithm before coding</li>
+<li>Ask AI to review your code for edge cases</li>
+</ul>
+</div>
+</div>
+<div class="panel">
+<h2 class="panel-title">Testing Your Solution</h2>
+<p>Create a test scenario to validate your organizer:</p>
+<div class="code-block" data-lang="bash"><span class="code-comment"># Create test directory structure</span> mkdir test_downloads cd test_downloads <span class="code-comment"># Create test files</span> touch report.pdf document.docx README.txt touch photo.jpg image.PNG screenshot.gif touch archive.zip backup.tar.gz touch installer.exe script.sh touch noextension FILE.WEIRD <span class="code-comment"># Run your organizer</span> python3 organizer.py test_downloads <span class="code-comment"># Check the results</span> ls -la test_downloads/</div>
+<h3 style="color: var(--cyber-red); margin: 20px 0;">Expected Output Structure:</h3>
+<div class="terminal">
+<div class="terminal-line"><span class="terminal-prompt">$</span> <span>tree test_downloads/</span></div>
+<div class="terminal-line"><span class="terminal-output">test_downloads/</span></div>
+<div class="terminal-line"><span class="terminal-output">├── documents/</span></div>
+<div class="terminal-line"><span class="terminal-output">│ ├── report.pdf</span></div>
+<div class="terminal-line"><span class="terminal-output">│ ├── document.docx</span></div>
+<div class="terminal-line"><span class="terminal-output">│ └── README.txt</span></div>
+<div class="terminal-line"><span class="terminal-output">├── images/</span></div>
+<div class="terminal-line"><span class="terminal-output">│ ├── photo.jpg</span></div>
+<div class="terminal-line"><span class="terminal-output">│ ├── image.PNG</span></div>
+<div class="terminal-line"><span class="terminal-output">│ └── screenshot.gif</span></div>
+<div class="terminal-line"><span class="terminal-output">├── archives/</span></div>
+<div class="terminal-line"><span class="terminal-output">│ ├── archive.zip</span></div>
+<div class="terminal-line"><span class="terminal-output">│ └── backup.tar.gz</span></div>
+<div class="terminal-line"><span class="terminal-output">├── executables/</span></div>
+<div class="terminal-line"><span class="terminal-output">│ ├── installer.exe</span></div>
+<div class="terminal-line"><span class="terminal-output">│ └── script.sh</span></div>
+<div class="terminal-line"><span class="terminal-output">├── other/</span></div>
+<div class="terminal-line"><span class="terminal-output">│ ├── noextension</span></div>
+<div class="terminal-line"><span class="terminal-output">│ └── FILE.WEIRD</span></div>
+<div class="terminal-line"><span class="terminal-output">├── organization_report.json</span></div>
+<div class="terminal-line"><span class="terminal-output">└── organization_report.txt</span></div>
+</div>
+</div>
+<div class="panel">
+<h2 class="panel-title">Submission Checklist</h2>
+<p>Before submitting your project, verify:</p>
+<ul>
+<li><input type="checkbox"> Code includes comprehensive comments</li>
+<li><input type="checkbox"> All functions have docstrings</li>
+<li><input type="checkbox"> Edge cases are handled (no extension, uppercase, etc.)</li>
+<li><input type="checkbox"> Error handling is implemented</li>
+<li><input type="checkbox"> JSON report includes timestamp and statistics</li>
+<li><input type="checkbox"> Text report is human-readable and formatted</li>
+<li><input type="checkbox"> Code works with command-line arguments</li>
+<li><input type="checkbox"> You can explain your algorithm design choices</li>
+<li><input type="checkbox"> You've used AI to review and improve your code</li>
+</ul>
+<div class="hint-box"><strong>🎯 Grading Criteria:</strong>
+<ul>
+<li><strong>Functionality (40%):</strong> Does it organize files correctly?</li>
+<li><strong>Code Quality (30%):</strong> Clean, readable, well-commented?</li>
+<li><strong>Error Handling (15%):</strong> Handles edge cases gracefully?</li>
+<li><strong>Reports (15%):</strong> JSON and text reports are accurate and formatted?</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<!-- Help Modal -->
+<div class="help-modal" id="helpModal">
+<div class="help-content"><button class="help-close" onclick="toggleHelp()">×</button>
+<h2 style="color: var(--cyber-red); margin-bottom: 20px;">⌨️ Keyboard Shortcuts &amp; Help</h2>
+<h3 style="color: var(--text-primary); margin-top: 20px;">Navigation</h3>
+<div class="keyboard-shortcut"><span>Previous Section</span> <span class="key">←</span></div>
+<div class="keyboard-shortcut"><span>Next Section</span> <span class="key">→</span></div>
+<div class="keyboard-shortcut"><span>Close Modal/Help</span> <span class="key">ESC</span></div>
+<div class="keyboard-shortcut"><span>Show/Hide Help</span> <span class="key">?</span></div>
+<h3 style="color: var(--text-primary); margin-top: 20px;">Features</h3>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>Hover over code blocks to see the <strong style="color: var(--cyber-red);">Copy</strong> button</li>
+<li>Your progress is automatically saved in localStorage</li>
+<li>Complete challenges to unlock achievement badges</li>
+<li>Test your code in the interactive simulators</li>
+<li>Use AI prompts to enhance your learning</li>
+</ul>
+<h3 style="color: var(--text-primary); margin-top: 20px;">Tips</h3>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>Complete sections in order for the best learning experience</li>
+<li>Experiment with the file simulator before writing code</li>
+<li>Use the AI section to learn effective prompting techniques</li>
+<li>Check your progress bar at the top to track completion</li>
+</ul>
+<h3 style="color: var(--text-primary); margin-top: 20px;">About</h3>
+<p style="margin-top: 10px;">This interactive lab teaches Python file organization through hands-on practice, simulations, and AI-assisted learning. Perfect for cybersecurity students learning automation and scripting.</p>
+</div>
+</div>
+<!-- Help Button -->
+<p><button class="help-btn" onclick="toggleHelp()">?</button> <script>
+        // Track progress
+        let completedSections = new Set();
+        const totalSections = 6;
+
+        // Load progress from localStorage
+        function loadProgress() {
+            const saved = localStorage.getItem('downloadsOrganizerProgress');
+            if (saved) {
+                completedSections = new Set(JSON.parse(saved));
+                updateProgress();
+            }
+        }
+
+        // Toggle help modal
+        function toggleHelp() {
+            const modal = document.getElementById('helpModal');
+            modal.classList.toggle('show');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Close modal on ESC
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('helpModal');
+                if (modal.classList.contains('show')) {
+                    toggleHelp();
+                }
+            }
+            
+            // Show help on ?
+            if (e.key === '?' && !e.target.matches('input, textarea')) {
+                e.preventDefault();
+                toggleHelp();
+            }
+
+            // Navigate sections with arrow keys
+            if (!e.target.matches('input, textarea')) {
+                const sections = ['review', 'concepts', 'simulator', 'challenges', 'ai', 'final'];
+                const currentSection = document.querySelector('.section.active').id;
+                const currentIndex = sections.indexOf(currentSection);
+
+                if (e.key === 'ArrowRight' && currentIndex < sections.length - 1) {
+                    const nextBtn = document.querySelector(`[data-section="${sections[currentIndex + 1]}"]`);
+                    if (nextBtn) nextBtn.click();
+                } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                    const prevBtn = document.querySelector(`[data-section="${sections[currentIndex - 1]}"]`);
+                    if (prevBtn) prevBtn.click();
+                }
+            }
+        });
+
+        // Add copy buttons to code blocks
+        function addCopyButtons() {
+            document.querySelectorAll('.code-block').forEach(block => {
+                if (!block.querySelector('.copy-btn')) {
+                    const button = document.createElement('button');
+                    button.className = 'copy-btn';
+                    button.textContent = 'Copy';
+                    button.onclick = function() {
+                        const code = block.textContent.replace('Copy', '').replace(/python|bash|json/i, '').trim();
+                        navigator.clipboard.writeText(code).then(() => {
+                            button.textContent = '✓ Copied!';
+                            button.classList.add('copied');
+                            setTimeout(() => {
+                                button.textContent = 'Copy';
+                                button.classList.remove('copied');
+                            }, 2000);
+                        });
+                    };
+                    block.style.position = 'relative';
+                    block.appendChild(button);
+                }
+            });
+        }
+
+        // Show achievement toast
+        function showToast(title, message, icon = '🎉') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon">${{icon}}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${{title}}</div>
+                    <div class="toast-message">${{message}}</div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Save progress to localStorage
+        function saveProgress() {
+            localStorage.setItem('downloadsOrganizerProgress', JSON.stringify([...completedSections]));
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const percentage = (completedSections.size / totalSections) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = Math.round(percentage) + '%';
+            
+            // Celebration when 100% complete
+            if (percentage === 100 && !localStorage.getItem('celebrationShown')) {
+                setTimeout(() => {
+                    showToast('🎊 Congratulations!', 'You\'ve completed all sections!', '🎉');
+                    localStorage.setItem('celebrationShown', 'true');
+                }, 500);
+            }
+            
+            saveProgress();
+        }
+
+        // Mark section as complete
+        function markSectionComplete(sectionId) {
+            completedSections.add(sectionId);
+            updateProgress();
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetSection = this.dataset.section;
+                
+                // Update nav buttons
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update sections
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById(targetSection).classList.add('active');
+                
+                // Mark previous section as complete
+                const allSections = ['review', 'concepts', 'simulator', 'challenges', 'ai', 'final'];
+                const currentIndex = allSections.indexOf(targetSection);
+                if (currentIndex > 0) {
+                    markSectionComplete(allSections[currentIndex - 1]);
+                }
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetTab = this.dataset.tab;
+                const parent = this.closest('.panel');
+                
+                parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                parent.querySelector('#' + targetTab).classList.add('active');
+            });
+        });
+
+        // File simulator
+        const sampleFiles = [
+            'report.pdf', 'presentation.pptx', 'budget.xlsx', 'notes.txt',
+            'photo.jpg', 'screenshot.PNG', 'diagram.svg', 'banner.gif',
+            'backup.zip', 'archive.tar.gz', 'files.rar',
+            'installer.exe', 'setup.msi', 'script.sh',
+            'video.mp4', 'song.mp3', 'noextension', 'UPPERCASE.PDF'
+        ];
+
+        let simulatedFiles = [];
+
+        function generateFiles() {
+            simulatedFiles = [...sampleFiles].sort(() => Math.random() - 0.5).slice(0, 12);
+            const downloadsList = document.getElementById('downloadsList');
+            downloadsList.innerHTML = '';
+            
+            simulatedFiles.forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                const icon = getFileIcon(file);
+                item.innerHTML = `<span class="file-icon">${{icon}}</span><span>${{file}}</span>`;
+                downloadsList.appendChild(item);
+            });
+
+            addToTerminal('simulatorTerminal', `Generated ${simulatedFiles.length} test files`, 'output');
+        }
+
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (['pdf', 'doc', 'docx', 'txt'].includes(ext)) return '📄';
+            if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) return '🖼️';
+            if (['zip', 'tar', 'gz', 'rar'].includes(ext)) return '📦';
+            if (['exe', 'msi', 'sh'].includes(ext)) return '⚙️';
+            if (['mp4', 'avi', 'mkv'].includes(ext)) return '🎬';
+            if (['mp3', 'wav', 'flac'].includes(ext)) return '🎵';
+            return '📎';
+        }
+
+        function organizeFiles() {
+            if (simulatedFiles.length === 0) {
+                addToTerminal('simulatorTerminal', 'ERROR: No files to organize. Click "Generate Files" first.', 'error');
+                return;
+            }
+
+            const categories = {
+                documents: [],
+                images: [],
+                archives: [],
+                executables: [],
+                videos: [],
+                audio: [],
+                other: []
+            };
+
+            simulatedFiles.forEach(file => {
+                const category = categorizeFileSimple(file);
+                categories[category].push(file);
+            });
+
+            // Display organized structure
+            const organizedStructure = document.getElementById('organizedStructure');
+            organizedStructure.innerHTML = '';
+
+            Object.entries(categories).forEach(([category, files]) => {
+                if (files.length > 0) {
+                    const folderDiv = document.createElement('div');
+                    folderDiv.className = 'folder-item';
+                    folderDiv.innerHTML = `<div class="folder-name">📁 ${{category}}/</div>`;
+                    files.forEach(file => {
+                        const fileDiv = document.createElement('div');
+                        fileDiv.style.marginLeft = '20px';
+                        fileDiv.style.color = 'var(--success-green)';
+                        fileDiv.innerHTML = `${getFileIcon(file)} ${{file}}`;
+                        folderDiv.appendChild(fileDiv);
+                    });
+                    organizedStructure.appendChild(folderDiv);
+                }
+            });
+
+            addToTerminal('simulatorTerminal', `Successfully organized ${simulatedFiles.length} files into ${Object.keys(categories).filter(k => categories[k].length > 0).length} categories`, 'output');
+            showToast('Files Organized!', `${simulatedFiles.length} files sorted successfully`, '📁');
+        }
+
+        function resetSimulator() {
+            simulatedFiles = [];
+            document.getElementById('downloadsList').innerHTML = '<p style="color: var(--text-secondary);">Click "Generate Files" to populate</p>';
+            document.getElementById('organizedStructure').innerHTML = '<p style="color: var(--text-secondary);">Click "Organize Files" to see results</p>';
+            document.getElementById('simulatorTerminal').innerHTML = '<div class="terminal-line"><span class="terminal-prompt">&gt;&gt;&gt;</span><span>Simulator reset. Ready for new files.</span></div>';
+        }
+
+        function categorizeFileSimple(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            
+            if (['pdf', 'doc', 'docx', 'txt', 'rtf', 'odt', 'pptx', 'xlsx'].includes(ext)) return 'documents';
+            if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(ext)) return 'images';
+            if (['zip', 'tar', 'gz', 'rar', '7z'].includes(ext)) return 'archives';
+            if (['exe', 'msi', 'bat', 'sh', 'app'].includes(ext)) return 'executables';
+            if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(ext)) return 'videos';
+            if (['mp3', 'wav', 'flac', 'aac', 'ogg'].includes(ext)) return 'audio';
+            return 'other';
+        }
+
+        function addToTerminal(terminalId, message, type = 'output') {
+            const terminal = document.getElementById(terminalId);
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            
+            const prompt = document.createElement('span');
+            prompt.className = 'terminal-prompt';
+            prompt.textContent = type === 'error' ? '❌' : '▶';
+            
+            const output = document.createElement('span');
+            output.className = type === 'error' ? 'terminal-error' : 'terminal-output';
+            output.textContent = message;
+            
+            line.appendChild(prompt);
+            line.appendChild(output);
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Test categorizer code
+        function testCategorizer() {
+            const code = document.getElementById('categorizerCode').value;
+            const terminal = document.getElementById('categorizerOutput');
+            terminal.innerHTML = '';
+
+            const testFiles = [
+                'report.pdf', 'photo.JPG', 'archive.zip', 'setup.exe', 'README', 'file.tar.gz'
+            ];
+
+            addToTerminal('categorizerOutput', 'Testing your categorize_file() function...', 'output');
+
+            try {
+                // Create function from code
+                eval(code);
+                
+                testFiles.forEach(file => {
+                    try {
+                        const result = categorize_file(file);
+                        addToTerminal('categorizerOutput', `${{file}} → ${{result}}`, 'output');
+                    } catch (e) {
+                        addToTerminal('categorizerOutput', `Error with ${{file}}: ${e.message}`, 'error');
+                    }
+                });
+                
+                addToTerminal('categorizerOutput', 'Tests complete! ✓', 'output');
+            } catch (e) {
+                addToTerminal('categorizerOutput', `Syntax error: ${e.message}`, 'error');
+            }
+        }
+
+        // Challenge testing
+        function testChallenge(challengeNum) {
+            const codeId = `challenge${{challengeNum}}Code`;
+            const outputId = `challenge${{challengeNum}}Output`;
+            const successId = `challenge${{challengeNum}}Success`;
+            
+            const code = document.getElementById(codeId).value;
+            const terminal = document.getElementById(outputId);
+            terminal.innerHTML = '';
+
+            try {
+                eval(code);
+                
+                if (challengeNum === 1) {
+                    // Test extension handler
+                    const tests = [
+                        ['FILE.PDF', 'pdf'],
+                        ['README', ''],
+                        ['archive.tar.gz', 'gz'],
+                        ['photo.JPG', 'jpg']
+                    ];
+                    
+                    let allPassed = true;
+                    tests.forEach(([input, expected]) => {
+                        const result = get_extension(input);
+                        const passed = result === expected;
+                        allPassed = allPassed && passed;
+                        const status = passed ? '✓' : '✗';
+                        addToTerminal(outputId, `${{status}} get_extension("${{input}}") → "${{result}}" ${passed ? '' : `(expected "${{expected}}")`}`, passed ? 'output' : 'error');
+                    });
+                    
+                    if (allPassed) {
+                        document.getElementById(successId).classList.add('show');
+                        markSectionComplete('challenge1');
+                        showToast('Achievement Unlocked!', 'Extension Handler Master', '🏆');
+                    }
+                } else if (challengeNum === 2) {
+                    // Test file counter
+                    const testFiles = ['report.pdf', 'photo.jpg', 'archive.zip', 'setup.exe', 'README'];
+                    const result = count_by_category(testFiles);
+                    
+                    addToTerminal(outputId, 'Testing with: ' + testFiles.join(', '), 'output');
+                    addToTerminal(outputId, JSON.stringify(result, null, 2), 'output');
+                    
+                    if (result && typeof result === 'object') {
+                        document.getElementById(successId).classList.add('show');
+                        markSectionComplete('challenge2');
+                        showToast('Achievement Unlocked!', 'Dictionary Dynamics Expert', '🏆');
+                    }
+                } else if (challengeNum === 3) {
+                    // Test report generator
+                    const testCounts = {documents: 10, images: 15, archives: 3, executables: 2, other: 5};
+                    const result = generate_text_report(testCounts, 35);
+                    
+                    addToTerminal(outputId, result, 'output');
+                    
+                    if (result && result.includes('REPORT')) {
+                        document.getElementById(successId).classList.add('show');
+                        markSectionComplete('challenge3');
+                        showToast('Achievement Unlocked!', 'Report Generation Guru', '🏆');
+                    }
+                }
+            } catch (e) {
+                addToTerminal(outputId, `Error: ${e.message}`, 'error');
+            }
+        }
+
+        // AI prompt analyzer
+        function analyzePrompt() {
+            const prompt = document.getElementById('aiPrompt').value;
+            const terminal = document.getElementById('promptFeedback');
+            terminal.innerHTML = '';
+
+            addToTerminal('promptFeedback', '🔍 Analyzing your AI prompt...', 'output');
+
+            // Simple analysis
+            const hasContext = prompt.toLowerCase().includes('building') || prompt.toLowerCase().includes('working on');
+            const hasSpecifics = prompt.includes('1.') || prompt.includes('2.') || prompt.includes('-');
+            const hasExample = prompt.toLowerCase().includes('example') || prompt.toLowerCase().includes('code');
+            const length = prompt.split(' ').length;
+
+            let score = 0;
+            if (hasContext) score++;
+            if (hasSpecifics) score++;
+            if (hasExample) score++;
+            if (length > 20) score++;
+
+            addToTerminal('promptFeedback', '📊 Prompt Quality Analysis:', 'output');
+            addToTerminal('promptFeedback', `${hasContext ? '✓' : '✗'} Provides context about what you're building`, hasContext ? 'output' : 'error');
+            addToTerminal('promptFeedback', `${hasSpecifics ? '✓' : '✗'} Includes specific requirements or cases`, hasSpecifics ? 'output' : 'error');
+            addToTerminal('promptFeedback', `${hasExample ? '✓' : '✗'} Requests examples or code`, hasExample ? 'output' : 'error');
+            addToTerminal('promptFeedback', `${length > 20 ? '✓' : '✗'} Sufficient detail (${{length}} words)`, length > 20 ? 'output' : 'error');
+            
+            const rating = score === 4 ? 'Excellent!' : score === 3 ? 'Good' : score === 2 ? 'Fair' : 'Needs improvement';
+            addToTerminal('promptFeedback', `Overall: ${{rating}} (${{score}}/4)`, 'output');
+            
+            if (score >= 3) {
+                markSectionComplete('ai');
+            }
+        }
+
+        // Quick check answer
+        function checkAnswer(questionNum, isCorrect) {
+            if (isCorrect) {
+                document.getElementById(`success${{questionNum}}`).classList.add('show');
+                setTimeout(() => {
+                    document.getElementById(`success${{questionNum}}`).classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize
+        loadProgress();
+        addCopyButtons();
+
+        // Mark final section as complete when all requirements are checked
+        document.querySelectorAll('#final input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const allChecked = Array.from(document.querySelectorAll('#final input[type="checkbox"]')).every(cb => cb.checked);
+                if (allChecked) {
+                    markSectionComplete('final');
+                }
+            });
+        });
+
+        // Visual feedback for file items
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('file-item')) {
+                e.target.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    e.target.style.transform = 'translateX(5px)';
+                }, 100);
+            }
+        });
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script></p></body></html>
