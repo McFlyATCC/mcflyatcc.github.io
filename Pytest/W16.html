@@ -1,0 +1,2441 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 16: Demo, Reflection &amp; Portfolio Packaging | Cybersecurity Programming</title>
+    <style>
+        /* ===== CSS VARIABLES & RESET ===== */
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --bg-elevated: #252525;
+            --text-primary: #e8e8e8;
+            --text-secondary: #b0b0b0;
+            --text-muted: #707070;
+            --accent-red: #dc3545;
+            --accent-red-dark: #a71d2a;
+            --accent-red-glow: rgba(220, 53, 69, 0.3);
+            --accent-green: #28a745;
+            --accent-yellow: #ffc107;
+            --accent-blue: #4a9eff;
+            --border-dark: #2a2a2a;
+            --border-red: rgba(220, 53, 69, 0.4);
+            --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --shadow-red: 0 0 30px rgba(220, 53, 69, 0.2);
+            --font-mono: 'Courier New', Consolas, monospace;
+            --font-sans: 'Segoe UI', Arial, sans-serif;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-bottom: 2px solid var(--accent-red);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(220, 53, 69, 0.03) 2px,
+                    rgba(220, 53, 69, 0.03) 4px
+                );
+            pointer-events: none;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: var(--accent-red);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 30px var(--accent-red-glow);
+        }
+
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .header-theme {
+            margin-top: 1.5rem;
+            padding: 1rem 2rem;
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-red);
+            display: inline-block;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .header-theme span {
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav-container {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-dark);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .nav-tab {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--border-dark);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--accent-red);
+        }
+
+        .nav-tab.active {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--border-red);
+            box-shadow: var(--shadow-red);
+        }
+
+        .card-header {
+            background: var(--bg-tertiary);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .card-icon {
+            font-size: 1.3rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ===== GRID LAYOUTS ===== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* ===== TERMINAL BLOCKS ===== */
+        .terminal {
+            background: #0d0d0d;
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .terminal-header {
+            background: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: var(--accent-red); }
+        .terminal-dot.yellow { background: var(--accent-yellow); }
+        .terminal-dot.green { background: var(--accent-green); }
+
+        .terminal-title {
+            margin-left: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .terminal-body {
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .terminal-body .prompt {
+            color: var(--accent-green);
+        }
+
+        .terminal-body .command {
+            color: var(--text-primary);
+        }
+
+        .terminal-body .output {
+            color: var(--text-secondary);
+        }
+
+        .terminal-body .comment {
+            color: var(--text-muted);
+        }
+
+        .terminal-body .error {
+            color: var(--accent-red);
+        }
+
+        .terminal-body .success {
+            color: var(--accent-green);
+        }
+
+        .terminal-body .highlight {
+            color: var(--accent-yellow);
+        }
+
+        /* ===== CHECKLISTS ===== */
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-dark);
+            transition: var(--transition);
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .checklist-item.completed {
+            opacity: 0.6;
+        }
+
+        .checklist-item.completed .checklist-text {
+            text-decoration: line-through;
+        }
+
+        .checklist-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--accent-red);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .checklist-checkbox:hover {
+            background: var(--accent-red-glow);
+        }
+
+        .checklist-checkbox.checked {
+            background: var(--accent-red);
+        }
+
+        .checklist-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .checklist-content {
+            flex: 1;
+        }
+
+        .checklist-text {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .checklist-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-container {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .progress-percentage {
+            font-family: var(--font-mono);
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--bg-primary);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-red-dark), var(--accent-red));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* ===== TABS ===== */
+        .tab-container {
+            margin: 1.5rem 0;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-dark);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== INTERACTIVE BUILDER ===== */
+        .builder-section {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .builder-input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-dark);
+            color: var(--text-primary);
+            border-radius: 4px;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .builder-input:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px var(--accent-red-glow);
+        }
+
+        .builder-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-dark);
+            color: var(--text-primary);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 100px;
+            font-family: var(--font-sans);
+            transition: var(--transition);
+        }
+
+        .builder-textarea:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px var(--accent-red-glow);
+        }
+
+        .builder-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-red-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-elevated);
+            border-color: var(--accent-red);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* ===== OUTPUT PREVIEW ===== */
+        .output-preview {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            min-height: 150px;
+        }
+
+        .output-preview h4 {
+            color: var(--accent-red);
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        .output-content {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            color: var(--text-secondary);
+        }
+
+        /* ===== INFO BOXES ===== */
+        .info-box {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .info-box-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .info-box-content h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box.warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .info-box.warning .info-box-icon {
+            color: var(--accent-yellow);
+        }
+
+        .info-box.success {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .info-box.success .info-box-icon {
+            color: var(--accent-green);
+        }
+
+        .info-box.tip {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid var(--border-red);
+        }
+
+        .info-box.tip .info-box-icon {
+            color: var(--accent-red);
+        }
+
+        .info-box.info {
+            background: rgba(74, 158, 255, 0.1);
+            border: 1px solid rgba(74, 158, 255, 0.3);
+        }
+
+        .info-box.info .info-box-icon {
+            color: var(--accent-blue);
+        }
+
+        /* ===== EXAMPLE CARDS ===== */
+        .example-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .example-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .example-badge {
+            background: var(--accent-red);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .example-title {
+            font-weight: 600;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-dark);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 1.25rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            border: 2px solid var(--bg-primary);
+        }
+
+        .timeline-item.completed::before {
+            background: var(--accent-green);
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ===== JOB ROLE CARDS ===== */
+        .role-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .role-card:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-3px);
+        }
+
+        .role-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-red);
+        }
+
+        .role-company {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .role-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            background: var(--bg-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== COPY BUTTON ===== */
+        .copy-wrapper {
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-dark);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        /* ===== ACCORDION ===== */
+        .accordion-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .accordion-header:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .accordion-header h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            padding: 1rem 1.5rem;
+            max-height: 2000px;
+        }
+
+        /* ===== RUBRIC TABLE ===== */
+        .rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .rubric-table th,
+        .rubric-table td {
+            padding: 1rem;
+            text-align: left;
+            border: 1px solid var(--border-dark);
+        }
+
+        .rubric-table th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--accent-red);
+        }
+
+        .rubric-table td {
+            background: var(--bg-card);
+        }
+
+        .rubric-table tr:hover td {
+            background: var(--bg-tertiary);
+        }
+
+        /* ===== STATS DISPLAY ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat-item {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-dark);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-red);
+            font-family: var(--font-mono);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-dark);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-highlight {
+            color: var(--accent-red);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .nav-tabs {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding: 0.5rem;
+            }
+
+            .nav-tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+                white-space: nowrap;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .rubric-table {
+                font-size: 0.85rem;
+            }
+
+            .rubric-table th,
+            .rubric-table td {
+                padding: 0.75rem;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-elevated);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-red-dark);
+        }
+
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            .nav-container, .footer {
+                display: none;
+            }
+
+            .section {
+                display: block !important;
+                page-break-inside: avoid;
+            }
+
+            .card {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head><body><header class="header">
+<div class="header-content">
+<div class="week-badge">Week 16 - Final Week</div>
+<h1>🎯 Demo, Reflection &amp; Portfolio Packaging</h1>
+<p class="header-subtitle">Cybersecurity Programming Capstone</p>
+<div class="header-theme"><span>Theme:</span> Wrap it up, show it off, and reflect on how you worked.</div>
+</div>
+</header><!-- Navigation --><nav class="nav-container">
+<div class="nav-tabs"><button class="nav-tab active" data-section="overview">📋 Overview</button> <button class="nav-tab" data-section="polish">🧹 Final Polish</button> <button class="nav-tab" data-section="demo">🎬 Demo Prep</button> <button class="nav-tab" data-section="portfolio">💼 Portfolio</button> <button class="nav-tab" data-section="resume">📝 Resume &amp; Interview</button> <button class="nav-tab" data-section="ai-guide">🤖 AI Guidelines</button> <button class="nav-tab" data-section="deliverables">📦 Deliverables</button> <button class="nav-tab" data-section="reflection">💭 Reflection</button></div>
+</nav><!-- Main Content --><main class="main-content"><!-- Overview Section -->
+<section id="overview" class="section active">
+<div class="progress-container">
+<div class="progress-header"><span class="progress-title">🏆 Final Submission Progress</span> <span class="progress-percentage" id="progressPercent">0%</span></div>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">🎯</span>
+<h3>Week 16 Learning Objectives</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1rem;">By the end of this week, you will be able to:</p>
+<ul class="checklist" id="objectivesChecklist">
+<li class="checklist-item">
+<div class="checklist-checkbox" data-objective="1"></div>
+<div class="checklist-content">
+<div class="checklist-text">Prepare professional-quality code for portfolio submission</div>
+<div class="checklist-hint">Clean comments, remove dead code, ensure reproducibility</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-objective="2"></div>
+<div class="checklist-content">
+<div class="checklist-text">Create an effective technical demonstration video</div>
+<div class="checklist-hint">Problem → Solution → Impact narrative structure</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-objective="3"></div>
+<div class="checklist-content">
+<div class="checklist-text">Document AI usage transparently and professionally</div>
+<div class="checklist-hint">Track prompts, edits, and verification methods</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-objective="4"></div>
+<div class="checklist-content">
+<div class="checklist-text">Articulate project value for resumes and interviews</div>
+<div class="checklist-hint">Translate technical work into career-ready language</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-objective="5"></div>
+<div class="checklist-content">
+<div class="checklist-text">Reflect meaningfully on your learning journey</div>
+<div class="checklist-hint">Growth areas, challenges overcome, next steps</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="grid-2">
+<div class="card">
+<div class="card-header"><span class="card-icon">📅</span>
+<h3>This Week's Timeline</h3>
+</div>
+<div class="card-body">
+<div class="timeline">
+<div class="timeline-item">
+<div class="timeline-title">Days 1-2: Final Polish</div>
+<div class="timeline-content">Clean code, update documentation, verify dependencies work from clean checkout</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-title">Day 3: Demo Preparation</div>
+<div class="timeline-content">Write demo script, practice run-through, prepare sample data scenarios</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-title">Day 4: Record Demo</div>
+<div class="timeline-content">Record 3-5 minute narrated screen capture demonstrating your tool</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-title">Day 5: Portfolio &amp; AI Log</div>
+<div class="timeline-content">Finalize GitHub README, compile AI usage log, organize repository</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-title">Days 6-7: Reflection &amp; Submit</div>
+<div class="timeline-content">Complete reflection questions, final review, submit all deliverables</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-icon">🗂️</span>
+<h3>Final Submission Checklist</h3>
+</div>
+<div class="card-body">
+<ul class="checklist" id="submissionChecklist">
+<li class="checklist-item">
+<div class="checklist-checkbox" data-check="code"></div>
+<div class="checklist-content">
+<div class="checklist-text">Source code (cleaned &amp; commented)</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-check="tests"></div>
+<div class="checklist-content">
+<div class="checklist-text">Test files (pytest-compatible)</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-check="sample"></div>
+<div class="checklist-content">
+<div class="checklist-text">Sample JSON input &amp; output</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-check="readme"></div>
+<div class="checklist-content">
+<div class="checklist-text">README.md with setup instructions</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-check="ailog"></div>
+<div class="checklist-content">
+<div class="checklist-text">AI Usage Log (AI_USAGE.md)</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-check="demo"></div>
+<div class="checklist-content">
+<div class="checklist-text">Demo video (3-5 minutes)</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-check="reflection"></div>
+<div class="checklist-content">
+<div class="checklist-text">Reflection responses</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="info-box tip"><span class="info-box-icon">💡</span>
+<div class="info-box-content">
+<h4>Pro Tip: The "Clean Checkout" Test</h4>
+<p>Clone your repository to a new folder and follow your own README instructions. If something fails, your reviewer will hit the same problem. This single test catches 90% of submission issues.</p>
+</div>
+</div>
+</section>
+<!-- Final Polish Section -->
+<section id="polish" class="section">
+<div class="card">
+<div class="card-header"><span class="card-icon">🧹</span>
+<h3>Code Cleanup Checklist</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Before submission, systematically clean your codebase. This isn't just about grades—it's about building professional habits that matter in real security operations.</p>
+<div class="tab-container">
+<div class="tab-buttons"><button class="tab-btn active" data-tab="comments">Comments</button> <button class="tab-btn" data-tab="deadcode">Dead Code</button> <button class="tab-btn" data-tab="structure">Structure</button> <button class="tab-btn" data-tab="deps">Dependencies</button></div>
+<div id="comments" class="tab-content active">
+<h4 style="color: var(--accent-red); margin-bottom: 1rem;">✅ Comment Audit</h4>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Before</span> <span class="example-title">Messy Comments</span></div>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">log_analyzer.py</span></div>
+<div class="terminal-body"><span class="comment"># TODO: fix this later</span> <span class="comment"># print("debugging here")</span> <span class="comment"># old version - delete maybe?</span> <span class="command">def analyze_logs(filepath):</span> <span class="comment"># asdf</span> <span class="command">with open(filepath) as f:</span> <span class="comment"># does stuff</span> <span class="command">data = json.load(f)</span> <span class="comment"># idk why this works but it does</span> <span class="command">return process(data)</span></div>
+</div>
+</div>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge" style="background: var(--accent-green);">After</span> <span class="example-title">Professional Comments</span></div>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">log_analyzer.py</span></div>
+<div class="terminal-body"><span class="command">def analyze_logs(filepath: str) -&gt; dict:</span> <span class="highlight">""" Parse and analyze security log file for anomalies. Args: filepath: Path to JSON log file Returns: dict containing threat indicators and summary stats """</span> <span class="command">with open(filepath, 'r', encoding='utf-8') as f:</span> <span class="command">data = json.load(f)</span> <span class="comment"># Extract failed login attempts for brute-force detection</span> <span class="command">return process(data)</span></div>
+</div>
+</div>
+<div class="info-box info" style="margin-top: 1rem;"><span class="info-box-icon">📋</span>
+<div class="info-box-content">
+<h4>Comment Cleanup Rules</h4>
+<p>1. Remove all debug print statements and commented-out code<br>2. Delete vague TODOs (or make them specific with issue numbers)<br>3. Add docstrings to all functions explaining purpose, args, and returns<br>4. Keep inline comments for non-obvious logic only</p>
+</div>
+</div>
+</div>
+<div id="deadcode" class="tab-content">
+<h4 style="color: var(--accent-red); margin-bottom: 1rem;">🗑️ Dead Code Removal</h4>
+<p style="margin-bottom: 1rem;">Dead code is unused functions, imports, variables, or commented-out blocks. It confuses readers and can introduce security risks.</p>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">Finding Dead Code with Python Tools</span></div>
+<div class="terminal-body"><span class="comment"># Install vulture (dead code finder)</span> <span class="prompt">$</span> <span class="command">pip install vulture</span> <span class="comment"># Scan your project</span> <span class="prompt">$</span> <span class="command">vulture src/ --min-confidence 80</span> <span class="output">src/utils.py:45: unused function 'old_parser' (90% confidence) src/main.py:12: unused import 'requests' (100% confidence) src/analyzer.py:78: unused variable 'temp_data' (80% confidence)</span> <span class="comment"># Also check for unused imports with flake8</span> <span class="prompt">$</span> <span class="command">pip install flake8</span> <span class="prompt">$</span> <span class="command">flake8 src/ --select=F401</span> <span class="output">src/main.py:3:1: F401 'os' imported but unused</span></div>
+</div>
+<div class="grid-2" style="margin-top: 1.5rem;">
+<div class="info-box warning"><span class="info-box-icon">⚠️</span>
+<div class="info-box-content">
+<h4>Common Dead Code Patterns</h4>
+<p>• Imports you tried but never used<br>• Functions from early iterations<br>• Commented-out "backup" code<br>• Debug variables left behind</p>
+</div>
+</div>
+<div class="info-box success"><span class="info-box-icon">✅</span>
+<div class="info-box-content">
+<h4>Keep in Version Control</h4>
+<p>Don't be afraid to delete code! Git preserves history. If you need that old function later, you can retrieve it from commit history.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="structure" class="tab-content">
+<h4 style="color: var(--accent-red); margin-bottom: 1rem;">📁 Repository Structure</h4>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">Recommended Project Structure</span></div>
+<div class="terminal-body"><span class="highlight">my-security-tool/</span> ├── <span class="success">README.md</span> <span class="comment"># Project overview &amp; setup</span> ├── <span class="success">AI_USAGE.md</span> <span class="comment"># AI assistance documentation</span> ├── <span class="success">requirements.txt</span> <span class="comment"># Python dependencies</span> ├── <span class="highlight">src/</span> │ ├── __init__.py │ ├── <span class="command">main.py</span> <span class="comment"># Entry point</span> │ ├── <span class="command">analyzer.py</span> <span class="comment"># Core logic</span> │ └── <span class="command">utils.py</span> <span class="comment"># Helper functions</span> ├── <span class="highlight">tests/</span> │ ├── __init__.py │ ├── <span class="command">test_analyzer.py</span> <span class="comment"># Unit tests</span> │ └── <span class="command">test_utils.py</span> ├── <span class="highlight">data/</span> │ ├── <span class="output">sample_input.json</span> <span class="comment"># Example input</span> │ └── <span class="output">sample_output.json</span> <span class="comment"># Expected output</span> └── <span class="highlight">docs/</span> └── <span class="output">screenshots/</span> <span class="comment"># Demo images if needed</span></div>
+</div>
+<div class="info-box tip" style="margin-top: 1rem;"><span class="info-box-icon">💡</span>
+<div class="info-box-content">
+<h4>Structure Tips from the Field</h4>
+<p>This structure mirrors how real security tools are organized. SOC analysts and security engineers expect to find README at the root, source in src/, and tests alongside the code. Consistency makes collaboration easier.</p>
+</div>
+</div>
+</div>
+<div id="deps" class="tab-content">
+<h4 style="color: var(--accent-red); margin-bottom: 1rem;">📦 Dependency Management</h4>
+<p style="margin-bottom: 1rem;">Hidden dependencies are the #1 reason projects fail on other machines. Here's how to ensure yours works everywhere:</p>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">Creating requirements.txt</span></div>
+<div class="terminal-body"><span class="comment"># Option 1: Freeze current environment (includes everything)</span> <span class="prompt">$</span> <span class="command">pip freeze &gt; requirements.txt</span> <span class="comment"># Option 2: Better - use pipreqs (only includes imports you use)</span> <span class="prompt">$</span> <span class="command">pip install pipreqs</span> <span class="prompt">$</span> <span class="command">pipreqs src/ --force</span> <span class="comment"># Verify by installing in fresh environment</span> <span class="prompt">$</span> <span class="command">python -m venv test_env</span> <span class="prompt">$</span> <span class="command">source test_env/bin/activate</span> <span class="comment"># or test_env\Scripts\activate on Windows</span> <span class="prompt">$</span> <span class="command">pip install -r requirements.txt</span> <span class="prompt">$</span> <span class="command">python src/main.py --help</span> <span class="comment"># Should work!</span></div>
+</div>
+<div class="example-card" style="margin-top: 1.5rem;">
+<div class="example-card-header"><span class="example-badge" style="background: var(--accent-green);">Example</span> <span class="example-title">Good requirements.txt</span></div>
+<div class="terminal">
+<div class="terminal-body"><span class="comment"># Core dependencies</span> <span class="command">requests&gt;=2.28.0</span> <span class="command">python-dateutil&gt;=2.8.0</span> <span class="comment"># Data processing</span> <span class="command">pandas&gt;=1.5.0</span> <span class="comment"># Testing (dev dependency)</span> <span class="command">pytest&gt;=7.0.0</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Clean Checkout Simulator -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🧪</span>
+<h3>Interactive: Clean Checkout Simulator</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Walk through the clean checkout process and check off each step as you verify your project:</p>
+<ul class="checklist" id="checkoutChecklist">
+<li class="checklist-item">
+<div class="checklist-checkbox" data-checkout="1"></div>
+<div class="checklist-content">
+<div class="checklist-text">Clone repo to new directory</div>
+<div class="checklist-hint">git clone [your-repo-url] fresh_test/</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-checkout="2"></div>
+<div class="checklist-content">
+<div class="checklist-text">Create fresh virtual environment</div>
+<div class="checklist-hint">python -m venv venv &amp;&amp; source venv/bin/activate</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-checkout="3"></div>
+<div class="checklist-content">
+<div class="checklist-text">Install dependencies from requirements.txt</div>
+<div class="checklist-hint">pip install -r requirements.txt</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-checkout="4"></div>
+<div class="checklist-content">
+<div class="checklist-text">Run the tool with sample data</div>
+<div class="checklist-hint">python src/main.py data/sample_input.json</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-checkout="5"></div>
+<div class="checklist-content">
+<div class="checklist-text">Run all tests</div>
+<div class="checklist-hint">pytest tests/ -v</div>
+</div>
+</li>
+<li class="checklist-item">
+<div class="checklist-checkbox" data-checkout="6"></div>
+<div class="checklist-content">
+<div class="checklist-text">Verify output matches expected results</div>
+<div class="checklist-hint">Compare with data/sample_output.json</div>
+</div>
+</li>
+</ul>
+<div id="checkoutResult" style="margin-top: 1.5rem; display: none;">
+<div class="info-box success"><span class="info-box-icon">🎉</span>
+<div class="info-box-content">
+<h4>Clean Checkout Passed!</h4>
+<p>Your project is ready for submission. Anyone can now clone and run your tool without issues.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Demo Preparation Section -->
+<section id="demo" class="section">
+<div class="card">
+<div class="card-header"><span class="card-icon">🎬</span>
+<h3>Demo Mindset: Problem → Solution → Impact</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">A great demo tells a story. You're not just showing code—you're showing how you solved a real problem. This is the exact skill you'll use in job interviews and team presentations.</p>
+<div class="grid-3" style="margin-bottom: 2rem;">
+<div class="stat-item">
+<div class="stat-value">3-5</div>
+<div class="stat-label">Minutes Total</div>
+</div>
+<div class="stat-item">
+<div class="stat-value">30s</div>
+<div class="stat-label">Problem Setup</div>
+</div>
+<div class="stat-item">
+<div class="stat-value">3-4m</div>
+<div class="stat-label">Live Walkthrough</div>
+</div>
+</div>
+<div class="accordion-item open">
+<div class="accordion-header">
+<h4><span>1️⃣</span> The Problem (30 seconds)</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<p style="margin-bottom: 1rem;">Start by painting a picture of the problem your tool solves. Make it relatable.</p>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Example Opening</span></div>
+<p style="padding: 1rem; background: var(--bg-primary); border-radius: 4px; font-style: italic;">"Imagine you're a SOC analyst and you just received 50,000 log entries from last night. Somewhere in there might be evidence of a brute-force attack, but manually searching through JSON files would take hours. That's the problem my tool solves."</p>
+</div>
+<div class="info-box tip" style="margin-top: 1rem;"><span class="info-box-icon">💡</span>
+<div class="info-box-content">
+<h4>Hook Template</h4>
+<p>"Imagine you're a [role] and you need to [task]. The challenge is [pain point]. My tool solves this by [brief solution]."</p>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">
+<h4><span>2️⃣</span> The Solution Walkthrough (3-4 minutes)</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<p style="margin-bottom: 1rem;">Show your tool in action with real (sample) data. Follow this structure:</p>
+<div class="timeline">
+<div class="timeline-item">
+<div class="timeline-title">Show the Input</div>
+<div class="timeline-content">"Here's a sample log file with 500 entries. Let me show you what the raw data looks like..."</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-title">Run the Tool</div>
+<div class="timeline-content">"Now I'll run my analyzer... [execute command]. You can see it processing the entries..."</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-title">Explain Key Features</div>
+<div class="timeline-content">"Notice how it automatically flags this IP address—that's the brute-force detection algorithm identifying 47 failed logins from the same source."</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-title">Show the Output</div>
+<div class="timeline-content">"The output JSON summarizes the threats found, organized by severity. A SOC analyst can now prioritize their investigation."</div>
+</div>
+</div>
+<div class="info-box warning" style="margin-top: 1rem;"><span class="info-box-icon">⚠️</span>
+<div class="info-box-content">
+<h4>Demo Day Rules</h4>
+<p>• Use pre-tested sample data (never live/unknown data)<br>• Have a backup recording in case of technical issues<br>• Close unnecessary applications to avoid notifications<br>• Zoom in on terminal text so viewers can read it</p>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">
+<h4><span>3️⃣</span> The Impact (30 seconds)</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<p style="margin-bottom: 1rem;">End with the "so what?"—why does this matter?</p>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Example Closing</span></div>
+<p style="padding: 1rem; background: var(--bg-primary); border-radius: 4px; font-style: italic;">"What would have taken an analyst 2-3 hours of manual review now takes 10 seconds. More importantly, the automated detection catches patterns a human might miss when fatigued. This is the kind of tooling that helps security teams scale."</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Demo Script Builder -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📝</span>
+<h3>Interactive: Demo Script Builder</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Build your demo script section by section. This will generate a speaker notes document you can use while recording.</p>
+<div class="builder-section"><label class="builder-label">🎯 Tool Name</label> <input type="text" class="builder-input" id="demoToolName" placeholder="e.g., Log Anomaly Detector"> <label class="builder-label">😰 The Problem (What pain point does your tool address?)</label> <textarea class="builder-textarea" id="demoProblem" placeholder="e.g., Security analysts spend hours manually reviewing JSON log files to identify potential threats..."></textarea> <label class="builder-label">🎯 Target User (Who benefits from this tool?)</label> <input type="text" class="builder-input" id="demoUser" placeholder="e.g., SOC Analysts, IT Security Teams, System Administrators"> <label class="builder-label">⚡ Key Feature 1</label> <input type="text" class="builder-input" id="demoFeature1" placeholder="e.g., Automatic brute-force attack detection"> <label class="builder-label">⚡ Key Feature 2</label> <input type="text" class="builder-input" id="demoFeature2" placeholder="e.g., JSON output for SIEM integration"> <label class="builder-label">⚡ Key Feature 3</label> <input type="text" class="builder-input" id="demoFeature3" placeholder="e.g., Configurable threshold settings"> <label class="builder-label">📊 Impact Statement (Quantify if possible)</label> <textarea class="builder-textarea" id="demoImpact" placeholder="e.g., Reduces manual review time from 2 hours to 10 seconds while improving detection accuracy..."></textarea> <button class="btn btn-primary" style="margin-top: 1rem;" onclick="generateDemoScript()"> 📄 Generate Demo Script </button></div>
+<div class="output-preview" id="demoScriptOutput" style="display: none;">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<h4>📋 Your Demo Script</h4>
+<button class="btn btn-small btn-secondary" onclick="copyDemoScript()">📋 Copy</button></div>
+<pre class="output-content" id="demoScriptContent"></pre>
+</div>
+</div>
+</div>
+<!-- Recording Tips -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🎥</span>
+<h3>Video Recording Tips</h3>
+</div>
+<div class="card-body">
+<div class="grid-2">
+<div>
+<h4 style="color: var(--accent-green); margin-bottom: 1rem;">✅ Do This</h4>
+<ul style="list-style: none;">
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">📹 Use OBS Studio (free) or Loom for recording</li>
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">🔊 Record in a quiet space with good audio</li>
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">🔍 Increase terminal font size (14-16pt minimum)</li>
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">⏱️ Practice your timing 2-3 times before recording</li>
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">📝 Keep your script visible but speak naturally</li>
+<li style="padding: 0.5rem 0;">💾 Test with sample data before recording</li>
+</ul>
+</div>
+<div>
+<h4 style="color: var(--accent-red); margin-bottom: 1rem;">❌ Avoid This</h4>
+<ul style="list-style: none;">
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">🚫 Reading directly from script (sounds robotic)</li>
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">🚫 Tiny text that viewers can't read</li>
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">🚫 Background music or distracting notifications</li>
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">🚫 Going over 5 minutes (respect time limits)</li>
+<li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-dark);">🚫 Apologizing for your work ("it's not perfect but...")</li>
+<li style="padding: 0.5rem 0;">🚫 Using untested data that might fail</li>
+</ul>
+</div>
+</div>
+<div class="terminal" style="margin-top: 1.5rem;">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">Recommended Recording Setup (OBS)</span></div>
+<div class="terminal-body"><span class="comment"># OBS Studio Settings for Clear Demos</span> <span class="highlight">Video Settings:</span> <span class="output"> Base Resolution: 1920x1080</span> <span class="output"> Output Resolution: 1920x1080</span> <span class="output"> FPS: 30</span> <span class="highlight">Audio Settings:</span> <span class="output"> Sample Rate: 44.1 kHz</span> <span class="output"> Desktop Audio: Disabled (avoid system sounds)</span> <span class="output"> Mic/Aux: Your microphone</span> <span class="highlight">Output Settings:</span> <span class="output"> Format: MP4 or MKV</span> <span class="output"> Encoder: x264</span> <span class="output"> Bitrate: 2500-4000 Kbps</span></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Portfolio Section -->
+<section id="portfolio" class="section">
+<div class="card">
+<div class="card-header"><span class="card-icon">💼</span>
+<h3>Building Your GitHub Portfolio</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Your capstone project is more than a class assignment—it's a portfolio piece that demonstrates your skills to future employers. Here's how to present it professionally.</p>
+<div class="info-box success"><span class="info-box-icon">🌟</span>
+<div class="info-box-content">
+<h4>Why This Matters</h4>
+<p>Hiring managers for entry-level security roles often check GitHub profiles. A well-documented project shows you can write code, document your work, and communicate technical concepts—skills that matter as much as coding itself.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- README Template Builder -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📄</span>
+<h3>Interactive: README.md Builder</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">A great README is your project's front door. Build yours section by section:</p>
+<div class="builder-section"><label class="builder-label">📛 Project Name</label> <input type="text" class="builder-input" id="readmeName" placeholder="e.g., SecLog Analyzer"> <label class="builder-label">📝 One-Line Description</label> <input type="text" class="builder-input" id="readmeDesc" placeholder="e.g., A Python tool for detecting security anomalies in JSON log files"> <label class="builder-label">🎯 Problem Solved</label> <textarea class="builder-textarea" id="readmeProblem" placeholder="What problem does this tool solve? Who is it for?"></textarea> <label class="builder-label">✨ Key Features (one per line)</label> <textarea class="builder-textarea" id="readmeFeatures" placeholder="Brute-force detection algorithm
+JSON output for SIEM integration
+Configurable alert thresholds"></textarea> <label class="builder-label">📋 Prerequisites</label> <input type="text" class="builder-input" id="readmePrereqs" placeholder="e.g., Python 3.8+"> <label class="builder-label">⚙️ Installation Commands</label> <textarea class="builder-textarea" id="readmeInstall" placeholder="git clone https://github.com/yourusername/project.git
+cd project
+pip install -r requirements.txt"></textarea> <label class="builder-label">🚀 Usage Example</label> <textarea class="builder-textarea" id="readmeUsage" placeholder="python src/main.py data/sample_input.json --output results.json"></textarea> <label class="builder-label">🏫 Course Context</label> <input type="text" class="builder-input" id="readmeCourse" placeholder="e.g., CYB 200 - Cybersecurity Programming"> <button class="btn btn-primary" style="margin-top: 1rem;" onclick="generateReadme()"> 📄 Generate README.md </button></div>
+<div class="output-preview" id="readmeOutput" style="display: none;">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<h4>📋 Your README.md</h4>
+<button class="btn btn-small btn-secondary" onclick="copyReadme()">📋 Copy</button></div>
+<pre class="output-content" id="readmeContent"></pre>
+</div>
+</div>
+</div>
+<!-- Portfolio Connection to Course Projects -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🔗</span>
+<h3>Connecting to Your Course Journey</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Your capstone builds on skills from the entire semester. Here's how each project contributed:</p>
+<div class="grid-2">
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Week 5</span> <span class="example-title">Login Failure Log Scanner</span></div>
+<p style="color: var(--text-secondary);">Foundation: File I/O, pattern matching, basic log analysis</p>
+<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">→ These skills power your log parsing logic</p>
+</div>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Week 6</span> <span class="example-title">API &amp; Data Mashup Primer</span></div>
+<p style="color: var(--text-secondary);">Foundation: HTTP basics, JSON transformation, threat intel feeds</p>
+<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">→ These skills enable external data integration</p>
+</div>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Week 7</span> <span class="example-title">Config-Driven Backup Planner</span></div>
+<p style="color: var(--text-secondary);">Foundation: JSON configuration, validation, user settings</p>
+<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">→ These skills make your tool configurable</p>
+</div>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Week 8</span> <span class="example-title">System Inventory &amp; Patch Tracker</span></div>
+<p style="color: var(--text-secondary);">Foundation: Nested data structures, risk scoring, CIS benchmarks</p>
+<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">→ These skills enable severity classification</p>
+</div>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Week 9</span> <span class="example-title">User Account &amp; Permissions Auditor</span></div>
+<p style="color: var(--text-secondary);">Foundation: Joins, sets, anomaly detection patterns</p>
+<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">→ These skills power your detection algorithms</p>
+</div>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Week 12</span> <span class="example-title">Mini Toolkit Refactor &amp; Testing</span></div>
+<p style="color: var(--text-secondary);">Foundation: Clean code, pytest, production-ready patterns</p>
+<p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">→ These skills ensure code quality</p>
+</div>
+</div>
+<div class="info-box tip" style="margin-top: 1.5rem;"><span class="info-box-icon">💡</span>
+<div class="info-box-content">
+<h4>Portfolio Tip</h4>
+<p>Consider mentioning these building blocks in your README's "Background" section. It shows progression and intentional skill development—exactly what employers want to see.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Resume & Interview Section -->
+<section id="resume" class="section">
+<div class="card">
+<div class="card-header"><span class="card-icon">📝</span>
+<h3>Translating Your Project to Career Language</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Your capstone demonstrates skills that map directly to entry-level cybersecurity and IT roles. Here's how to communicate that value.</p>
+<!-- Target Roles -->
+<h4 style="color: var(--accent-red); margin-bottom: 1rem;">🎯 Target Roles Your Skills Match</h4>
+<div class="grid-3" style="margin-bottom: 2rem;">
+<div class="role-card">
+<div class="role-icon">🛡️</div>
+<div class="role-title">SOC Analyst (Tier 1)</div>
+<div class="role-company">Security Operations Centers</div>
+<div class="role-skills"><span class="skill-tag">Log Analysis</span> <span class="skill-tag">Python Scripting</span> <span class="skill-tag">SIEM Tools</span> <span class="skill-tag">Threat Detection</span></div>
+</div>
+<div class="role-card">
+<div class="role-icon">⚙️</div>
+<div class="role-title">Junior Security Engineer</div>
+<div class="role-company">Enterprise IT Teams</div>
+<div class="role-skills"><span class="skill-tag">Automation</span> <span class="skill-tag">Tool Development</span> <span class="skill-tag">JSON/API</span> <span class="skill-tag">Testing</span></div>
+</div>
+<div class="role-card">
+<div class="role-icon">🔧</div>
+<div class="role-title">IT Automation Specialist</div>
+<div class="role-company">MSPs &amp; IT Departments</div>
+<div class="role-skills"><span class="skill-tag">Scripting</span> <span class="skill-tag">Process Automation</span> <span class="skill-tag">Data Processing</span> <span class="skill-tag">Documentation</span></div>
+</div>
+<div class="role-card">
+<div class="role-icon">🔍</div>
+<div class="role-title">Threat Intelligence Analyst</div>
+<div class="role-company">Security Vendors &amp; Enterprises</div>
+<div class="role-skills"><span class="skill-tag">Data Analysis</span> <span class="skill-tag">Pattern Recognition</span> <span class="skill-tag">MITRE ATT&amp;CK</span> <span class="skill-tag">Reporting</span></div>
+</div>
+<div class="role-card">
+<div class="role-icon">📊</div>
+<div class="role-title">GRC Analyst</div>
+<div class="role-company">Compliance Teams</div>
+<div class="role-skills"><span class="skill-tag">Audit Tools</span> <span class="skill-tag">Policy Automation</span> <span class="skill-tag">SOC 2/PCI-DSS</span> <span class="skill-tag">Reporting</span></div>
+</div>
+<div class="role-card">
+<div class="role-icon">💻</div>
+<div class="role-title">Security Tools Developer</div>
+<div class="role-company">Security Product Companies</div>
+<div class="role-skills"><span class="skill-tag">Python</span> <span class="skill-tag">Tool Building</span> <span class="skill-tag">API Integration</span> <span class="skill-tag">Unit Testing</span></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Resume Bullet Builder -->
+<div class="card">
+<div class="card-header"><span class="card-icon">✍️</span>
+<h3>Interactive: Resume Bullet Builder</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1rem;">Transform your project into powerful resume bullets using the <strong>Action + Context + Result</strong> formula:</p>
+<div class="info-box info" style="margin-bottom: 1.5rem;"><span class="info-box-icon">📐</span>
+<div class="info-box-content">
+<h4>The ACR Formula</h4>
+<p><strong>Action:</strong> What you did (strong verb)<br><strong>Context:</strong> The technical environment/challenge<br><strong>Result:</strong> Quantifiable outcome or impact</p>
+</div>
+</div>
+<div class="builder-section"><label class="builder-label">💪 Action Verb</label><select class="builder-input" id="resumeVerb" style="cursor: pointer;">
+<option value="">Select a strong action verb...</option>
+<option value="Developed">Developed</option>
+<option value="Engineered">Engineered</option>
+<option value="Automated">Automated</option>
+<option value="Implemented">Implemented</option>
+<option value="Designed">Designed</option>
+<option value="Built">Built</option>
+<option value="Created">Created</option>
+<option value="Architected">Architected</option>
+</select><label class="builder-label">🔧 What You Built</label> <input type="text" class="builder-input" id="resumeWhat" placeholder="e.g., Python-based log analysis tool"> <label class="builder-label">🎯 Purpose/Function</label> <input type="text" class="builder-input" id="resumePurpose" placeholder="e.g., to detect brute-force attacks in security logs"> <label class="builder-label">🛠️ Technologies Used</label> <input type="text" class="builder-input" id="resumeTech" placeholder="e.g., Python, JSON, pytest"> <label class="builder-label">📊 Quantifiable Result (if applicable)</label> <input type="text" class="builder-input" id="resumeResult" placeholder="e.g., reducing manual analysis time by 95%"> <button class="btn btn-primary" style="margin-top: 1rem;" onclick="generateResumeBullet()"> ✨ Generate Resume Bullet </button></div>
+<div class="output-preview" id="resumeOutput" style="display: none;">
+<h4>📋 Your Resume Bullet</h4>
+<div id="resumeBulletContent" style="padding: 1rem; background: var(--bg-tertiary); border-radius: 4px; margin-top: 1rem; font-size: 1rem; line-height: 1.6;"></div>
+<button class="btn btn-small btn-secondary" style="margin-top: 1rem;" onclick="copyResumeBullet()">📋 Copy</button></div>
+<div class="example-card" style="margin-top: 1.5rem;">
+<div class="example-card-header"><span class="example-badge" style="background: var(--accent-green);">Example Bullets</span></div>
+<ul style="list-style: none; padding: 1rem;">
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>•</strong> Developed Python-based security log analyzer to detect brute-force attacks, processing 50,000+ log entries and reducing manual review time by 95%</li>
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>•</strong> Engineered automated threat detection tool with JSON output compatible with SIEM platforms, implementing configurable alert thresholds</li>
+<li style="padding: 0.75rem 0;"><strong>•</strong> Built comprehensive test suite using pytest achieving 85% code coverage, ensuring reliability for production security workflows</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Interview Prep -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🎤</span>
+<h3>Interview Question Prep</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Practice answering these common questions about your project. Use the STAR method (Situation, Task, Action, Result).</p>
+<div class="accordion-item">
+<div class="accordion-header">
+<h4><span>❓</span> "Tell me about a technical project you've worked on."</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<div class="info-box tip"><span class="info-box-icon">💡</span>
+<div class="info-box-content">
+<h4>Sample Answer Framework</h4>
+<p><strong>Situation:</strong> "In my cybersecurity programming course, we needed to address a real problem SOC analysts face..."<br><br><strong>Task:</strong> "I was responsible for designing and building a tool that could automatically analyze security logs..."<br><br><strong>Action:</strong> "I developed a Python application that parses JSON log files, applies detection algorithms for brute-force patterns, and outputs structured threat reports..."<br><br><strong>Result:</strong> "The tool can process 50,000 log entries in seconds, identifying threats that would take hours to find manually."</p>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">
+<h4><span>❓</span> "How do you approach debugging when something doesn't work?"</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<div class="info-box tip"><span class="info-box-icon">💡</span>
+<div class="info-box-content">
+<h4>Key Points to Cover</h4>
+<p>• Describe your systematic approach (reproduce, isolate, hypothesize, test)<br>• Mention specific tools you used (print debugging, pytest, logging)<br>• Give a concrete example from your project where debugging revealed an insight<br>• Show you can learn from errors and document solutions</p>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">
+<h4><span>❓</span> "How did you use AI tools in your development process?"</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<div class="info-box tip"><span class="info-box-icon">💡</span>
+<div class="info-box-content">
+<h4>Honest &amp; Professional Answer</h4>
+<p>This is increasingly asked! Be honest about your AI usage:<br><br>• "I used AI as a learning accelerator, not a replacement for understanding"<br>• "For example, I'd ask for explanations of concepts, then implement my own version"<br>• "I always tested AI-generated code thoroughly—I found about 30% needed modifications"<br>• "I kept an AI usage log documenting what I used, edited, and rejected"<br>• "The key skill is knowing when AI suggestions are wrong and why"</p>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">
+<h4><span>❓</span> "What would you improve if you had more time?"</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<div class="info-box tip"><span class="info-box-icon">💡</span>
+<div class="info-box-content">
+<h4>Shows Self-Awareness</h4>
+<p>This question tests if you can critically evaluate your own work:<br><br>• Pick 1-2 specific, realistic improvements<br>• Explain WHY they would add value<br>• Show you understand the tradeoffs you made<br>• Frame it positively ("next iteration" not "I failed to...")<br><br>Example: "I'd add support for multiple log formats. Currently it handles JSON, but real SOC environments have CSV, syslog, and CEF formats. That would make it more practical for production use."</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- AI Guidelines Section -->
+<section id="ai-guide" class="section">
+<div class="card">
+<div class="card-header"><span class="card-icon">🤖</span>
+<h3>Week 16 AI Usage Guidelines</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">This final week has specific guidance on appropriate AI use. The goal is polishing and presentation—not last-minute rewrites.</p>
+<div class="grid-2">
+<div class="card" style="border-color: var(--accent-green);">
+<div class="card-header" style="background: rgba(40, 167, 69, 0.2);"><span class="card-icon">✅</span>
+<h3 style="color: var(--accent-green);">Appropriate AI Use</h3>
+</div>
+<div class="card-body">
+<ul style="list-style: none;">
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>📝 Documentation Polish</strong><br><span style="color: var(--text-secondary);">"Help me make this README section clearer"</span></li>
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>✍️ Resume Language</strong><br><span style="color: var(--text-secondary);">"How can I describe this project for a SOC analyst job?"</span></li>
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>💬 Comment Clarity</strong><br><span style="color: var(--text-secondary);">"Is this docstring clear and complete?"</span></li>
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>🎯 Demo Script Review</strong><br><span style="color: var(--text-secondary);">"Does this demo flow make sense?"</span></li>
+<li style="padding: 0.75rem 0;"><strong>🔍 Minor Bug Fixes</strong><br><span style="color: var(--text-secondary);">"Why is this test failing?" (for small issues you understand)</span></li>
+</ul>
+</div>
+</div>
+<div class="card" style="border-color: var(--accent-red);">
+<div class="card-header" style="background: rgba(220, 53, 69, 0.2);"><span class="card-icon">❌</span>
+<h3 style="color: var(--accent-red);">Inappropriate AI Use</h3>
+</div>
+<div class="card-body">
+<ul style="list-style: none;">
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>🚫 Major Code Changes</strong><br><span style="color: var(--text-secondary);">"Rewrite my main function to be better"</span></li>
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>🚫 New Features</strong><br><span style="color: var(--text-secondary);">"Add a GUI to my project" (last minute)</span></li>
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>🚫 Writing Reflections</strong><br><span style="color: var(--text-secondary);">"Write my reflection about what I learned"</span></li>
+<li style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-dark);"><strong>🚫 Fabricating Results</strong><br><span style="color: var(--text-secondary);">"Create sample output that looks good"</span></li>
+<li style="padding: 0.75rem 0;"><strong>🚫 Unexplained Code</strong><br><span style="color: var(--text-secondary);">Adding AI code you can't explain in demo</span></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="info-box warning" style="margin-top: 1.5rem;"><span class="info-box-icon">⚠️</span>
+<div class="info-box-content">
+<h4>The "Explain It" Test</h4>
+<p>If you can't explain every line of code in your demo, you shouldn't submit it. Last-minute AI additions you don't understand will hurt you in interviews and on the job. It's better to submit simpler code you fully own than complex code you can't defend.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Usage Log Template -->
+<div class="card">
+<div class="card-header"><span class="card-icon">📋</span>
+<h3>AI Usage Log Template</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Your AI_USAGE.md file should document how you used AI throughout the project. This demonstrates responsible AI collaboration—a skill employers value.</p>
+<div class="terminal">
+<div class="terminal-header"><span class="terminal-dot red"></span> <span class="terminal-dot yellow"></span> <span class="terminal-dot green"></span> <span class="terminal-title">AI_USAGE.md Template</span></div>
+<div class="terminal-body copy-wrapper"><button class="copy-btn" onclick="copyAITemplate()">📋 Copy</button>
+<pre id="aiTemplateContent"><span class="highlight"># AI Usage Log</span>
+
+<span class="command">## Overview</span>
+This document tracks my use of AI assistance (GitHub Copilot, ChatGPT, Claude)
+throughout the capstone project development.
+
+<span class="command">## Summary Statistics</span>
+- Total AI-assisted sessions: [NUMBER]
+- Code suggestions accepted: [NUMBER]
+- Code suggestions rejected/modified: [NUMBER]
+- Primary uses: [e.g., debugging, documentation, learning concepts]
+
+<span class="command">## Key Prompts &amp; Interactions</span>
+
+<span class="comment">### Session 1: [Date] - [Topic]</span>
+**Prompt:** "[What you asked]"
+**AI Response Summary:** [Brief description]
+**My Action:** [Accepted/Modified/Rejected]
+**Reasoning:** [Why you made that choice]
+
+<span class="comment">### Session 2: [Date] - [Topic]</span>
+**Prompt:** "[What you asked]"
+**AI Response Summary:** [Brief description]
+**My Action:** [Accepted/Modified/Rejected]
+**Reasoning:** [Why you made that choice]
+
+<span class="command">## Examples of Rejected/Modified AI Code</span>
+
+<span class="comment">### Example 1: [Description]</span>
+**Original AI suggestion:**
+```python
+# AI-generated code here
+```
+
+**My modified version:**
+```python
+# Your improved version here
+```
+
+**Why I changed it:** [Explanation]
+
+<span class="command">## Verification Methods</span>
+- How I tested AI-generated code: [e.g., unit tests, manual testing]
+- Edge cases I specifically checked: [list]
+- Resources I used to verify correctness: [e.g., documentation, StackOverflow]
+
+<span class="command">## Reflection</span>
+[2-3 sentences on what you learned about using AI responsibly]</pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Deliverables Section -->
+<section id="deliverables" class="section">
+<div class="card">
+<div class="card-header"><span class="card-icon">📦</span>
+<h3>Final Submission Requirements</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Your final capstone submission includes these components. Review each requirement carefully.</p>
+<div class="accordion-item open">
+<div class="accordion-header">
+<h4><span>📁</span> GitHub Repository</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<table class="rubric-table">
+<thead>
+<tr>
+<th>Component</th>
+<th>Requirements</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Source Code</strong></td>
+<td>Clean, commented, follows project structure</td>
+<td>20</td>
+</tr>
+<tr>
+<td><strong>Tests</strong></td>
+<td>pytest-compatible, meaningful coverage</td>
+<td>15</td>
+</tr>
+<tr>
+<td><strong>Sample Data</strong></td>
+<td>JSON input and expected output files</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>README.md</strong></td>
+<td>Setup instructions, usage, features</td>
+<td>15</td>
+</tr>
+<tr>
+<td><strong>requirements.txt</strong></td>
+<td>All dependencies, works from clean install</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">
+<h4><span>📹</span> Demo Video (3-5 minutes)</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<table class="rubric-table">
+<thead>
+<tr>
+<th>Criteria</th>
+<th>Excellent (Full Points)</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Problem Statement</strong></td>
+<td>Clear explanation of problem being solved</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Live Demonstration</strong></td>
+<td>Shows tool running with real sample data</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>Technical Explanation</strong></td>
+<td>Explains key features and how they work</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Impact/Value</strong></td>
+<td>Articulates why this tool matters</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Production Quality</strong></td>
+<td>Clear audio, readable text, good pacing</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">
+<h4><span>🤖</span> AI Usage Log</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<table class="rubric-table">
+<thead>
+<tr>
+<th>Criteria</th>
+<th>Requirements</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Completeness</strong></td>
+<td>Documents AI use throughout project</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Specificity</strong></td>
+<td>Includes actual prompts and responses</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Critical Thinking</strong></td>
+<td>Shows examples of edits/rejections with reasoning</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Verification</strong></td>
+<td>Describes how AI code was tested</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">
+<h4><span>💭</span> Reflection Responses</h4>
+<span class="accordion-icon">▼</span></div>
+<div class="accordion-content">
+<table class="rubric-table">
+<thead>
+<tr>
+<th>Question</th>
+<th>Focus</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Technical Growth</strong></td>
+<td>Python &amp; JSON skills developed</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Problem Solving</strong></td>
+<td>Approach to debugging and challenges</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>AI Collaboration</strong></td>
+<td>Lessons learned about responsible AI use</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Future Improvements</strong></td>
+<td>What you'd improve with more time</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="stats-grid" style="margin-top: 2rem;">
+<div class="stat-item">
+<div class="stat-value">65</div>
+<div class="stat-label">Repository Points</div>
+</div>
+<div class="stat-item">
+<div class="stat-value">30</div>
+<div class="stat-label">Demo Points</div>
+</div>
+<div class="stat-item">
+<div class="stat-value">20</div>
+<div class="stat-label">AI Log Points</div>
+</div>
+<div class="stat-item">
+<div class="stat-value">20</div>
+<div class="stat-label">Reflection Points</div>
+</div>
+<div class="stat-item" style="border-color: var(--accent-red);">
+<div class="stat-value">135</div>
+<div class="stat-label">Total Points</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Reflection Section -->
+<section id="reflection" class="section">
+<div class="card">
+<div class="card-header"><span class="card-icon">💭</span>
+<h3>Final Reflection Questions</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">Take time to thoughtfully answer each reflection question. These responses should be your genuine thoughts—not AI-generated content.</p>
+<div class="info-box warning" style="margin-bottom: 2rem;"><span class="info-box-icon">⚠️</span>
+<div class="info-box-content">
+<h4>Authenticity Matters</h4>
+<p>Your reflection should be in your own voice. Instructors can tell the difference between genuine reflection and AI-generated content. These questions are about YOUR learning journey.</p>
+</div>
+</div>
+<div class="builder-section">
+<h4 style="color: var(--accent-red); margin-bottom: 1rem;">Question 1: Technical Growth</h4>
+<label class="builder-label">What specific Python and JSON skills did you develop through this project? Give concrete examples from your code.</label> <textarea class="builder-textarea" id="reflection1" placeholder="Example: I learned to use list comprehensions effectively when filtering log entries. In my analyze_logs function, I used [entry for entry in logs if entry['status'] == 'failed'] instead of a traditional for loop, which made my code more readable..."></textarea>
+<h4 style="color: var(--accent-red); margin-bottom: 1rem; margin-top: 2rem;">Question 2: Problem Solving</h4>
+<label class="builder-label">Describe a specific challenge you encountered and how you solved it. What was your debugging process?</label> <textarea class="builder-textarea" id="reflection2" placeholder="Example: My brute-force detection was flagging legitimate users who just forgot their password. I debugged this by adding print statements to see the threshold values, then realized I needed to add a time window—50 failed logins in 1 hour is suspicious, but 50 over a month isn't..."></textarea>
+<h4 style="color: var(--accent-red); margin-bottom: 1rem; margin-top: 2rem;">Question 3: AI Collaboration</h4>
+<label class="builder-label">What did you learn about using AI tools responsibly in development? Include a specific example of when you modified or rejected AI-generated code.</label> <textarea class="builder-textarea" id="reflection3" placeholder="Example: I learned that AI suggestions often work for simple cases but miss edge cases. When I asked for help with JSON parsing, the AI suggested code that would crash on empty files. I had to add error handling myself because I knew my sample data might include empty log files..."></textarea>
+<h4 style="color: var(--accent-red); margin-bottom: 1rem; margin-top: 2rem;">Question 4: Future Improvements</h4>
+<label class="builder-label">If you had two more weeks, what would you improve and why?</label> <textarea class="builder-textarea" id="reflection4" placeholder="Example: I would add support for real-time log streaming instead of just batch file processing. This would make the tool usable in a live SOC environment where analysts need immediate alerts, not just reports on yesterday's logs..."></textarea>
+<div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button class="btn btn-primary" onclick="saveReflections()">💾 Save Responses</button> <button class="btn btn-secondary" onclick="exportReflections()">📤 Export as Markdown</button></div>
+</div>
+<div id="reflectionSaved" class="info-box success" style="display: none; margin-top: 1rem;"><span class="info-box-icon">✅</span>
+<div class="info-box-content">
+<h4>Responses Saved!</h4>
+<p>Your reflection responses have been saved to your browser. You can export them as Markdown when ready to submit.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Career Mapping -->
+<div class="card">
+<div class="card-header"><span class="card-icon">🗺️</span>
+<h3>How This Maps to Real Security Work</h3>
+</div>
+<div class="card-body">
+<p style="margin-bottom: 1.5rem;">The skills you've developed directly translate to entry-level security tasks:</p>
+<div class="grid-2">
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Your Skill</span> <span class="example-title">JSON Log Parsing</span></div>
+<p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Real Job Task:</strong></p>
+<p style="color: var(--text-muted);">SOC analysts parse SIEM logs (Splunk, Microsoft Sentinel) daily. JSON is the lingua franca of security tools—every API, every log format, every configuration uses it.</p>
+</div>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Your Skill</span> <span class="example-title">Automated Detection</span></div>
+<p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Real Job Task:</strong></p>
+<p style="color: var(--text-muted);">Security engineers write detection rules and automated alerts. Your threshold-based detection logic mirrors how real tools like Crowdstrike and Elastic Security work.</p>
+</div>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Your Skill</span> <span class="example-title">Test-Driven Development</span></div>
+<p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Real Job Task:</strong></p>
+<p style="color: var(--text-muted);">Security tools MUST be reliable. False positives waste analyst time; false negatives miss threats. pytest skills ensure your detection logic actually works.</p>
+</div>
+<div class="example-card">
+<div class="example-card-header"><span class="example-badge">Your Skill</span> <span class="example-title">Documentation</span></div>
+<p style="color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>Real Job Task:</strong></p>
+<p style="color: var(--text-muted);">Security teams share tools and runbooks. A well-documented tool can be adopted by the whole team; an undocumented one dies when you leave.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><!-- Footer --><footer class="footer">
+<p class="footer-text"><span class="footer-highlight">Week 16</span> | Demo, Reflection &amp; Portfolio Packaging<br>Cybersecurity Programming Capstone | <span class="footer-highlight">🔐</span> Secure Your Future</p>
+</footer>
+<p><script>
+        // ===== NAVIGATION =====
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show corresponding section
+                const sectionId = tab.dataset.section;
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById(sectionId).classList.add('active');
+                
+                // Scroll to top of content
+                window.scrollTo({ top: 200, behavior: 'smooth' });
+            });
+        });
+
+        // ===== CHECKLIST FUNCTIONALITY =====
+        let checklistState = {
+            objectives: {},
+            submission: {},
+            checkout: {}
+        };
+
+        // Load saved state
+        const savedState = localStorage.getItem('week16_checklist');
+        if (savedState) {
+            checklistState = JSON.parse(savedState);
+            restoreChecklistState();
+        }
+
+        function restoreChecklistState() {
+            // Restore objectives
+            Object.keys(checklistState.objectives).forEach(key => {
+                if (checklistState.objectives[key]) {
+                    const checkbox = document.querySelector(`[data-objective="${{key}}"]`);
+                    if (checkbox) {
+                        checkbox.classList.add('checked');
+                        checkbox.closest('.checklist-item').classList.add('completed');
+                    }
+                }
+            });
+            
+            // Restore submission
+            Object.keys(checklistState.submission).forEach(key => {
+                if (checklistState.submission[key]) {
+                    const checkbox = document.querySelector(`[data-check="${{key}}"]`);
+                    if (checkbox) {
+                        checkbox.classList.add('checked');
+                        checkbox.closest('.checklist-item').classList.add('completed');
+                    }
+                }
+            });
+            
+            // Restore checkout
+            Object.keys(checklistState.checkout).forEach(key => {
+                if (checklistState.checkout[key]) {
+                    const checkbox = document.querySelector(`[data-checkout="${{key}}"]`);
+                    if (checkbox) {
+                        checkbox.classList.add('checked');
+                        checkbox.closest('.checklist-item').classList.add('completed');
+                    }
+                }
+            });
+            
+            updateProgress();
+            checkCheckoutComplete();
+        }
+
+        // Objectives checklist
+        document.querySelectorAll('[data-objective]').forEach(checkbox => {
+            checkbox.addEventListener('click', () => {
+                checkbox.classList.toggle('checked');
+                checkbox.closest('.checklist-item').classList.toggle('completed');
+                checklistState.objectives[checkbox.dataset.objective] = checkbox.classList.contains('checked');
+                saveChecklistState();
+                updateProgress();
+            });
+        });
+
+        // Submission checklist
+        document.querySelectorAll('[data-check]').forEach(checkbox => {
+            checkbox.addEventListener('click', () => {
+                checkbox.classList.toggle('checked');
+                checkbox.closest('.checklist-item').classList.toggle('completed');
+                checklistState.submission[checkbox.dataset.check] = checkbox.classList.contains('checked');
+                saveChecklistState();
+                updateProgress();
+            });
+        });
+
+        // Checkout checklist
+        document.querySelectorAll('[data-checkout]').forEach(checkbox => {
+            checkbox.addEventListener('click', () => {
+                checkbox.classList.toggle('checked');
+                checkbox.closest('.checklist-item').classList.toggle('completed');
+                checklistState.checkout[checkbox.dataset.checkout] = checkbox.classList.contains('checked');
+                saveChecklistState();
+                checkCheckoutComplete();
+            });
+        });
+
+        function saveChecklistState() {
+            localStorage.setItem('week16_checklist', JSON.stringify(checklistState));
+        }
+
+        function updateProgress() {
+            const totalItems = 7; // submission checklist items
+            const checkedItems = Object.values(checklistState.submission).filter(v => v).length;
+            const percentage = Math.round((checkedItems / totalItems) * 100);
+            
+            document.getElementById('progressPercent').textContent = percentage + '%';
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        function checkCheckoutComplete() {
+            const totalItems = 6;
+            const checkedItems = Object.values(checklistState.checkout).filter(v => v).length;
+            
+            if (checkedItems === totalItems) {
+                document.getElementById('checkoutResult').style.display = 'block';
+            } else {
+                document.getElementById('checkoutResult').style.display = 'none';
+            }
+        }
+
+        // ===== TAB FUNCTIONALITY =====
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const container = btn.closest('.tab-container');
+                const tabId = btn.dataset.tab;
+                
+                // Update buttons
+                container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update content
+                container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                container.querySelector(`#${{tabId}}`).classList.add('active');
+            });
+        });
+
+        // ===== ACCORDION FUNCTIONALITY =====
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.closest('.accordion-item').classList.toggle('open');
+            });
+        });
+
+        // ===== DEMO SCRIPT BUILDER =====
+        function generateDemoScript() {
+            const toolName = document.getElementById('demoToolName').value || '[Tool Name]';
+            const problem = document.getElementById('demoProblem').value || '[Problem description]';
+            const user = document.getElementById('demoUser').value || '[Target user]';
+            const feature1 = document.getElementById('demoFeature1').value || '[Feature 1]';
+            const feature2 = document.getElementById('demoFeature2').value || '[Feature 2]';
+            const feature3 = document.getElementById('demoFeature3').value || '[Feature 3]';
+            const impact = document.getElementById('demoImpact').value || '[Impact statement]';
+
+            const script = `DEMO SCRIPT: ${{toolName}}
+=====================================
+Duration: 3-5 minutes
+
+[0:00 - 0:30] INTRODUCTION
+----------------------------
+"Hi, I'm presenting ${{toolName}}.
+
+Imagine you're a ${{user}}. ${{problem}}
+
+That's exactly what my tool solves."
+
+[0:30 - 1:00] SETUP
+----------------------------
+"Let me show you the tool in action. 
+I have a sample log file here with [X] entries.
+Let's run the analyzer..."
+
+[COMMAND]: python src/main.py data/sample_input.json
+
+[1:00 - 3:30] DEMONSTRATION
+----------------------------
+Key Feature 1: ${{feature1}}
+"Notice how the tool [explain what's happening]..."
+
+Key Feature 2: ${{feature2}}
+"Here you can see [explain the output]..."
+
+Key Feature 3: ${{feature3}}
+"What makes this especially useful is [explain value]..."
+
+[3:30 - 4:00] OUTPUT REVIEW
+----------------------------
+"Let's look at the output file..."
+[Show JSON output, highlight key findings]
+
+[4:00 - 4:30] IMPACT
+----------------------------
+"${{impact}}
+
+This is the kind of automation that helps security teams scale."
+
+[4:30 - 5:00] CLOSING
+----------------------------
+"Thank you for watching. The code is available on GitHub 
+with full documentation and sample data."
+
+=====================================
+REMINDERS:
+- Test with sample data before recording
+- Increase terminal font size
+- Close notifications
+- Speak naturally, don't read verbatim`;
+
+            document.getElementById('demoScriptOutput').style.display = 'block';
+            document.getElementById('demoScriptContent').textContent = script;
+        }
+
+        function copyDemoScript() {
+            const content = document.getElementById('demoScriptContent').textContent;
+            navigator.clipboard.writeText(content);
+            alert('Demo script copied to clipboard!');
+        }
+
+        // ===== README BUILDER =====
+        function generateReadme() {
+            const name = document.getElementById('readmeName').value || 'Project Name';
+            const desc = document.getElementById('readmeDesc').value || 'Project description';
+            const problem = document.getElementById('readmeProblem').value || 'Problem description';
+            const features = document.getElementById('readmeFeatures').value || 'Feature 1\nFeature 2';
+            const prereqs = document.getElementById('readmePrereqs').value || 'Python 3.8+';
+            const install = document.getElementById('readmeInstall').value || 'pip install -r requirements.txt';
+            const usage = document.getElementById('readmeUsage').value || 'python src/main.py';
+            const course = document.getElementById('readmeCourse').value || 'Cybersecurity Programming';
+
+            const featureList = features.split('\n').map(f => `- ${f.trim()}`).join('\n');
+
+            const readme = `# ${{name}}
+
+${{desc}}
+
+## 🎯 Problem Statement
+
+${{problem}}
+
+## ✨ Features
+
+${{featureList}}
+
+## 📋 Prerequisites
+
+- ${{prereqs}}
+
+## ⚙️ Installation
+
+\`\`\`bash
+${{install}}
+\`\`\`
+
+## 🚀 Usage
+
+\`\`\`bash
+${{usage}}
+\`\`\`
+
+## 📁 Project Structure
+
+\`\`\`
+${name.toLowerCase().replace(/\s+/g, '-')}/
+├── README.md
+├── AI_USAGE.md
+├── requirements.txt
+├── src/
+│   ├── __init__.py
+│   └── main.py
+├── tests/
+│   └── test_main.py
+└── data/
+    ├── sample_input.json
+    └── sample_output.json
+\`\`\`
+
+## 🧪 Running Tests
+
+\`\`\`bash
+pytest tests/ -v
+\`\`\`
+
+## 📚 Course Context
+
+This project was developed as part of ${{course}}.
+
+## 📄 License
+
+This project is for educational purposes.
+
+---
+*Built with Python | ${new Date().getFullYear()}*`;
+
+            document.getElementById('readmeOutput').style.display = 'block';
+            document.getElementById('readmeContent').textContent = readme;
+        }
+
+        function copyReadme() {
+            const content = document.getElementById('readmeContent').textContent;
+            navigator.clipboard.writeText(content);
+            alert('README copied to clipboard!');
+        }
+
+        // ===== RESUME BULLET BUILDER =====
+        function generateResumeBullet() {
+            const verb = document.getElementById('resumeVerb').value;
+            const what = document.getElementById('resumeWhat').value;
+            const purpose = document.getElementById('resumePurpose').value;
+            const tech = document.getElementById('resumeTech').value;
+            const result = document.getElementById('resumeResult').value;
+
+            if (!verb || !what) {
+                alert('Please select an action verb and describe what you built.');
+                return;
+            }
+
+            let bullet = `• ${{verb}} ${{what}}`;
+            
+            if (purpose) {
+                bullet += ` ${{purpose}}`;
+            }
+            
+            if (tech) {
+                bullet += ` using ${{tech}}`;
+            }
+            
+            if (result) {
+                bullet += `, ${{result}}`;
+            }
+
+            document.getElementById('resumeOutput').style.display = 'block';
+            document.getElementById('resumeBulletContent').textContent = bullet;
+        }
+
+        function copyResumeBullet() {
+            const content = document.getElementById('resumeBulletContent').textContent;
+            navigator.clipboard.writeText(content);
+            alert('Resume bullet copied to clipboard!');
+        }
+
+        // ===== AI TEMPLATE COPY =====
+        function copyAITemplate() {
+            const content = document.getElementById('aiTemplateContent').textContent;
+            navigator.clipboard.writeText(content);
+            alert('AI Usage template copied to clipboard!');
+        }
+
+        // ===== REFLECTIONS =====
+        function saveReflections() {
+            const reflections = {
+                q1: document.getElementById('reflection1').value,
+                q2: document.getElementById('reflection2').value,
+                q3: document.getElementById('reflection3').value,
+                q4: document.getElementById('reflection4').value
+            };
+            
+            localStorage.setItem('week16_reflections', JSON.stringify(reflections));
+            document.getElementById('reflectionSaved').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('reflectionSaved').style.display = 'none';
+            }, 3000);
+        }
+
+        function exportReflections() {
+            const r1 = document.getElementById('reflection1').value || '[No response]';
+            const r2 = document.getElementById('reflection2').value || '[No response]';
+            const r3 = document.getElementById('reflection3').value || '[No response]';
+            const r4 = document.getElementById('reflection4').value || '[No response]';
+
+            const markdown = `# Week 16 Final Reflection
+
+## Question 1: Technical Growth
+**What specific Python and JSON skills did you develop through this project?**
+
+${{r1}}
+
+## Question 2: Problem Solving
+**Describe a specific challenge you encountered and how you solved it.**
+
+${{r2}}
+
+## Question 3: AI Collaboration
+**What did you learn about using AI tools responsibly in development?**
+
+${{r3}}
+
+## Question 4: Future Improvements
+**If you had two more weeks, what would you improve and why?**
+
+${{r4}}
+
+---
+*Submitted: ${new Date().toLocaleDateString()}*`;
+
+            // Create download
+            const blob = new Blob([markdown], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'week16_reflection.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Load saved reflections
+        const savedReflections = localStorage.getItem('week16_reflections');
+        if (savedReflections) {
+            const reflections = JSON.parse(savedReflections);
+            if (reflections.q1) document.getElementById('reflection1').value = reflections.q1;
+            if (reflections.q2) document.getElementById('reflection2').value = reflections.q2;
+            if (reflections.q3) document.getElementById('reflection3').value = reflections.q3;
+            if (reflections.q4) document.getElementById('reflection4').value = reflections.q4;
+        }
+
+        // Initialize
+        updateProgress();
+    </script></p></body></html>
