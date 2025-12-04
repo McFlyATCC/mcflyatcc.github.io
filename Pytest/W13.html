@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 13: Capstone Kickoff &amp; Project Proposal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a0000 0%, #000000 50%, #1a0000 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #cc0000 0%, #8b0000 100%);
+            padding: 30px;
+            text-align: center;
+            border: 2px solid #ff0000;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #ffcccc;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border: 2px solid #555;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .tab-button:hover {
+            background: #cc0000;
+            border-color: #ff0000;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: #cc0000;
+            border-color: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        .tab-content {
+            display: none;
+            background: #1a1a1a;
+            border: 2px solid #cc0000;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h2 {
+            color: #ff0000;
+            border-bottom: 2px solid #cc0000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #ff6666;
+            margin: 20px 0 10px 0;
+            font-size: 1.4em;
+        }
+
+        .info-box {
+            background: #2a2a2a;
+            border-left: 4px solid #cc0000;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #3a1a1a;
+            border: 2px solid #ff6600;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #1a3a1a;
+            border: 2px solid #00ff00;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .requirement-list {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .requirement-list li {
+            background: #2a2a2a;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #ff0000;
+            border-radius: 3px;
+        }
+
+        .requirement-list li::before {
+            content: "✓ ";
+            color: #00ff00;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .project-card {
+            background: #2a2a2a;
+            border: 2px solid #555;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            border-color: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .project-card h4 {
+            color: #ff6666;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .project-card.expanded {
+            border-color: #ff0000;
+            background: #333;
+        }
+
+        .project-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #555;
+        }
+
+        .project-details.show {
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 2px solid #555;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            margin: 8px 0;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .button {
+            background: #cc0000;
+            color: #ffffff;
+            border: 2px solid #ff0000;
+            padding: 12px 30px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            transition: all 0.3s;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+
+        .button:hover {
+            background: #ff0000;
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        .button.secondary {
+            background: #555;
+            border-color: #888;
+        }
+
+        .button.secondary:hover {
+            background: #777;
+            border-color: #aaa;
+        }
+
+        .form-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            color: #ff6666;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .checklist {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 8px 0;
+            background: #1a1a1a;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            background: #333;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .checklist-item.checked {
+            background: #1a3a1a;
+            border-left: 4px solid #00ff00;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #2a2a2a;
+            border: 2px solid #555;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #cc0000 0%, #ff0000 100%);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-left: 4px solid #cc0000;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+        }
+
+        .ai-prompt-box {
+            background: #1a1a2a;
+            border: 2px solid #6666ff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .ai-prompt-box h4 {
+            color: #6666ff;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #cc0000;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            margin: 4px;
+        }
+
+        .tag.must-have {
+            background: #ff0000;
+        }
+
+        .tag.nice-to-have {
+            background: #666;
+        }
+
+        .json-preview {
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .week-review {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .week-card {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #cc0000;
+        }
+
+        .week-card h4 {
+            color: #ff6666;
+            margin-bottom: 8px;
+        }
+
+        .export-section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .proposal-preview {
+            background: #f5f5f5;
+            color: #000;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+        }
+
+        .proposal-preview h3 {
+            color: #cc0000;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            color: #6666ff;
+            cursor: help;
+            margin-left: 5px;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            white-space: nowrap;
+            z-index: 1000;
+            border: 1px solid #6666ff;
+        }
+    </style>
+</head><body><div class="container"><header>
+<h1>⚡ Week 13: Capstone Kickoff ⚡</h1>
+<p class="subtitle">Choose Your Problem. Design Your Solution. Build Your Future.</p>
+</header>
+<div class="nav-tabs"><button class="tab-button active" onclick="showTab('overview')">📋 Overview</button> <button class="tab-button" onclick="showTab('course-recap')">🎓 Course Recap</button> <button class="tab-button" onclick="showTab('requirements')">✓ Requirements</button> <button class="tab-button" onclick="showTab('project-ideas')">💡 Project Ideas</button> <button class="tab-button" onclick="showTab('proposal-builder')">📝 Proposal Builder</button> <button class="tab-button" onclick="showTab('data-design')">🗂️ Data Design</button> <button class="tab-button" onclick="showTab('ai-guidance')">🤖 AI Guidance</button> <button class="tab-button" onclick="showTab('checklist')">☑️ Checklist</button></div>
+<!-- Overview Tab -->
+<div id="overview" class="tab-content active">
+<h2>🎯 Week 13 Mission: Plan Your Capstone Project</h2>
+<div class="warning-box"><strong>⚠️ CRITICAL:</strong> This week is about PLANNING, not coding. Focus on creating a solid proposal and design before writing any implementation code.</div>
+<div class="info-box">
+<h3>What You'll Do This Week</h3>
+<ul>
+<li><strong>Review</strong> everything you've learned over the past 12 weeks</li>
+<li><strong>Choose</strong> a capstone project from our menu or pitch your own idea</li>
+<li><strong>Design</strong> your project's data structures and JSON schemas</li>
+<li><strong>Write</strong> a comprehensive 1-2 page proposal</li>
+<li><strong>Leverage</strong> AI to refine your scope and brainstorm features</li>
+</ul>
+</div>
+<h3>📊 Your Deliverables</h3>
+<div class="requirement-list"><strong>Capstone Proposal Document</strong> (1-2 pages or markdown file)<strong>Initial Data Design</strong> with draft JSON examples<strong>Feature Breakdown</strong> (must-have vs. nice-to-have)</div>
+<h3>🎯 Learning Objectives</h3>
+<ul>
+<li>Apply course concepts to design a complete cybersecurity tool</li>
+<li>Practice scoping projects appropriately (not too big, not too small)</li>
+<li>Design data structures and file formats for real-world applications</li>
+<li>Use AI effectively for ideation and design (not just code generation)</li>
+<li>Create technical documentation and proposals</li>
+</ul>
+<div class="success-box"><strong>🎉 Remember:</strong> A well-planned project is half-built. Invest time in this proposal phase, and your next few weeks will be much smoother!</div>
+</div>
+<!-- Course Recap Tab -->
+<div id="course-recap" class="tab-content">
+<h2>🎓 Course Journey: 12 Weeks of Cybersecurity Programming</h2>
+<div class="info-box"><strong>You've Come a Long Way!</strong> From Python basics to advanced security applications, let's review the patterns and skills you've mastered.</div>
+<h3>Core Learning Outcomes You've Achieved</h3>
+<ul>
+<li><strong>Python Fundamentals:</strong> Variables, loops, functions, conditionals, data structures</li>
+<li><strong>File Operations:</strong> Reading/writing text, CSV, JSON, and managing file systems</li>
+<li><strong>Data Processing:</strong> Parsing logs, analyzing patterns, detecting anomalies</li>
+<li><strong>Object-Oriented Programming:</strong> Classes, objects, methods, inheritance</li>
+<li><strong>API Integration:</strong> RESTful APIs, JSON responses, error handling</li>
+<li><strong>CLI Development:</strong> Command-line interfaces, argument parsing, user interaction</li>
+<li><strong>Security Concepts:</strong> Threat detection, CVE analysis, MITRE ATT&amp;CK framework</li>
+<li><strong>AI-Assisted Development:</strong> Using GitHub Copilot and AI tools critically</li>
+</ul>
+<h3>🔧 Core Patterns from Previous Weeks</h3>
+<div class="week-review">
+<div class="week-card">
+<h4>📁 File Organizer Pattern</h4>
+<p>Reading directory contents, categorizing files, organizing by attributes, generating reports</p>
+</div>
+<div class="week-card">
+<h4>🔍 Log Scanner Pattern</h4>
+<p>Parsing log files, identifying patterns, detecting anomalies, flagging suspicious activity</p>
+</div>
+<div class="week-card">
+<h4>⚙️ Configuration Manager Pattern</h4>
+<p>Reading config files, detecting drift, comparing states, enforcing baselines</p>
+</div>
+<div class="week-card">
+<h4>📊 Comparison/Diff Pattern</h4>
+<p>Comparing datasets, identifying changes, tracking versions, highlighting deltas</p>
+</div>
+<div class="week-card">
+<h4>🎯 Risk Scoring Pattern</h4>
+<p>Evaluating threats, calculating risk scores, prioritizing alerts, generating recommendations</p>
+</div>
+<div class="week-card">
+<h4>👤 User Audit Pattern</h4>
+<p>Analyzing user activity, detecting anomalies, tracking permissions, identifying violations</p>
+</div>
+<div class="week-card">
+<h4>🗄️ Inventory Pattern</h4>
+<p>Scanning systems, cataloging assets, tracking changes, reporting status</p>
+</div>
+<div class="week-card">
+<h4>🔗 API Mashup Pattern</h4>
+<p>Integrating multiple APIs, enriching data, cross-referencing sources, generating insights</p>
+</div>
+<div class="week-card">
+<h4>💾 Backup Planning Pattern</h4>
+<p>Analyzing file systems, calculating sizes, scheduling backups, validating integrity</p>
+</div>
+<div class="week-card">
+<h4>🚨 Alert Analysis Pattern</h4>
+<p>Processing security events, correlating data, detecting patterns, triggering responses</p>
+</div>
+</div>
+<div class="success-box"><strong>💡 Pro Tip:</strong> Your capstone project should combine 2-3 of these patterns in a meaningful way. Think about how they can work together to solve a real problem!</div>
+</div>
+<!-- Requirements Tab -->
+<div id="requirements" class="tab-content">
+<h2>✓ Capstone Project Requirements</h2>
+<div class="warning-box"><strong>⚠️ NON-NEGOTIABLE:</strong> All capstone projects MUST include these elements. No exceptions!</div>
+<h3>🎯 Mandatory Technical Requirements</h3>
+<ul class="requirement-list">
+<li><strong>At least one JSON input file:</strong> Your program must read data from a JSON file (could be config, data, rules, etc.)</li>
+<li><strong>At least one JSON output file:</strong> Your program must write results to a JSON file (report, log, processed data, etc.)</li>
+<li><strong>File system interaction:</strong> Read from and/or write to disk beyond just JSON (logs, reports, data files)</li>
+<li><strong>CLI interface with arguments:</strong> Use argparse or similar to accept command-line parameters</li>
+<li><strong>At least one class used meaningfully:</strong> Not just a wrapper—a class that models your domain</li>
+<li><strong>Basic tests for core logic:</strong> Unit tests using unittest or pytest for key functions</li>
+<li><strong>Logging and error handling:</strong> Use Python's logging module and handle errors gracefully</li>
+</ul>
+<h3>📏 Scope Guidelines</h3>
+<div class="info-box">
+<h4>✅ Just Right Scope</h4>
+<ul>
+<li>200-400 lines of meaningful Python code (excluding tests)</li>
+<li>3-5 core features that work well together</li>
+<li>Can be completed in 2-3 weeks with steady effort</li>
+<li>Solves a specific, well-defined problem</li>
+<li>Has clear inputs and outputs</li>
+</ul>
+</div>
+<div class="warning-box">
+<h4>❌ Too Big (Reduce Scope)</h4>
+<ul>
+<li>Building a full SIEM system</li>
+<li>Creating an enterprise-grade application</li>
+<li>Requires external databases or complex infrastructure</li>
+<li>Would take months to implement properly</li>
+</ul>
+</div>
+<div class="warning-box">
+<h4>❌ Too Small (Expand Scope)</h4>
+<ul>
+<li>Just a single function or script</li>
+<li>No real file system interaction</li>
+<li>Could be completed in a few hours</li>
+<li>Doesn't combine multiple concepts</li>
+</ul>
+</div>
+<h3>🎨 Quality Expectations</h3>
+<div class="code-block"># Your code should demonstrate: ✓ Clean, readable code with meaningful names ✓ Proper function and class documentation ✓ Consistent formatting and style ✓ Thoughtful error handling ✓ Useful logging messages ✓ Well-organized file structure ✓ Clear README with usage instructions</div>
+<div class="success-box"><strong>🎯 The Goal:</strong> Build something you'd be proud to show in a job interview. This is portfolio-worthy work!</div>
+</div>
+<!-- Project Ideas Tab -->
+<div id="project-ideas" class="tab-content">
+<h2>💡 Capstone Project Menu</h2>
+<div class="info-box"><strong>Choose wisely!</strong> Pick a project that excites you and aligns with your career interests. We have 20 project ideas covering both cybersecurity-focused and general IT/API development. Or pitch your own idea!</div>
+<div id="project-cards-container"><!-- Project cards will be generated by JavaScript --></div>
+<div class="warning-box">
+<h3>🎨 Want to Pitch Your Own Idea?</h3>
+<p>Great! Make sure it:</p>
+<ul>
+<li>Meets all technical requirements</li>
+<li>Solves a real IT/cybersecurity problem</li>
+<li>Is appropriately scoped (not too big or small)</li>
+<li>Can be completed in 2-3 weeks</li>
+</ul>
+<p><strong>Discuss with your instructor before committing to a custom project!</strong></p>
+</div>
+</div>
+<!-- Proposal Builder Tab -->
+<div id="proposal-builder" class="tab-content">
+<h2>📝 Capstone Proposal Builder</h2>
+<div class="info-box"><strong>Build your proposal step-by-step.</strong> Fill in each section carefully—this will be your blueprint for the next few weeks!</div>
+<div class="progress-bar">
+<div id="proposal-progress" class="progress-fill" style="width: 0%;">0%</div>
+</div>
+<form id="proposal-form">
+<div class="form-group"><label>Project Title <span class="tooltip" data-tip="Choose a clear, descriptive name">ℹ️</span></label> <input type="text" id="project-title" placeholder="e.g., Advanced Login Failure Analyzer" oninput="updateProgress()"></div>
+<div class="form-group"><label>One-Paragraph Description <span class="tooltip" data-tip="Explain what your tool does in 2-3 sentences">ℹ️</span></label> <textarea id="project-description" placeholder="A command-line tool that analyzes authentication logs from multiple sources, detects suspicious login patterns, and generates risk-scored alerts. The tool identifies brute force attempts, credential stuffing, and anomalous access times across different user accounts." oninput="updateProgress()"></textarea></div>
+<div class="form-group"><label>Problem It Solves <span class="tooltip" data-tip="What real-world IT/security problem does this address?">ℹ️</span></label> <textarea id="project-problem" placeholder="Security analysts spend hours manually reviewing login logs to identify potential account compromises. This tool automates the detection of suspicious patterns and prioritizes high-risk events for investigation." oninput="updateProgress()"></textarea></div>
+<div class="form-group"><label>Target Users/Use Case <span class="tooltip" data-tip="Who will use this and how?">ℹ️</span></label> <textarea id="project-users" placeholder="SOC analysts, system administrators, security operations teams" oninput="updateProgress()"></textarea></div>
+<h3>📥 Inputs</h3>
+<div class="form-group"><label>JSON Input File(s) <span class="tooltip" data-tip="What JSON data will your program read?">ℹ️</span></label> <textarea id="project-inputs" placeholder="- config.json: Alert thresholds, known IPs, baseline patterns
+- auth_logs.json: Authentication events from various sources" oninput="updateProgress()"></textarea></div>
+<div class="form-group"><label>Other Input Files <span class="tooltip" data-tip="Any other files your program needs?">ℹ️</span></label> <textarea id="project-other-inputs" placeholder="- Raw log files (.log, .txt)
+- CSV exports from systems
+- Text files with known malicious IPs" oninput="updateProgress()"></textarea></div>
+<h3>📤 Outputs</h3>
+<div class="form-group"><label>JSON Output File(s) <span class="tooltip" data-tip="What JSON data will your program write?">ℹ️</span></label> <textarea id="project-outputs" placeholder="- alert_report.json: Risk-scored security alerts
+- analysis_summary.json: Statistics and detected patterns
+- flagged_users.json: List of accounts requiring investigation" oninput="updateProgress()"></textarea></div>
+<div class="form-group"><label>Other Output Files <span class="tooltip" data-tip="Any other files your program generates?">ℹ️</span></label> <textarea id="project-other-outputs" placeholder="- detailed_report.html: Human-readable analysis report
+- alerts.log: Timestamped log of all processing
+- visualization.txt: ASCII charts of patterns" oninput="updateProgress()"></textarea></div>
+<h3>💻 CLI Interface</h3>
+<div class="form-group"><label>Command Structure <span class="tooltip" data-tip="How will users run your program?">ℹ️</span></label> <textarea id="project-cli" placeholder="python capstone.py --input logs.json --config config.json --output report.json --threshold high --days 7" oninput="updateProgress()"></textarea></div>
+<div class="form-group"><label>CLI Arguments <span class="tooltip" data-tip="List all command-line arguments">ℹ️</span></label> <textarea id="project-args" placeholder="--input: Path to input log file (required)
+--config: Path to configuration file (required)
+--output: Path to output report file (required)
+--threshold: Risk threshold (low/medium/high, default: medium)
+--days: Number of days to analyze (default: 7)
+--verbose: Enable detailed logging (flag)" oninput="updateProgress()"></textarea></div>
+<h3>🎯 Features</h3>
+<div class="form-group"><label>Must-Have Features (Core Functionality) <span class="tooltip" data-tip="Essential features for v1.0">ℹ️</span></label> <textarea id="project-must-have" placeholder="1. Read and parse authentication logs from JSON
+2. Detect brute force attempts (failed login threshold)
+3. Calculate risk scores for each event
+4. Generate JSON report with alerts
+5. CLI interface with required arguments
+6. Error handling for malformed input" oninput="updateProgress()"></textarea></div>
+<div class="form-group"><label>Nice-to-Have Features (Enhancements) <span class="tooltip" data-tip="Features if time permits">ℹ️</span></label> <textarea id="project-nice-to-have" placeholder="1. HTML report generation with charts
+2. Integration with threat intelligence feeds
+3. Machine learning-based anomaly detection
+4. Real-time monitoring mode
+5. Email alerts for critical events
+6. Web dashboard" oninput="updateProgress()"></textarea></div>
+<h3>🏗️ Technical Approach</h3>
+<div class="form-group"><label>Classes You'll Create <span class="tooltip" data-tip="At least one class is required">ℹ️</span></label> <textarea id="project-classes" placeholder="- LogAnalyzer: Main class for parsing and analyzing logs
+- SecurityEvent: Represents a single authentication event
+- RiskCalculator: Computes risk scores based on patterns
+- ReportGenerator: Creates output files and summaries" oninput="updateProgress()"></textarea></div>
+<div class="form-group"><label>Key Algorithms/Logic <span class="tooltip" data-tip="Core processing logic">ℹ️</span></label> <textarea id="project-algorithms" placeholder="- Sliding window algorithm for brute force detection
+- Risk scoring based on multiple factors (time, location, frequency)
+- Pattern matching for known attack signatures
+- Statistical analysis for baseline deviation" oninput="updateProgress()"></textarea></div>
+<div class="form-group"><label>Testing Strategy <span class="tooltip" data-tip="How will you test your code?">ℹ️</span></label> <textarea id="project-testing" placeholder="- Unit tests for risk calculation logic
+- Tests for log parsing with sample data
+- Edge case testing (empty files, malformed JSON)
+- Integration tests for end-to-end workflow" oninput="updateProgress()"></textarea></div>
+<h3>📅 Timeline &amp; Milestones</h3>
+<div class="form-group"><label>Week-by-Week Plan <span class="tooltip" data-tip="Break down your work">ℹ️</span></label> <textarea id="project-timeline" placeholder="Week 13: Proposal and data design
+Week 14: Core classes and JSON parsing
+Week 15: Analysis logic and risk scoring
+Week 16: CLI, tests, and documentation" oninput="updateProgress()"></textarea></div>
+<div class="export-section"><button type="button" class="button" onclick="generateProposal()">📄 Generate Proposal Document</button> <button type="button" class="button secondary" onclick="saveProposal()">💾 Save Draft</button> <button type="button" class="button secondary" onclick="loadProposal()">📂 Load Draft</button></div>
+</form>
+<div id="proposal-output" style="display: none;">
+<h3>📋 Your Proposal Preview</h3>
+<div id="proposal-preview-content" class="proposal-preview"></div>
+<button class="button" onclick="downloadProposal()">⬇️ Download as Markdown</button> <button class="button secondary" onclick="copyProposal()">📋 Copy to Clipboard</button></div>
+</div>
+<!-- Data Design Tab -->
+<div id="data-design" class="tab-content">
+<h2>🗂️ Data Design Workshop</h2>
+<div class="info-box"><strong>Design your JSON schemas and data structures.</strong> Good data design = easier implementation!</div>
+<h3>📥 Input JSON Example</h3>
+<div class="form-group"><label>Design Your Input JSON Structure</label> <textarea id="input-json" rows="15" placeholder="{
+  &quot;config&quot;: {
+    &quot;threshold&quot;: 5,
+    &quot;time_window&quot;: 300,
+    &quot;alert_level&quot;: &quot;high&quot;
+  },
+  &quot;known_good_ips&quot;: [
+    &quot;192.168.1.100&quot;,
+    &quot;10.0.0.50&quot;
+  ],
+  &quot;baseline_patterns&quot;: {
+    &quot;normal_hours&quot;: [8, 17],
+    &quot;max_daily_logins&quot;: 20
+  }
+}"></textarea> <button class="button" onclick="validateJSON('input-json')">✓ Validate JSON</button> <button class="button secondary" onclick="formatJSON('input-json')">🎨 Format JSON</button></div>
+<h3>📤 Output JSON Example</h3>
+<div class="form-group"><label>Design Your Output JSON Structure</label> <textarea id="output-json" rows="15" placeholder="{
+  &quot;analysis_timestamp&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;summary&quot;: {
+    &quot;total_events&quot;: 1523,
+    &quot;suspicious_events&quot;: 47,
+    &quot;high_risk_alerts&quot;: 12
+  },
+  &quot;alerts&quot;: [
+    {
+      &quot;alert_id&quot;: &quot;ALT-001&quot;,
+      &quot;timestamp&quot;: &quot;2024-01-15T03:22:15Z&quot;,
+      &quot;username&quot;: &quot;admin&quot;,
+      &quot;source_ip&quot;: &quot;185.220.101.45&quot;,
+      &quot;event_type&quot;: &quot;brute_force&quot;,
+      &quot;risk_score&quot;: 95,
+      &quot;details&quot;: &quot;Multiple failed login attempts detected&quot;
+    }
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Block IP 185.220.101.45&quot;,
+    &quot;Review admin account activity&quot;
+  ]
+}"></textarea> <button class="button" onclick="validateJSON('output-json')">✓ Validate JSON</button> <button class="button secondary" onclick="formatJSON('output-json')">🎨 Format JSON</button></div>
+<div id="json-validation-result"></div>
+<h3>🏗️ Data Structure Planning</h3>
+<div class="info-box">
+<h4>Key Questions to Answer:</h4>
+<ul>
+<li>What are the main entities in your system? (Users, Events, Alerts, etc.)</li>
+<li>What attributes does each entity need?</li>
+<li>How will entities relate to each other?</li>
+<li>What data types will you use? (strings, ints, lists, dicts)</li>
+<li>What validations do you need? (required fields, ranges, formats)</li>
+</ul>
+</div>
+<div class="form-group"><label>Sketch Your Python Classes &amp; Data Structures</label> <textarea id="data-structures" rows="20" placeholder="# Main Classes
+
+class SecurityEvent:
+    &quot;&quot;&quot;Represents a single authentication event&quot;&quot;&quot;
+    def __init__(self, timestamp, username, source_ip, success):
+        self.timestamp = timestamp
+        self.username = username
+        self.source_ip = source_ip
+        self.success = success
+        self.risk_score = 0
+
+class LogAnalyzer:
+    &quot;&quot;&quot;Analyzes authentication logs for suspicious patterns&quot;&quot;&quot;
+    def __init__(self, config):
+        self.config = config
+        self.events = []
+        self.alerts = []
+    
+    def load_logs(self, filepath):
+        &quot;&quot;&quot;Load logs from JSON file&quot;&quot;&quot;
+        pass
+    
+    def analyze_patterns(self):
+        &quot;&quot;&quot;Detect suspicious patterns&quot;&quot;&quot;
+        pass
+    
+    def generate_report(self):
+        &quot;&quot;&quot;Create output JSON report&quot;&quot;&quot;
+        pass
+
+# Data Structures
+# - List of SecurityEvent objects
+# - Dictionary of user activity (username -&gt; events)
+# - Dictionary of IP reputation (ip -&gt; risk_level)
+"></textarea></div>
+<div class="ai-prompt-box">
+<h4>🤖 AI Prompt for Data Design</h4>
+<p><strong>Try this prompt:</strong></p>
+<div class="code-block">I'm designing a [YOUR PROJECT TYPE] tool in Python. I need to: 1. Read data from JSON files about [INPUT DATA] 2. Process it to [YOUR GOAL] 3. Output results as JSON with [OUTPUT DATA] Can you help me design: - The optimal JSON structure for my input file - The JSON schema for my output/report file - Python classes to represent the main entities - Key data structures (lists, dicts) I'll need Keep it simple and suitable for a student project (200-400 lines of code).</div>
+</div>
+</div>
+<!-- AI Guidance Tab -->
+<div id="ai-guidance" class="tab-content">
+<h2>🤖 AI-Assisted Project Planning</h2>
+<div class="warning-box"><strong>⚠️ Remember:</strong> Use AI to enhance your thinking, not replace it. The goal is to learn, not just get code!</div>
+<h3>🎯 Week 13 AI Strategy</h3>
+<div class="info-box">
+<p><strong>This week, use AI for:</strong></p>
+<ul>
+<li>✅ Brainstorming project ideas and features</li>
+<li>✅ Refining your project scope (too big? too small?)</li>
+<li>✅ Designing JSON schemas and data structures</li>
+<li>✅ Getting feedback on your proposal</li>
+<li>✅ Understanding technical approaches</li>
+</ul>
+<p><strong>Do NOT use AI to:</strong></p>
+<ul>
+<li>❌ Write your full implementation (that comes later!)</li>
+<li>❌ Copy-paste code without understanding it</li>
+<li>❌ Skip the planning phase</li>
+</ul>
+</div>
+<h3>💡 Effective AI Prompts for Each Stage</h3>
+<div class="ai-prompt-box">
+<h4>Stage 1: Brainstorming &amp; Idea Selection</h4>
+<div class="code-block">I'm a cybersecurity student choosing a capstone project. I'm interested in [YOUR INTEREST AREA: log analysis / malware detection / network security / etc.]. The project must: - Be completed in 2-3 weeks - Use Python with JSON input/output - Be 200-400 lines of code - Solve a real IT/security problem Can you suggest 3 project ideas that: 1. Match my interest area 2. Meet these constraints 3. Would be valuable for a portfolio For each idea, explain: what it does, why it's useful, and what makes it interesting.</div>
+</div>
+<div class="ai-prompt-box">
+<h4>Stage 2: Scope Refinement</h4>
+<div class="code-block">I want to build [YOUR PROJECT IDEA]. Here's my initial plan: [PASTE YOUR DESCRIPTION] Please help me evaluate: 1. Is this scope appropriate for a 2-3 week student project (200-400 lines)? 2. Is it too ambitious? If so, what features should I cut? 3. Is it too simple? If so, what would make it more substantial? 4. What are the core features (must-haves) vs. nice-to-haves? Give me a realistic "MVP" version that still demonstrates strong Python skills.</div>
+</div>
+<div class="ai-prompt-box">
+<h4>Stage 3: JSON Schema Design</h4>
+<div class="code-block">I'm building [YOUR PROJECT] that will: - Input: [DESCRIBE INPUT DATA] - Output: [DESCRIBE OUTPUT DATA] Can you help me design: 1. A JSON schema for my input file with example data 2. A JSON schema for my output/report file 3. Explanation of why this structure makes sense Consider: - The data should be easy to parse in Python - The output should be useful for [YOUR TARGET USER] - Include all necessary fields for [YOUR ANALYSIS]</div>
+</div>
+<div class="ai-prompt-box">
+<h4>Stage 4: Architecture &amp; Class Design</h4>
+<div class="code-block">For my [PROJECT TYPE] project, I need to design the Python architecture. Requirements: - Read JSON input files - Process data to [YOUR GOAL] - Write JSON output files - Use at least one meaningful class - Have a CLI interface Can you suggest: 1. What classes I should create (and why) 2. What key methods each class should have 3. How the classes should interact 4. What the main program flow should look like Keep it simple and educational - I need to understand and implement this myself!</div>
+</div>
+<div class="ai-prompt-box">
+<h4>Stage 5: Proposal Review</h4>
+<div class="code-block">I've written my capstone proposal. Can you review it and provide feedback? [PASTE YOUR PROPOSAL] Please evaluate: 1. Is the problem statement clear and compelling? 2. Are the inputs/outputs well-defined? 3. Is the scope appropriate (not too big or small)? 4. Are the must-have features realistic for 2-3 weeks? 5. Is the technical approach sound? 6. What's missing or unclear? Be constructive but honest - I want to submit a strong proposal!</div>
+</div>
+<h3>⚠️ AI Pitfalls to Avoid</h3>
+<div class="warning-box">
+<ul>
+<li><strong>Don't accept the first answer:</strong> Ask follow-up questions, request alternatives</li>
+<li><strong>Don't trust blindly:</strong> Verify technical claims, test suggestions</li>
+<li><strong>Don't skip thinking:</strong> AI should enhance your design process, not replace it</li>
+<li><strong>Don't copy-paste:</strong> Understand every line of code you include</li>
+<li><strong>Don't over-complicate:</strong> Simpler solutions are often better</li>
+</ul>
+</div>
+<div class="success-box">
+<h3>🎯 Best Practice: Iterative Refinement</h3>
+<p>Have a conversation with AI, don't just ask one question:</p>
+<ol>
+<li>Ask your initial question</li>
+<li>Review the response critically</li>
+<li>Ask follow-ups: "What about X?" or "How would you handle Y?"</li>
+<li>Challenge assumptions: "Is there a simpler way?"</li>
+<li>Request alternatives: "What's another approach?"</li>
+</ol>
+</div>
+</div>
+<!-- Checklist Tab -->
+<div id="checklist" class="tab-content">
+<h2>☑️ Week 13 Completion Checklist</h2>
+<div class="progress-bar">
+<div id="checklist-progress" class="progress-fill" style="width: 0%;">0%</div>
+</div>
+<div class="checklist">
+<h3>📋 Proposal Requirements</h3>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check1"> <label>Project title is clear and descriptive</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check2"> <label>One-paragraph description explains what the tool does</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check3"> <label>Problem statement describes a real IT/security need</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check4"> <label>Target users/use case is clearly identified</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check5"> <label>JSON input files are specified with purpose</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check6"> <label>JSON output files are specified with contents</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check7"> <label>Other file system interactions are documented</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check8"> <label>CLI interface is described with example commands</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check9"> <label>All CLI arguments are listed and explained</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check10"> <label>Must-have features are realistic and well-defined</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check11"> <label>Nice-to-have features are distinguished from must-haves</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check12"> <label>At least one meaningful class is planned</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check13"> <label>Testing strategy is outlined</label></div>
+</div>
+<div class="checklist">
+<h3>🗂️ Data Design Requirements</h3>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check14"> <label>Input JSON example is created with realistic data</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check15"> <label>Output JSON example is created with expected results</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check16"> <label>Both JSON structures are valid (no syntax errors)</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check17"> <label>Python classes are sketched out with key methods</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check18"> <label>Data structures (lists, dicts) are planned</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check19"> <label>Data relationships are clear and logical</label></div>
+</div>
+<div class="checklist">
+<h3>🤖 AI Usage Requirements</h3>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check20"> <label>Used AI to brainstorm or refine project ideas</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check21"> <label>Used AI to evaluate project scope</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check22"> <label>Used AI to help design JSON schemas</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check23"> <label>Critically evaluated AI suggestions (didn't blindly accept)</label></div>
+</div>
+<div class="checklist">
+<h3>📊 Scope Validation</h3>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check24"> <label>Project is not too large (can be done in 2-3 weeks)</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check25"> <label>Project is not too small (requires substantial effort)</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check26"> <label>Project meets ALL technical requirements</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check27"> <label>Project solves a clear, defined problem</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check28"> <label>Timeline/milestones are realistic</label></div>
+</div>
+<div class="checklist">
+<h3>📄 Submission Ready</h3>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check29"> <label>Proposal is 1-2 pages (or equivalent markdown)</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check30"> <label>All sections are complete (no "TODO" placeholders)</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check31"> <label>Writing is clear and professional</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check32"> <label>Proposal reviewed by peer or instructor (if possible)</label></div>
+<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" id="check33"> <label>JSON examples are included as separate files or appendix</label></div>
+</div>
+<div class="export-section"><button class="button" onclick="downloadChecklist()">📥 Download Checklist</button> <button class="button secondary" onclick="resetChecklist()">🔄 Reset All</button></div>
+<div id="completion-message" style="display: none;" class="success-box">
+<h3>🎉 Congratulations!</h3>
+<p>You've completed all checklist items! Your proposal is ready for submission.</p>
+<p><strong>Next steps:</strong></p>
+<ul>
+<li>Submit your proposal to your instructor</li>
+<li>Prepare for Week 14: Start implementing your core classes</li>
+<li>Keep your JSON examples handy for testing</li>
+</ul>
+</div>
+</div>
+</div>
+<p><script>
+        // Project ideas data
+        const projectIdeas = [
+            {
+                title: "Security Log Correlation Engine",
+                category: "Log Analysis",
+                difficulty: "Medium",
+                description: "Analyze logs from multiple sources (firewall, IDS, authentication) to correlate events and detect multi-stage attacks.",
+                problem: "Security analysts manually correlate events across different systems, missing patterns that span multiple log sources.",
+                inputs: "- config.json: Correlation rules and thresholds\n- logs.json: Aggregated log entries from various sources\n- threat_indicators.json: Known IOCs and attack patterns",
+                outputs: "- correlated_events.json: Timeline of related security events\n- attack_chains.json: Detected multi-stage attack patterns\n- alert_report.json: High-priority security alerts",
+                features: "Must-have: Log parsing, event correlation, timeline generation, alert creation\nNice-to-have: MITRE ATT&CK mapping, graph visualization, threat intelligence integration",
+                technicalHints: "Use classes for Event, CorrelationRule, AttackChain. Implement sliding time-window analysis. Consider hash-based event matching."
+            },
+            {
+                title: "Vulnerability Prioritization System",
+                category: "Risk Management",
+                difficulty: "Medium",
+                description: "Analyze CVE data, asset inventory, and threat intelligence to prioritize which vulnerabilities to patch first.",
+                problem: "Organizations have thousands of vulnerabilities but limited resources. Need intelligent prioritization based on actual risk.",
+                inputs: "- asset_inventory.json: Systems, software, and their criticality\n- cve_feed.json: Vulnerability data with CVSS scores\n- threat_intel.json: Actively exploited CVEs",
+                outputs: "- priority_list.json: Ranked vulnerabilities with risk scores\n- patch_plan.json: Recommended patching schedule\n- risk_report.json: Risk analysis by system/department",
+                features: "Must-have: CVE parsing, risk scoring algorithm, asset matching, prioritization\nNice-to-have: EPSS integration, exploit prediction, timeline optimization",
+                technicalHints: "Create Vulnerability and Asset classes. Implement multi-factor risk scoring. Consider business impact weighting."
+            },
+            {
+                title: "Incident Response Playbook Validator",
+                category: "Incident Response",
+                difficulty: "Medium",
+                description: "Validate that incident response playbooks are complete, have proper dependencies, and cover required scenarios.",
+                problem: "IR playbooks are often incomplete or inconsistent. Organizations need to validate playbooks before incidents occur.",
+                inputs: "- playbooks.json: IR procedures and steps\n- requirements.json: Mandatory playbook elements\n- scenarios.json: Required incident scenarios",
+                outputs: "- validation_report.json: Playbook completeness scores\n- gaps.json: Missing steps or scenarios\n- recommendations.json: Suggested improvements",
+                features: "Must-have: Playbook parsing, requirement checking, dependency validation, gap analysis\nNice-to-have: NIST framework mapping, automated fix suggestions, version comparison",
+                technicalHints: "Use Playbook, Step, and Requirement classes. Implement graph-based dependency checking. Consider test case generation."
+            },
+            {
+                title: "Security Configuration Baseline Manager",
+                category: "Configuration Management",
+                difficulty: "Medium",
+                description: "Compare system configurations against security baselines (CIS, STIG) and detect drift or violations.",
+                problem: "Systems drift from secure baselines over time. Manual auditing is time-consuming and error-prone.",
+                inputs: "- baseline.json: Approved security configuration settings\n- current_config.json: Actual system configurations\n- policies.json: Configuration policies and exceptions",
+                outputs: "- drift_report.json: Configuration changes from baseline\n- violations.json: Policy violations with severity\n- remediation.json: Commands to fix issues",
+                features: "Must-have: Config parsing, baseline comparison, drift detection, violation flagging\nNice-to-have: Automated remediation scripts, change tracking, compliance scoring",
+                technicalHints: "Create ConfigItem and Baseline classes. Implement nested dictionary comparison. Consider regex-based matching for flexibility."
+            },
+            {
+                title: "Phishing Email Analysis Tool",
+                category: "Email Security",
+                difficulty: "Medium-High",
+                description: "Analyze email metadata and content to detect phishing indicators and extract IOCs for threat intelligence.",
+                problem: "Security teams manually analyze reported phishing emails. Automation can speed up analysis and improve detection.",
+                inputs: "- email_data.json: Email headers, body, links, attachments\n- indicators.json: Known phishing patterns and IOCs\n- whitelist.json: Legitimate domains and senders",
+                outputs: "- analysis_report.json: Phishing indicators found\n- iocs.json: Extracted URLs, domains, IPs, hashes\n- verdict.json: Risk score and recommendation",
+                features: "Must-have: Header parsing, URL extraction, domain analysis, indicator matching\nNice-to-have: Screenshot analysis, sandbox integration, VirusTotal lookup",
+                technicalHints: "Create Email and Indicator classes. Implement regex-based extraction. Consider URL defanging and reputation checks."
+            },
+            {
+                title: "Access Control Anomaly Detector",
+                category: "IAM / Access Control",
+                difficulty: "Medium",
+                description: "Analyze user permissions and access patterns to detect privilege creep, orphaned accounts, and anomalous access.",
+                problem: "Over time, users accumulate unnecessary permissions. Need to detect over-privileged accounts and access anomalies.",
+                inputs: "- users.json: User accounts and current permissions\n- access_logs.json: Historical access patterns\n- policies.json: Access policies and role definitions",
+                outputs: "- anomalies.json: Unusual access patterns detected\n- privilege_creep.json: Users with excessive permissions\n- recommendations.json: Access reviews needed",
+                features: "Must-have: Permission parsing, baseline analysis, anomaly detection, risk scoring\nNice-to-have: ML-based behavioral analysis, peer comparison, visualization",
+                technicalHints: "Use User and Permission classes. Implement statistical anomaly detection. Consider time-based access patterns."
+            },
+            {
+                title: "Threat Intelligence Feed Aggregator",
+                category: "Threat Intelligence",
+                difficulty: "Medium",
+                description: "Aggregate and normalize threat data from multiple feeds, deduplicate IOCs, and output enriched intelligence.",
+                problem: "Organizations subscribe to multiple threat feeds with different formats. Need unified view of threat landscape.",
+                inputs: "- feed_configs.json: Threat feed sources and formats\n- raw_feeds.json: Threat data from various sources\n- local_iocs.json: Internally observed indicators",
+                outputs: "- enriched_iocs.json: Normalized and deduplicated indicators\n- threat_report.json: Threat actor and campaign summaries\n- actionable_intel.json: IOCs relevant to organization",
+                features: "Must-have: Feed parsing, normalization, deduplication, enrichment\nNice-to-have: Confidence scoring, false positive filtering, STIX format export",
+                technicalHints: "Create IOC and ThreatActor classes. Implement hash-based deduplication. Consider STIX/TAXII standards."
+            },
+            {
+                title: "Security Metrics Dashboard Data Generator",
+                category: "Metrics / Reporting",
+                difficulty: "Medium",
+                description: "Collect security data from various sources, calculate KPIs, and generate dashboard-ready JSON for visualization.",
+                problem: "Security teams manually compile metrics from different tools. Automation enables real-time security posture visibility.",
+                inputs: "- data_sources.json: Connections to various security tools\n- metrics_config.json: KPI definitions and thresholds\n- historical_data.json: Previous metrics for trending",
+                outputs: "- dashboard_data.json: Calculated metrics and trends\n- alerts.json: Metrics exceeding thresholds\n- report.json: Executive summary of security posture",
+                features: "Must-have: Data collection, KPI calculation, trend analysis, threshold checking\nNice-to-have: Predictive trending, benchmark comparison, drill-down data",
+                technicalHints: "Use Metric and DataSource classes. Implement time-series calculations. Consider rolling averages and percentile calculations."
+            },
+            {
+                title: "Network Traffic Pattern Analyzer",
+                category: "Network Security",
+                difficulty: "Medium-High",
+                description: "Analyze network flow data to detect unusual traffic patterns, potential data exfiltration, and C2 communication.",
+                problem: "Network defenders need to identify suspicious traffic patterns in large volumes of flow data quickly.",
+                inputs: "- flow_data.json: NetFlow or similar network flow records\n- baseline.json: Normal traffic patterns per subnet/host\n- indicators.json: Known malicious IPs and domains",
+                outputs: "- anomalies.json: Unusual traffic patterns detected\n- exfiltration_alerts.json: Potential data theft indicators\n- connections.json: Suspicious external connections",
+                features: "Must-have: Flow parsing, baseline comparison, anomaly detection, alert generation\nNice-to-have: Beaconing detection, protocol analysis, geo-IP enrichment",
+                technicalHints: "Create Flow and Connection classes. Implement statistical baseline modeling. Consider time-series analysis for beaconing."
+            },
+            {
+                title: "Malware Sandbox Result Aggregator",
+                category: "Malware Analysis",
+                difficulty: "Medium",
+                description: "Collect results from malware sandbox analysis, extract key behaviors, and generate structured intelligence reports.",
+                problem: "Security analysts review sandbox reports manually. Automated extraction of key behaviors enables faster triage.",
+                inputs: "- sandbox_results.json: Raw output from sandbox analysis\n- behavior_patterns.json: Known malicious behavior indicators\n- family_signatures.json: Malware family characteristics",
+                outputs: "- behavior_report.json: Extracted malicious behaviors\n- family_classification.json: Likely malware family\n- iocs.json: Network and file indicators extracted",
+                features: "Must-have: Report parsing, behavior extraction, IOC identification, classification\nNice-to-have: YARA rule generation, ATT&CK technique mapping, similarity analysis",
+                technicalHints: "Use SandboxReport and Behavior classes. Implement pattern matching for behaviors. Consider MITRE ATT&CK mappings."
+            },
+            {
+                title: "Multi-Cloud Cost Analyzer",
+                category: "Cloud / DevOps",
+                difficulty: "Medium",
+                description: "Aggregate and analyze cloud spending data from multiple providers (AWS, Azure, GCP), identify cost anomalies, and generate optimization recommendations.",
+                problem: "Organizations struggle to track and optimize cloud spending across multiple providers. Manual cost analysis is time-consuming.",
+                inputs: "- cloud_costs.json: Cost data from multiple cloud providers\n- resource_inventory.json: Current cloud resources and tags\n- budget_thresholds.json: Spending limits and alerts",
+                outputs: "- cost_report.json: Aggregated spending by service/project/team\n- anomalies.json: Unusual spending patterns detected\n- recommendations.json: Cost optimization suggestions",
+                features: "Must-have: Multi-cloud cost parsing, trend analysis, anomaly detection, budget alerts\nNice-to-have: Cost forecasting, right-sizing recommendations, unused resource identification",
+                technicalHints: "Create CloudProvider and CostItem classes. Implement time-series analysis for trend detection. Use statistical methods for anomaly identification."
+            },
+            {
+                title: "API Health Monitor & Aggregator",
+                category: "API / Monitoring",
+                difficulty: "Medium",
+                description: "Monitor multiple REST APIs for availability, performance, and response validity. Generate uptime reports and alert on issues.",
+                problem: "IT teams need to monitor dozens of APIs across services. Manual checking is impractical and delayed detection causes incidents.",
+                inputs: "- api_config.json: List of APIs to monitor with expected responses\n- health_checks.json: Historical health check results\n- alert_rules.json: Conditions that trigger alerts",
+                outputs: "- health_report.json: Current status of all monitored APIs\n- uptime_stats.json: Availability metrics per API\n- alerts.json: APIs failing health checks with details",
+                features: "Must-have: Multi-API health checking, response validation, uptime calculation, alert generation\nNice-to-have: Performance trend analysis, SLA compliance tracking, HTML dashboard",
+                technicalHints: "Use HealthCheck and APIEndpoint classes. Implement retry logic with exponential backoff. Consider response time percentiles (p50, p95, p99)."
+            },
+            {
+                title: "GitHub Repository Analyzer",
+                category: "API / DevOps",
+                difficulty: "Medium",
+                description: "Use GitHub API to analyze repository metrics, identify code quality issues, and track project health across multiple repos.",
+                problem: "Development teams manage many repositories but lack consolidated view of code quality, activity, and health metrics.",
+                inputs: "- repo_list.json: GitHub repositories to analyze\n- quality_rules.json: Code quality thresholds and best practices\n- team_config.json: Team members and their repositories",
+                outputs: "- repo_health.json: Health scores for each repository\n- quality_report.json: Code quality issues and recommendations\n- activity_summary.json: Commit frequency, PR metrics, contributor stats",
+                features: "Must-have: GitHub API integration, metric calculation, health scoring, report generation\nNice-to-have: Trend analysis over time, team productivity metrics, stale repo identification",
+                technicalHints: "Use Repository and Contributor classes. Handle GitHub API rate limits. Implement caching to minimize API calls."
+            },
+            {
+                title: "Infrastructure Change Tracker",
+                category: "IT Operations / Config",
+                difficulty: "Medium",
+                description: "Track changes to IT infrastructure across multiple systems, detect unauthorized modifications, and maintain change audit trail.",
+                problem: "IT infrastructure changes without proper tracking lead to incidents. Manual change tracking is incomplete and unreliable.",
+                inputs: "- current_state.json: Current infrastructure configuration\n- baseline_state.json: Approved infrastructure baseline\n- change_approvals.json: Authorized changes with timestamps",
+                outputs: "- change_report.json: All detected infrastructure changes\n- unauthorized_changes.json: Changes without approval\n- audit_trail.json: Complete history of modifications",
+                features: "Must-have: State comparison, change detection, approval validation, audit logging\nNice-to-have: Change risk scoring, rollback recommendations, compliance reporting",
+                technicalHints: "Create InfrastructureItem and Change classes. Implement deep dictionary comparison. Consider change categorization (high/medium/low risk)."
+            },
+            {
+                title: "Weather & Incident Correlator",
+                category: "API Mashup / Analysis",
+                difficulty: "Medium",
+                description: "Correlate weather events with IT incidents to identify patterns (power outages during storms, network issues in heat, etc.).",
+                problem: "IT teams don't always connect infrastructure incidents to environmental factors. Understanding correlations enables better preparedness.",
+                inputs: "- incidents.json: Historical IT incident data with timestamps and locations\n- weather_config.json: Weather API settings and location mappings\n- facility_locations.json: Data center and office locations",
+                outputs: "- correlation_report.json: Incidents correlated with weather events\n- risk_forecast.json: Predicted incident risk based on weather forecast\n- recommendations.json: Preventive actions for weather events",
+                features: "Must-have: Weather API integration, incident parsing, correlation analysis, risk assessment\nNice-to-have: Historical trend analysis, predictive modeling, automated alerting",
+                technicalHints: "Use Incident and WeatherEvent classes. Implement time-window correlation (±6 hours). Consider geographic distance matching."
+            },
+            {
+                title: "API Rate Limit Manager",
+                category: "API / Development",
+                difficulty: "Medium",
+                description: "Track API usage across multiple services, predict rate limit exhaustion, and optimize API call distribution.",
+                problem: "Applications use multiple APIs with different rate limits. Hitting rate limits causes failures. Manual tracking is insufficient.",
+                inputs: "- api_limits.json: Rate limits for each API service\n- usage_logs.json: Historical API call logs\n- application_config.json: Apps and their API dependencies",
+                outputs: "- usage_report.json: Current usage vs limits for each API\n- predictions.json: Forecasted rate limit exhaustion times\n- optimization.json: Recommendations to distribute load",
+                features: "Must-have: Usage tracking, limit calculation, exhaustion prediction, alert generation\nNice-to-have: Automatic request throttling simulation, cost analysis, alternative API suggestions",
+                technicalHints: "Create APIService and UsageWindow classes. Implement sliding window rate calculation. Consider burst vs sustained rate limits."
+            },
+            {
+                title: "Service Dependency Mapper",
+                category: "IT Operations / Architecture",
+                difficulty: "Medium",
+                description: "Analyze service logs and API calls to build dependency maps, identify single points of failure, and assess blast radius of outages.",
+                problem: "Modern applications have complex service dependencies. Understanding impact of failures requires dependency mapping.",
+                inputs: "- service_logs.json: Logs showing inter-service communication\n- service_registry.json: Known services and their endpoints\n- incident_history.json: Past outages and their impacts",
+                outputs: "- dependency_map.json: Service relationships and dependencies\n- critical_path.json: Services on critical paths\n- impact_analysis.json: Blast radius for each service failure",
+                features: "Must-have: Log parsing, dependency extraction, graph building, criticality scoring\nNice-to-have: Visualization export (DOT format), redundancy analysis, circular dependency detection",
+                technicalHints: "Use Service and Dependency classes. Implement directed graph data structure. Consider graph traversal algorithms for impact analysis."
+            },
+            {
+                title: "Documentation Quality Analyzer",
+                category: "IT Operations / Quality",
+                difficulty: "Medium",
+                description: "Analyze technical documentation for completeness, accuracy, and staleness. Identify gaps and generate improvement recommendations.",
+                problem: "Technical documentation becomes outdated quickly. Manual review is time-consuming and inconsistent.",
+                inputs: "- docs.json: Technical documentation files and metadata\n- standards.json: Documentation standards and required sections\n- code_references.json: Code-to-doc mappings",
+                outputs: "- quality_report.json: Quality scores for each document\n- gaps.json: Missing or incomplete documentation\n- stale_docs.json: Documents not updated recently",
+                features: "Must-have: Doc parsing, completeness checking, staleness detection, quality scoring\nNice-to-have: Code-doc consistency checking, readability analysis, broken link detection",
+                technicalHints: "Create Document and QualityMetric classes. Implement text analysis for completeness. Consider last-modified timestamps and code change correlation."
+            },
+            {
+                title: "Slack/Teams Message Analyzer",
+                category: "API / Analytics",
+                difficulty: "Medium-High",
+                description: "Analyze team communication patterns from Slack/Teams to identify collaboration bottlenecks, response times, and knowledge silos.",
+                problem: "Teams want to improve collaboration but lack data on communication patterns. Manual analysis of chat history is impractical.",
+                inputs: "- messages.json: Exported chat messages with timestamps\n- channels.json: Channel metadata and membership\n- analysis_config.json: Metrics to calculate and thresholds",
+                outputs: "- collaboration_metrics.json: Response times, message volumes, active hours\n- bottlenecks.json: Channels with slow response times\n- insights.json: Collaboration patterns and recommendations",
+                features: "Must-have: Message parsing, response time calculation, pattern identification, metric aggregation\nNice-to-have: Sentiment analysis, knowledge silo detection, network graph export",
+                technicalHints: "Use Message and Channel classes. Implement thread tracking for response time calculation. Consider time-zone normalization for global teams."
+            },
+            {
+                title: "System Resource Capacity Planner",
+                category: "IT Operations / Capacity",
+                difficulty: "Medium",
+                description: "Analyze historical resource usage (CPU, memory, disk, network) to forecast capacity needs and recommend scaling actions.",
+                problem: "IT teams struggle to predict when systems will run out of capacity. Reactive scaling causes outages or wastes resources.",
+                inputs: "- resource_metrics.json: Historical CPU, memory, disk, network usage\n- growth_assumptions.json: Expected business growth rates\n- thresholds.json: Alert thresholds for each resource type",
+                outputs: "- capacity_forecast.json: Predicted resource exhaustion dates\n- scaling_recommendations.json: When and how much to scale\n- cost_analysis.json: Estimated costs of recommendations",
+                features: "Must-have: Time-series analysis, trend forecasting, capacity calculation, alert generation\nNice-to-have: Seasonal pattern detection, cost optimization, right-sizing recommendations",
+                technicalHints: "Create Resource and Forecast classes. Implement linear regression for trend analysis. Consider moving averages for smoothing."
+            }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProjectCards();
+            loadSavedProposal();
+            updateProgress();
+            updateChecklistProgress();
+        });
+
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Mark button as active
+            event.target.classList.add('active');
+        }
+
+        // Load project cards
+        function loadProjectCards() {
+            const container = document.getElementById('project-cards-container');
+            
+            projectIdeas.forEach((project, index) => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.innerHTML = `
+                    <h4>${project.title}</h4>
+                    <div>
+                        <span class="tag">${project.category}</span>
+                        <span class="tag">${project.difficulty}</span>
+                    </div>
+                    <p>${project.description}</p>
+                    <div class="project-details" id="project-${{index}}">
+                        <h4>Problem:</h4>
+                        <p>${project.problem}</p>
+                        <h4>Inputs:</h4>
+                        <pre>${project.inputs}</pre>
+                        <h4>Outputs:</h4>
+                        <pre>${project.outputs}</pre>
+                        <h4>Features:</h4>
+                        <pre>${project.features}</pre>
+                        <h4>Technical Hints:</h4>
+                        <p>${project.technicalHints}</p>
+                        <button class="button" onclick="useThisProject(${{index}})">📋 Use This Project</button>
+                    </div>
+                `;
+                
+                card.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('button')) {
+                        const details = card.querySelector('.project-details');
+                        details.classList.toggle('show');
+                        card.classList.toggle('expanded');
+                    }
+                });
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Use project template
+        function useThisProject(index) {
+            const project = projectIdeas[index];
+            
+            document.getElementById('project-title').value = project.title;
+            document.getElementById('project-description').value = project.description;
+            document.getElementById('project-problem').value = project.problem;
+            document.getElementById('project-inputs').value = project.inputs;
+            document.getElementById('project-outputs').value = project.outputs;
+            
+            const features = project.features.split('\n');
+            const mustHave = features.find(f => f.includes('Must-have'))?.replace('Must-have:', '').trim() || '';
+            const niceToHave = features.find(f => f.includes('Nice-to-have'))?.replace('Nice-to-have:', '').trim() || '';
+            
+            document.getElementById('project-must-have').value = mustHave;
+            document.getElementById('project-nice-to-have').value = niceToHave;
+            
+            updateProgress();
+            showTab('proposal-builder');
+            
+            alert('✅ Project template loaded! Now customize it to make it your own.');
+        }
+
+        // Update proposal progress
+        function updateProgress() {
+            const fields = [
+                'project-title', 'project-description', 'project-problem', 'project-users',
+                'project-inputs', 'project-outputs', 'project-cli', 'project-args',
+                'project-must-have', 'project-classes', 'project-timeline'
+            ];
+            
+            let filled = 0;
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && field.value.trim().length > 10) {
+                    filled++;
+                }
+            });
+            
+            const percentage = Math.round((filled / fields.length) * 100);
+            const progressBar = document.getElementById('proposal-progress');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+        }
+
+        // Generate proposal document
+        function generateProposal() {
+            const title = document.getElementById('project-title').value;
+            const description = document.getElementById('project-description').value;
+            const problem = document.getElementById('project-problem').value;
+            const users = document.getElementById('project-users').value;
+            const inputs = document.getElementById('project-inputs').value;
+            const otherInputs = document.getElementById('project-other-inputs').value;
+            const outputs = document.getElementById('project-outputs').value;
+            const otherOutputs = document.getElementById('project-other-outputs').value;
+            const cli = document.getElementById('project-cli').value;
+            const args = document.getElementById('project-args').value;
+            const mustHave = document.getElementById('project-must-have').value;
+            const niceToHave = document.getElementById('project-nice-to-have').value;
+            const classes = document.getElementById('project-classes').value;
+            const algorithms = document.getElementById('project-algorithms').value;
+            const testing = document.getElementById('project-testing').value;
+            const timeline = document.getElementById('project-timeline').value;
+            
+            if (!title || !description || !problem) {
+                alert('⚠️ Please fill in at least the title, description, and problem statement before generating the proposal.');
+                return;
+            }
+            
+            const proposalHTML = `
+                <h3>${{title}}</h3>
+                <p><em>Capstone Project Proposal - Week 13</em></p>
+                
+                <h4>Project Overview</h4>
+                <p>${{description}}</p>
+                
+                <h4>Problem Statement</h4>
+                <p>${{problem}}</p>
+                
+                <h4>Target Users / Use Case</h4>
+                <p>${users || 'To be specified'}</p>
+                
+                <h4>Inputs</h4>
+                <p><strong>JSON Input Files:</strong></p>
+                <pre>${{inputs}}</pre>
+                ${otherInputs ? `<p><strong>Other Inputs:</strong></p><pre>${{otherInputs}}</pre>` : ''}
+                
+                <h4>Outputs</h4>
+                <p><strong>JSON Output Files:</strong></p>
+                <pre>${{outputs}}</pre>
+                ${otherOutputs ? `<p><strong>Other Outputs:</strong></p><pre>${{otherOutputs}}</pre>` : ''}
+                
+                <h4>Command-Line Interface</h4>
+                <p><strong>Usage:</strong></p>
+                <pre>${{cli}}</pre>
+                <p><strong>Arguments:</strong></p>
+                <pre>${{args}}</pre>
+                
+                <h4>Features</h4>
+                <p><strong>Must-Have Features (MVP):</strong></p>
+                <pre>${{mustHave}}</pre>
+                ${niceToHave ? `<p><strong>Nice-to-Have Features:</strong></p><pre>${{niceToHave}}</pre>` : ''}
+                
+                <h4>Technical Approach</h4>
+                <p><strong>Classes:</strong></p>
+                <pre>${{classes}}</pre>
+                ${algorithms ? `<p><strong>Key Algorithms:</strong></p><pre>${{algorithms}}</pre>` : ''}
+                ${testing ? `<p><strong>Testing Strategy:</strong></p><pre>${{testing}}</pre>` : ''}
+                
+                <h4>Timeline</h4>
+                <pre>${{timeline}}</pre>
+            `;
+            
+            document.getElementById('proposal-preview-content').innerHTML = proposalHTML;
+            document.getElementById('proposal-output').style.display = 'block';
+            document.getElementById('proposal-output').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Download proposal as markdown
+        function downloadProposal() {
+            const title = document.getElementById('project-title').value || 'Capstone_Proposal';
+            const description = document.getElementById('project-description').value;
+            const problem = document.getElementById('project-problem').value;
+            const users = document.getElementById('project-users').value;
+            const inputs = document.getElementById('project-inputs').value;
+            const otherInputs = document.getElementById('project-other-inputs').value;
+            const outputs = document.getElementById('project-outputs').value;
+            const otherOutputs = document.getElementById('project-other-outputs').value;
+            const cli = document.getElementById('project-cli').value;
+            const args = document.getElementById('project-args').value;
+            const mustHave = document.getElementById('project-must-have').value;
+            const niceToHave = document.getElementById('project-nice-to-have').value;
+            const classes = document.getElementById('project-classes').value;
+            const algorithms = document.getElementById('project-algorithms').value;
+            const testing = document.getElementById('project-testing').value;
+            const timeline = document.getElementById('project-timeline').value;
+            
+            let markdown = `# ${{title}}\n\n`;
+            markdown += `*Capstone Project Proposal - Week 13*\n\n`;
+            markdown += `## Project Overview\n\n${{description}}\n\n`;
+            markdown += `## Problem Statement\n\n${{problem}}\n\n`;
+            markdown += `## Target Users / Use Case\n\n${{users}}\n\n`;
+            markdown += `## Inputs\n\n### JSON Input Files\n\n${{inputs}}\n\n`;
+            if (otherInputs) markdown += `### Other Inputs\n\n${{otherInputs}}\n\n`;
+            markdown += `## Outputs\n\n### JSON Output Files\n\n${{outputs}}\n\n`;
+            if (otherOutputs) markdown += `### Other Outputs\n\n${{otherOutputs}}\n\n`;
+            markdown += `## Command-Line Interface\n\n### Usage\n\n\`\`\`bash\n${{cli}}\n\`\`\`\n\n`;
+            markdown += `### Arguments\n\n${{args}}\n\n`;
+            markdown += `## Features\n\n### Must-Have Features (MVP)\n\n${{mustHave}}\n\n`;
+            if (niceToHave) markdown += `### Nice-to-Have Features\n\n${{niceToHave}}\n\n`;
+            markdown += `## Technical Approach\n\n### Classes\n\n\`\`\`python\n${{classes}}\n\`\`\`\n\n`;
+            if (algorithms) markdown += `### Key Algorithms\n\n${{algorithms}}\n\n`;
+            if (testing) markdown += `### Testing Strategy\n\n${{testing}}\n\n`;
+            markdown += `## Timeline\n\n${{timeline}}\n\n`;
+            
+            const blob = new Blob([markdown], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = title.replace(/\s+/g, '_') + '.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Copy proposal to clipboard
+        function copyProposal() {
+            const content = document.getElementById('proposal-preview-content').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('✅ Proposal copied to clipboard!');
+            });
+        }
+
+        // Save proposal draft
+        function saveProposal() {
+            const proposal = {
+                title: document.getElementById('project-title').value,
+                description: document.getElementById('project-description').value,
+                problem: document.getElementById('project-problem').value,
+                users: document.getElementById('project-users').value,
+                inputs: document.getElementById('project-inputs').value,
+                otherInputs: document.getElementById('project-other-inputs').value,
+                outputs: document.getElementById('project-outputs').value,
+                otherOutputs: document.getElementById('project-other-outputs').value,
+                cli: document.getElementById('project-cli').value,
+                args: document.getElementById('project-args').value,
+                mustHave: document.getElementById('project-must-have').value,
+                niceToHave: document.getElementById('project-nice-to-have').value,
+                classes: document.getElementById('project-classes').value,
+                algorithms: document.getElementById('project-algorithms').value,
+                testing: document.getElementById('project-testing').value,
+                timeline: document.getElementById('project-timeline').value
+            };
+            
+            localStorage.setItem('capstoneProposal', JSON.stringify(proposal));
+            alert('💾 Proposal saved locally!');
+        }
+
+        // Load proposal draft
+        function loadProposal() {
+            const saved = localStorage.getItem('capstoneProposal');
+            if (!saved) {
+                alert('❌ No saved proposal found.');
+                return;
+            }
+            
+            const proposal = JSON.parse(saved);
+            document.getElementById('project-title').value = proposal.title || '';
+            document.getElementById('project-description').value = proposal.description || '';
+            document.getElementById('project-problem').value = proposal.problem || '';
+            document.getElementById('project-users').value = proposal.users || '';
+            document.getElementById('project-inputs').value = proposal.inputs || '';
+            document.getElementById('project-other-inputs').value = proposal.otherInputs || '';
+            document.getElementById('project-outputs').value = proposal.outputs || '';
+            document.getElementById('project-other-outputs').value = proposal.otherOutputs || '';
+            document.getElementById('project-cli').value = proposal.cli || '';
+            document.getElementById('project-args').value = proposal.args || '';
+            document.getElementById('project-must-have').value = proposal.mustHave || '';
+            document.getElementById('project-nice-to-have').value = proposal.niceToHave || '';
+            document.getElementById('project-classes').value = proposal.classes || '';
+            document.getElementById('project-algorithms').value = proposal.algorithms || '';
+            document.getElementById('project-testing').value = proposal.testing || '';
+            document.getElementById('project-timeline').value = proposal.timeline || '';
+            
+            updateProgress();
+            alert('✅ Proposal loaded!');
+        }
+
+        // Load saved proposal on page load
+        function loadSavedProposal() {
+            const saved = localStorage.getItem('capstoneProposal');
+            if (saved) {
+                const proposal = JSON.parse(saved);
+                if (proposal.title) {
+                    // Only auto-load if there's actual content
+                    loadProposal();
+                }
+            }
+        }
+
+        // JSON validation
+        function validateJSON(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            const resultDiv = document.getElementById('json-validation-result');
+            
+            try {
+                const parsed = JSON.parse(textarea.value);
+                resultDiv.innerHTML = `
+                    <div class="success-box">
+                        <strong>✅ Valid JSON!</strong>
+                        <p>Your JSON is properly formatted and can be parsed successfully.</p>
+                    </div>
+                `;
+            } catch (e) {
+                resultDiv.innerHTML = `
+                    <div class="warning-box">
+                        <strong>❌ Invalid JSON</strong>
+                        <p>Error: ${e.message}</p>
+                        <p>Please check your JSON syntax (commas, quotes, brackets).</p>
+                    </div>
+                `;
+            }
+            
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Format JSON
+        function formatJSON(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            
+            try {
+                const parsed = JSON.parse(textarea.value);
+                textarea.value = JSON.stringify(parsed, null, 2);
+            } catch (e) {
+                alert('❌ Cannot format invalid JSON. Please fix syntax errors first.');
+            }
+        }
+
+        // Checklist functions
+        function toggleCheck(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('checked');
+            } else {
+                element.classList.remove('checked');
+            }
+            
+            updateChecklistProgress();
+        }
+
+        function updateChecklistProgress() {
+            const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+            const checked = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked').length;
+            const total = checkboxes.length;
+            const percentage = Math.round((checked / total) * 100);
+            
+            const progressBar = document.getElementById('checklist-progress');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+            
+            // Show completion message
+            const completionMsg = document.getElementById('completion-message');
+            if (percentage === 100) {
+                completionMsg.style.display = 'block';
+            } else {
+                completionMsg.style.display = 'none';
+            }
+        }
+
+        function resetChecklist() {
+            if (confirm('Are you sure you want to reset all checklist items?')) {
+                document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                    cb.parentElement.classList.remove('checked');
+                });
+                updateChecklistProgress();
+            }
+        }
+
+        function downloadChecklist() {
+            let markdown = '# Week 13 Capstone Kickoff Checklist\n\n';
+            
+            document.querySelectorAll('.checklist').forEach(section => {
+                const heading = section.querySelector('h3').textContent;
+                markdown += `## ${{heading}}\n\n`;
+                
+                section.querySelectorAll('.checklist-item').forEach(item => {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    const label = item.querySelector('label').textContent;
+                    const checked = checkbox.checked ? 'x' : ' ';
+                    markdown += `- [${{checked}}] ${{label}}\n`;
+                });
+                
+                markdown += '\n';
+            });
+            
+            const blob = new Blob([markdown], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'week13_checklist.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script></p></body></html>
