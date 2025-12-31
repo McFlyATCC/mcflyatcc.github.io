@@ -610,6 +610,766 @@
             color: var(--success);
         }
 
+        /* Planning Tools Styles */
+        .tools-nav {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .tool-nav-btn {
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tool-nav-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--text-primary);
+        }
+
+        .tool-nav-btn.active {
+            background: var(--accent-red-glow);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .tool-panel {
+            display: none;
+        }
+
+        .tool-panel.active {
+            display: block;
+        }
+
+        /* Cost Calculator Styles */
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--accent-red);
+        }
+
+        .input-hint {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .cost-results-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1.5rem;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .cost-results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cost-result-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+        }
+
+        .cost-result-card.current {
+            border-color: var(--warning);
+        }
+
+        .cost-result-card.projected {
+            border-color: var(--success);
+        }
+
+        .cost-result-card.comparison {
+            background: transparent;
+            border: none;
+        }
+
+        .cost-result-header {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .cost-result-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .cost-result-value.savings {
+            color: var(--success);
+        }
+
+        .cost-result-value.increase {
+            color: var(--danger);
+        }
+
+        .cost-result-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .cost-breakdown {
+            margin-top: 1rem;
+            text-align: left;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .cost-breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cost-chart-container {
+            padding: 1.5rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .cost-chart {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            padding: 1rem 0;
+        }
+
+        .chart-bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .chart-bars {
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+            height: 150px;
+        }
+
+        .chart-bar {
+            width: 16px;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+
+        .chart-bar.current {
+            background: linear-gradient(to top, var(--warning), #f59e0b);
+        }
+
+        .chart-bar.projected {
+            background: linear-gradient(to top, var(--success), #10b981);
+        }
+
+        .chart-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .cost-chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-color.current {
+            background: var(--warning);
+        }
+
+        .legend-color.projected {
+            background: var(--success);
+        }
+
+        .export-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent-red);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1.5rem;
+        }
+
+        .export-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+        }
+
+        .export-btn.secondary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            margin-left: 1rem;
+        }
+
+        .export-btn.secondary:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            background: var(--bg-tertiary);
+        }
+
+        /* Readiness Assessment Styles */
+        .assessment-progress {
+            background: var(--bg-card);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-track {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-red), #f87171);
+            transition: width 0.3s ease;
+        }
+
+        .assessment-category {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .assessment-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .assessment-category-header:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .assessment-category-header h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .category-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-red);
+        }
+
+        .assessment-category-body {
+            padding: 0 1.5rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .assessment-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .assessment-item:last-child {
+            border-bottom: none;
+        }
+
+        .assessment-item label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .assessment-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .assess-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .assess-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--text-primary);
+        }
+
+        .assess-btn.selected {
+            background: var(--accent-red-glow);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .assessment-results {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .score-display {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-bg {
+            fill: none;
+            stroke: var(--bg-tertiary);
+            stroke-width: 8;
+        }
+
+        .score-fill {
+            fill: none;
+            stroke: var(--accent-red);
+            stroke-width: 8;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease, stroke 0.3s ease;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .score-max {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        .score-label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .score-breakdown {
+            margin-top: 2rem;
+        }
+
+        .breakdown-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .breakdown-label {
+            width: 120px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .breakdown-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .breakdown-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .breakdown-fill.technical {
+            background: var(--info);
+        }
+
+        .breakdown-fill.organizational {
+            background: var(--warning);
+        }
+
+        .breakdown-fill.process {
+            background: var(--success);
+        }
+
+        .breakdown-value {
+            width: 50px;
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .recommendations {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .recommendations h4 {
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .recommendation-item.critical {
+            border-left: 3px solid var(--danger);
+        }
+
+        .recommendation-item.warning {
+            border-left: 3px solid var(--warning);
+        }
+
+        .recommendation-item.info {
+            border-left: 3px solid var(--info);
+        }
+
+        /* Pre-Flight Checklist Styles */
+        .phase-selector {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .phase-selector label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .phase-selector select {
+            flex: 1;
+            max-width: 300px;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .checklist-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .checklist-section {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .checklist-section:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-section-header {
+            padding: 1rem 1.5rem;
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-progress {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-red);
+        }
+
+        .checklist-items {
+            padding: 0.5rem 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0.75rem 1.5rem;
+            transition: background 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            margin-top: 2px;
+        }
+
+        .checklist-checkbox:hover {
+            border-color: var(--accent-red);
+        }
+
+        .checklist-checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .checklist-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .checklist-checkbox.blocked {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .checklist-checkbox.blocked::after {
+            content: '✕';
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .checklist-content {
+            flex: 1;
+        }
+
+        .checklist-label {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .checklist-item.completed .checklist-label {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .checklist-detail {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .checklist-status {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .status-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .status-btn:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        .status-btn.na {
+            border-color: var(--text-muted);
+            background: var(--bg-card);
+        }
+
+        .gate-status {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .gate-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .gate-icon {
+            font-size: 3rem;
+        }
+
+        .gate-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .gate-status.go {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .gate-status.go .gate-text {
+            color: var(--success);
+        }
+
+        .gate-status.no-go {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .gate-status.no-go .gate-text {
+            color: var(--danger);
+        }
+
+        .gate-status.warning {
+            border-color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .gate-status.warning .gate-text {
+            color: var(--warning);
+        }
+
+        .gate-summary {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+        }
+
+        .gate-summary-item {
+            display: inline-block;
+            margin: 0.25rem 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        .checklist-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
         /* Badge styles */
         .badge {
             display: inline-block;
@@ -1025,6 +1785,7 @@
                 <button class="nav-tab active" data-tab="overview">Overview</button>
                 <button class="nav-tab" data-tab="architecture">Architecture</button>
                 <button class="nav-tab" data-tab="implementation">Implementation</button>
+                <button class="nav-tab" data-tab="planning-tools">Planning Tools</button>
                 <button class="nav-tab" data-tab="operations">Operations</button>
                 <button class="nav-tab" data-tab="metrics">Metrics</button>
                 <button class="nav-tab" data-tab="kql">KQL & Analytics</button>
@@ -1653,6 +2414,474 @@
                         <li>Only for regulatory requirements</li>
                     </ul>
                     <p><strong>Effort:</strong> High | <strong>Risk:</strong> High</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PLANNING TOOLS SECTION -->
+        <section id="planning-tools" class="content-section">
+            <h1>Planning Tools</h1>
+            <p>Interactive tools to help you plan, assess readiness, and validate your Sentinel Data Lake implementation.</p>
+
+            <div class="tools-nav" style="display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap;">
+                <button class="tool-nav-btn active" onclick="showTool('cost-calculator')">💰 Cost Calculator</button>
+                <button class="tool-nav-btn" onclick="showTool('readiness-assessment')">📋 Readiness Assessment</button>
+                <button class="tool-nav-btn" onclick="showTool('preflight-checklist')">✅ Pre-Flight Checklist</button>
+            </div>
+
+            <!-- COST CALCULATOR TOOL -->
+            <div id="cost-calculator" class="tool-panel active">
+                <div class="card card-highlight">
+                    <h2 style="margin-top: 0;">Cost Calculator</h2>
+                    <p>Compare your current Archive-based costs with projected Data Lake costs to understand potential savings and plan your budget.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>📊 Current Environment</h3>
+                        
+                        <div class="input-group">
+                            <label>Daily Ingestion Volume (GB/day)</label>
+                            <input type="number" id="dailyIngestion" value="1000" min="1" max="100000" onchange="calculateCosts()">
+                            <span class="input-hint">Your average daily log ingestion</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Current Commitment Tier</label>
+                            <select id="commitmentTier" onchange="calculateCosts()">
+                                <option value="payg">Pay-as-you-go ($4.30/GB)</option>
+                                <option value="100">100 GB/day ($2.76/GB)</option>
+                                <option value="200">200 GB/day ($2.48/GB)</option>
+                                <option value="400">400 GB/day ($2.21/GB)</option>
+                                <option value="500" selected>500 GB/day ($2.07/GB)</option>
+                                <option value="1000">1,000 GB/day ($1.84/GB)</option>
+                                <option value="2000">2,000 GB/day ($1.66/GB)</option>
+                                <option value="5000">5,000 GB/day ($1.47/GB)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Current Analytics Retention (days)</label>
+                            <input type="number" id="currentAnalyticsRetention" value="90" min="30" max="730" onchange="calculateCosts()">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Current Archive Retention (days)</label>
+                            <input type="number" id="currentArchiveRetention" value="365" min="0" max="2555" onchange="calculateCosts()">
+                            <span class="input-hint">Days beyond analytics retention</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Monthly Restore/Search Operations</label>
+                            <input type="number" id="monthlyRestores" value="10" min="0" max="1000" onchange="calculateCosts()">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Avg GB per Restore Operation</label>
+                            <input type="number" id="avgRestoreGB" value="50" min="1" max="10000" onchange="calculateCosts()">
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>🎯 Target Configuration</h3>
+                        
+                        <div class="input-group">
+                            <label>Target Analytics Retention (days)</label>
+                            <input type="number" id="targetAnalyticsRetention" value="90" min="30" max="730" onchange="calculateCosts()">
+                            <span class="input-hint">Recommended: 90 days (free tier)</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Target Total Retention (days)</label>
+                            <input type="number" id="targetTotalRetention" value="365" min="30" max="4380" onchange="calculateCosts()">
+                            <span class="input-hint">Data Lake retention (up to 12 years)</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Expected Lake Query Volume (GB/month)</label>
+                            <input type="number" id="lakeQueryVolume" value="500" min="0" max="100000" onchange="calculateCosts()">
+                            <span class="input-hint">Estimated data scanned in lake queries</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Estimated KQL Jobs per Month</label>
+                            <input type="number" id="monthlyJobs" value="20" min="0" max="1000" onchange="calculateCosts()">
+                        </div>
+
+                        <div class="callout callout-info" style="margin-top: 1rem;">
+                            <div class="callout-title">💡 Pricing Notes</div>
+                            <p style="font-size: 0.85rem; margin: 0;">Data Lake storage uses 6:1 compression. First 90 days of analytics retention is free with Sentinel. Prices are estimates - verify with Azure pricing calculator.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3>📈 Cost Comparison Results</h3>
+                    
+                    <div class="cost-results-grid">
+                        <div class="cost-result-card current">
+                            <div class="cost-result-header">Current Model (Archive)</div>
+                            <div class="cost-result-value" id="currentTotalCost">$0</div>
+                            <div class="cost-result-label">Monthly Cost</div>
+                            <div class="cost-breakdown" id="currentBreakdown"></div>
+                        </div>
+                        
+                        <div class="cost-result-card comparison">
+                            <div class="cost-result-header">vs</div>
+                            <div class="cost-result-value savings" id="savingsPercent">0%</div>
+                            <div class="cost-result-label" id="savingsLabel">Potential Savings</div>
+                        </div>
+                        
+                        <div class="cost-result-card projected">
+                            <div class="cost-result-header">Data Lake Model</div>
+                            <div class="cost-result-value" id="projectedTotalCost">$0</div>
+                            <div class="cost-result-label">Monthly Cost</div>
+                            <div class="cost-breakdown" id="projectedBreakdown"></div>
+                        </div>
+                    </div>
+
+                    <div class="cost-chart-container" style="margin-top: 2rem;">
+                        <h4>12-Month Cost Projection</h4>
+                        <div class="cost-chart" id="costChart"></div>
+                        <div class="cost-chart-legend">
+                            <span class="legend-item"><span class="legend-color current"></span> Current Model</span>
+                            <span class="legend-item"><span class="legend-color projected"></span> Data Lake Model</span>
+                        </div>
+                    </div>
+
+                    <div class="callout callout-success" style="margin-top: 1.5rem;">
+                        <div class="callout-title">💰 Annual Impact</div>
+                        <p id="annualSummary">Configure your environment above to see projected annual savings.</p>
+                    </div>
+                </div>
+
+                <button class="export-btn" onclick="exportCostReport()">📄 Export Cost Report</button>
+            </div>
+
+            <!-- READINESS ASSESSMENT TOOL -->
+            <div id="readiness-assessment" class="tool-panel">
+                <div class="card card-highlight">
+                    <h2 style="margin-top: 0;">Readiness Assessment</h2>
+                    <p>Evaluate your organization's readiness across technical, organizational, and process dimensions. Complete each section to generate your readiness score and recommendations.</p>
+                </div>
+
+                <div class="assessment-progress">
+                    <div class="progress-header">
+                        <span>Assessment Progress</span>
+                        <span id="assessmentProgress">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="assessmentProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Technical Readiness -->
+                <div class="assessment-category">
+                    <div class="assessment-category-header" onclick="toggleAssessmentCategory(this)">
+                        <h3>🔧 Technical Readiness</h3>
+                        <span class="category-score" id="technicalScore">0/40</span>
+                    </div>
+                    <div class="assessment-category-body">
+                        <div class="assessment-item">
+                            <label>Sentinel workspace connected to Defender portal?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="technical" data-value="2" onclick="selectAssessment(this)">In Progress</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Azure subscription and resource group identified for billing?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="technical" data-value="2" onclick="selectAssessment(this)">Partially</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Azure Policy evaluated for potential blockers?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">Yes, no blockers</button>
+                                <button class="assess-btn" data-category="technical" data-value="2" onclick="selectAssessment(this)">Yes, exemptions needed</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">Not evaluated</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>RBAC permissions documented and ready?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">Fully documented</button>
+                                <button class="assess-btn" data-category="technical" data-value="2" onclick="selectAssessment(this)">Partially</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">Not started</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Current ingestion baseline documented?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">Yes, by table</button>
+                                <button class="assess-btn" data-category="technical" data-value="2" onclick="selectAssessment(this)">Aggregate only</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>CMK requirements assessed? (Data Lake doesn't support CMK)</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">No CMK required</button>
+                                <button class="assess-btn" data-category="technical" data-value="1" onclick="selectAssessment(this)">CMK required - need plan</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">Not assessed</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Data residency requirements validated?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">Yes, compliant</button>
+                                <button class="assess-btn" data-category="technical" data-value="2" onclick="selectAssessment(this)">Under review</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">Not assessed</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Network connectivity to Defender portal verified?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="technical" data-value="2" onclick="selectAssessment(this)">Partial</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Service limits understood for your scale?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">Yes, documented</button>
+                                <button class="assess-btn" data-category="technical" data-value="2" onclick="selectAssessment(this)">Partially</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Test/pilot environment available?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="technical" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="technical" data-value="2" onclick="selectAssessment(this)">Can create one</button>
+                                <button class="assess-btn" data-category="technical" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Organizational Readiness -->
+                <div class="assessment-category">
+                    <div class="assessment-category-header" onclick="toggleAssessmentCategory(this)">
+                        <h3>👥 Organizational Readiness</h3>
+                        <span class="category-score" id="organizationalScore">0/32</span>
+                    </div>
+                    <div class="assessment-category-body">
+                        <div class="assessment-item">
+                            <label>Executive sponsor identified and engaged?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="organizational" data-value="4" onclick="selectAssessment(this)">Yes, active</button>
+                                <button class="assess-btn" data-category="organizational" data-value="2" onclick="selectAssessment(this)">Identified only</button>
+                                <button class="assess-btn" data-category="organizational" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>SOC team informed and supportive?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="organizational" data-value="4" onclick="selectAssessment(this)">Yes, engaged</button>
+                                <button class="assess-btn" data-category="organizational" data-value="2" onclick="selectAssessment(this)">Aware only</button>
+                                <button class="assess-btn" data-category="organizational" data-value="0" onclick="selectAssessment(this)">Not informed</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>FinOps/budget owner engaged?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="organizational" data-value="4" onclick="selectAssessment(this)">Yes, budget approved</button>
+                                <button class="assess-btn" data-category="organizational" data-value="2" onclick="selectAssessment(this)">Discussions ongoing</button>
+                                <button class="assess-btn" data-category="organizational" data-value="0" onclick="selectAssessment(this)">Not engaged</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>CloudOps/Platform team aligned?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="organizational" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="organizational" data-value="2" onclick="selectAssessment(this)">Partially</button>
+                                <button class="assess-btn" data-category="organizational" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>IAM team involved for RBAC planning?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="organizational" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="organizational" data-value="2" onclick="selectAssessment(this)">Scheduled</button>
+                                <button class="assess-btn" data-category="organizational" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>GRC/Compliance team consulted?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="organizational" data-value="4" onclick="selectAssessment(this)">Yes, approved</button>
+                                <button class="assess-btn" data-category="organizational" data-value="2" onclick="selectAssessment(this)">Under review</button>
+                                <button class="assess-btn" data-category="organizational" data-value="0" onclick="selectAssessment(this)">Not consulted</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Training resources available for SOC?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="organizational" data-value="4" onclick="selectAssessment(this)">Yes, scheduled</button>
+                                <button class="assess-btn" data-category="organizational" data-value="2" onclick="selectAssessment(this)">Planning</button>
+                                <button class="assess-btn" data-category="organizational" data-value="0" onclick="selectAssessment(this)">No plan</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Change management process defined?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="organizational" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="organizational" data-value="2" onclick="selectAssessment(this)">Partial</button>
+                                <button class="assess-btn" data-category="organizational" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Process Readiness -->
+                <div class="assessment-category">
+                    <div class="assessment-category-header" onclick="toggleAssessmentCategory(this)">
+                        <h3>⚙️ Process Readiness</h3>
+                        <span class="category-score" id="processScore">0/28</span>
+                    </div>
+                    <div class="assessment-category-body">
+                        <div class="assessment-item">
+                            <label>SOC content inventory completed? (rules, workbooks, queries)</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="process" data-value="4" onclick="selectAssessment(this)">Yes, complete</button>
+                                <button class="assess-btn" data-category="process" data-value="2" onclick="selectAssessment(this)">Partial</button>
+                                <button class="assess-btn" data-category="process" data-value="0" onclick="selectAssessment(this)">Not started</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Query patterns and lookback requirements documented?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="process" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="process" data-value="2" onclick="selectAssessment(this)">Partial</button>
+                                <button class="assess-btn" data-category="process" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Restore/search usage baseline captured?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="process" data-value="4" onclick="selectAssessment(this)">Yes, quantified</button>
+                                <button class="assess-btn" data-category="process" data-value="2" onclick="selectAssessment(this)">Estimated</button>
+                                <button class="assess-btn" data-category="process" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Rollback plan defined?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="process" data-value="4" onclick="selectAssessment(this)">Yes, tested</button>
+                                <button class="assess-btn" data-category="process" data-value="2" onclick="selectAssessment(this)">Documented</button>
+                                <button class="assess-btn" data-category="process" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Success criteria and KPIs defined?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="process" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="process" data-value="2" onclick="selectAssessment(this)">Draft</button>
+                                <button class="assess-btn" data-category="process" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Communication plan established?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="process" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="process" data-value="2" onclick="selectAssessment(this)">Draft</button>
+                                <button class="assess-btn" data-category="process" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                        <div class="assessment-item">
+                            <label>Monitoring and alerting plan ready?</label>
+                            <div class="assessment-options">
+                                <button class="assess-btn" data-category="process" data-value="4" onclick="selectAssessment(this)">Yes</button>
+                                <button class="assess-btn" data-category="process" data-value="2" onclick="selectAssessment(this)">Partial</button>
+                                <button class="assess-btn" data-category="process" data-value="0" onclick="selectAssessment(this)">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="assessment-results" id="assessmentResults">
+                    <h3>📊 Readiness Score</h3>
+                    <div class="score-display">
+                        <div class="score-circle" id="overallScoreCircle">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="score-bg" cx="50" cy="50" r="45"/>
+                                <circle class="score-fill" cx="50" cy="50" r="45" id="scoreCircleFill"/>
+                            </svg>
+                            <div class="score-text">
+                                <span class="score-value" id="overallScore">0</span>
+                                <span class="score-max">/100</span>
+                            </div>
+                        </div>
+                        <div class="score-label" id="readinessLevel">Not Assessed</div>
+                    </div>
+
+                    <div class="score-breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Technical</span>
+                            <div class="breakdown-bar"><div class="breakdown-fill technical" id="technicalBar" style="width: 0%"></div></div>
+                            <span class="breakdown-value" id="technicalPercent">0%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Organizational</span>
+                            <div class="breakdown-bar"><div class="breakdown-fill organizational" id="organizationalBar" style="width: 0%"></div></div>
+                            <span class="breakdown-value" id="organizationalPercent">0%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Process</span>
+                            <div class="breakdown-bar"><div class="breakdown-fill process" id="processBar" style="width: 0%"></div></div>
+                            <span class="breakdown-value" id="processPercent">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="recommendations" id="recommendations">
+                        <h4>📋 Recommendations</h4>
+                        <div id="recommendationsList"></div>
+                    </div>
+                </div>
+
+                <button class="export-btn" onclick="exportAssessment()">📄 Export Assessment Report</button>
+            </div>
+
+            <!-- PRE-FLIGHT CHECKLIST TOOL -->
+            <div id="preflight-checklist" class="tool-panel">
+                <div class="card card-highlight">
+                    <h2 style="margin-top: 0;">Pre-Flight Checklist</h2>
+                    <p>Validate readiness before each implementation phase. Complete all items to get GO/NO-GO status for each gate.</p>
+                </div>
+
+                <div class="phase-selector">
+                    <label>Select Phase:</label>
+                    <select id="phaseSelect" onchange="loadPhaseChecklist()">
+                        <option value="discovery">Phase 1: Discovery</option>
+                        <option value="design">Phase 2: Design</option>
+                        <option value="pilot">Phase 3: Pilot</option>
+                        <option value="rollout">Phase 4: Scale Rollout</option>
+                        <option value="cutover">Phase 5: Cutover</option>
+                    </select>
+                </div>
+
+                <div class="checklist-container" id="checklistContainer">
+                    <!-- Checklist items will be dynamically loaded -->
+                </div>
+
+                <div class="gate-status" id="gateStatus">
+                    <div class="gate-indicator" id="gateIndicator">
+                        <span class="gate-icon">⏳</span>
+                        <span class="gate-text">Complete checklist to determine gate status</span>
+                    </div>
+                    <div class="gate-summary" id="gateSummary"></div>
+                </div>
+
+                <div class="checklist-actions">
+                    <button class="export-btn" onclick="exportChecklist()">📄 Export Checklist</button>
+                    <button class="export-btn secondary" onclick="resetChecklist()">🔄 Reset Checklist</button>
                 </div>
             </div>
         </section>
@@ -4149,7 +5378,7 @@ AzureActivity
 
         // Progress tracking
         function updateProgress() {
-            const totalSections = 8;
+            const totalSections = 9;
             const progress = (completedSections.size / totalSections) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
         }
@@ -4238,6 +5467,731 @@ AzureActivity
                 btn.textContent = 'Failed';
             });
         }
+
+        // ==================== PLANNING TOOLS ====================
+
+        // Tool Navigation
+        function showTool(toolId) {
+            document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tool-nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(toolId).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (toolId === 'cost-calculator') calculateCosts();
+            if (toolId === 'preflight-checklist') loadPhaseChecklist();
+        }
+
+        // ==================== COST CALCULATOR ====================
+
+        const pricingTiers = {
+            'payg': 4.30,
+            '100': 2.76,
+            '200': 2.48,
+            '400': 2.21,
+            '500': 2.07,
+            '1000': 1.84,
+            '2000': 1.66,
+            '5000': 1.47
+        };
+
+        function calculateCosts() {
+            // Get inputs
+            const dailyIngestion = parseFloat(document.getElementById('dailyIngestion').value) || 0;
+            const tier = document.getElementById('commitmentTier').value;
+            const currentAnalyticsRet = parseFloat(document.getElementById('currentAnalyticsRetention').value) || 90;
+            const currentArchiveRet = parseFloat(document.getElementById('currentArchiveRetention').value) || 0;
+            const monthlyRestores = parseFloat(document.getElementById('monthlyRestores').value) || 0;
+            const avgRestoreGB = parseFloat(document.getElementById('avgRestoreGB').value) || 0;
+            const targetAnalyticsRet = parseFloat(document.getElementById('targetAnalyticsRetention').value) || 90;
+            const targetTotalRet = parseFloat(document.getElementById('targetTotalRetention').value) || 365;
+            const lakeQueryVolume = parseFloat(document.getElementById('lakeQueryVolume').value) || 0;
+            const monthlyJobs = parseFloat(document.getElementById('monthlyJobs').value) || 0;
+
+            const costPerGB = pricingTiers[tier];
+            const monthlyIngestionGB = dailyIngestion * 30;
+
+            // Current Model Costs
+            const currentIngestionCost = monthlyIngestionGB * costPerGB;
+            
+            // Analytics retention beyond 90 days (free): ~$0.023/GB/month
+            const analyticsBeyond90 = Math.max(0, currentAnalyticsRet - 90);
+            const currentAnalyticsStorageCost = (monthlyIngestionGB * analyticsBeyond90 / 30) * 0.023;
+            
+            // Archive storage: ~$0.02/GB/month (compressed ~2:1)
+            const archiveStorageGB = (monthlyIngestionGB * currentArchiveRet / 30) / 2;
+            const currentArchiveStorageCost = archiveStorageGB * 0.02;
+            
+            // Restore costs: $0.10/GB for restore + query costs
+            const currentRestoreCost = monthlyRestores * avgRestoreGB * 0.12;
+
+            const currentTotalCost = currentIngestionCost + currentAnalyticsStorageCost + currentArchiveStorageCost + currentRestoreCost;
+
+            // Data Lake Model Costs
+            const projectedIngestionCost = monthlyIngestionGB * costPerGB;
+            
+            // Analytics retention beyond 90 days
+            const projectedAnalyticsBeyond90 = Math.max(0, targetAnalyticsRet - 90);
+            const projectedAnalyticsStorageCost = (monthlyIngestionGB * projectedAnalyticsBeyond90 / 30) * 0.023;
+            
+            // Data Lake storage: ~$0.02/GB/month with 6:1 compression
+            const lakeRetentionDays = Math.max(0, targetTotalRet - targetAnalyticsRet);
+            const lakeStorageGB = (monthlyIngestionGB * lakeRetentionDays / 30) / 6;
+            const projectedLakeStorageCost = lakeStorageGB * 0.02;
+            
+            // Lake query costs: $0.005/GB scanned
+            const projectedQueryCost = lakeQueryVolume * 0.005;
+            
+            // KQL Job costs (minimal, mostly compute)
+            const projectedJobCost = monthlyJobs * 0.50;
+
+            const projectedTotalCost = projectedIngestionCost + projectedAnalyticsStorageCost + projectedLakeStorageCost + projectedQueryCost + projectedJobCost;
+
+            // Update UI
+            document.getElementById('currentTotalCost').textContent = formatCurrency(currentTotalCost);
+            document.getElementById('projectedTotalCost').textContent = formatCurrency(projectedTotalCost);
+
+            const savings = currentTotalCost - projectedTotalCost;
+            const savingsPercent = currentTotalCost > 0 ? (savings / currentTotalCost * 100) : 0;
+            
+            const savingsEl = document.getElementById('savingsPercent');
+            const savingsLabelEl = document.getElementById('savingsLabel');
+            
+            if (savings >= 0) {
+                savingsEl.textContent = savingsPercent.toFixed(1) + '%';
+                savingsEl.className = 'cost-result-value savings';
+                savingsLabelEl.textContent = 'Potential Savings';
+            } else {
+                savingsEl.textContent = Math.abs(savingsPercent).toFixed(1) + '%';
+                savingsEl.className = 'cost-result-value increase';
+                savingsLabelEl.textContent = 'Cost Increase';
+            }
+
+            // Breakdowns
+            document.getElementById('currentBreakdown').innerHTML = `
+                <div class="cost-breakdown-item"><span>Ingestion</span><span>${formatCurrency(currentIngestionCost)}</span></div>
+                <div class="cost-breakdown-item"><span>Analytics Storage</span><span>${formatCurrency(currentAnalyticsStorageCost)}</span></div>
+                <div class="cost-breakdown-item"><span>Archive Storage</span><span>${formatCurrency(currentArchiveStorageCost)}</span></div>
+                <div class="cost-breakdown-item"><span>Restore/Search</span><span>${formatCurrency(currentRestoreCost)}</span></div>
+            `;
+
+            document.getElementById('projectedBreakdown').innerHTML = `
+                <div class="cost-breakdown-item"><span>Ingestion</span><span>${formatCurrency(projectedIngestionCost)}</span></div>
+                <div class="cost-breakdown-item"><span>Analytics Storage</span><span>${formatCurrency(projectedAnalyticsStorageCost)}</span></div>
+                <div class="cost-breakdown-item"><span>Data Lake Storage</span><span>${formatCurrency(projectedLakeStorageCost)}</span></div>
+                <div class="cost-breakdown-item"><span>Lake Queries</span><span>${formatCurrency(projectedQueryCost)}</span></div>
+                <div class="cost-breakdown-item"><span>KQL Jobs</span><span>${formatCurrency(projectedJobCost)}</span></div>
+            `;
+
+            // Annual summary
+            const annualSavings = savings * 12;
+            document.getElementById('annualSummary').innerHTML = `
+                <strong>Annual Projection:</strong> Current model costs <strong>${formatCurrency(currentTotalCost * 12)}/year</strong>. 
+                Data Lake model costs <strong>${formatCurrency(projectedTotalCost * 12)}/year</strong>. 
+                ${annualSavings >= 0 
+                    ? `Potential annual savings: <strong style="color: var(--success);">${formatCurrency(annualSavings)}</strong>`
+                    : `Additional annual cost: <strong style="color: var(--danger);">${formatCurrency(Math.abs(annualSavings))}</strong>`
+                }
+            `;
+
+            // Update chart
+            updateCostChart(currentTotalCost, projectedTotalCost);
+        }
+
+        function formatCurrency(value) {
+            return '$' + value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        function updateCostChart(currentMonthly, projectedMonthly) {
+            const chart = document.getElementById('costChart');
+            const maxValue = Math.max(currentMonthly, projectedMonthly) * 1.2;
+            
+            let html = '';
+            const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+            
+            months.forEach((month, i) => {
+                const currentHeight = (currentMonthly / maxValue) * 150;
+                const projectedHeight = (projectedMonthly / maxValue) * 150;
+                
+                html += `
+                    <div class="chart-bar-group">
+                        <div class="chart-bars">
+                            <div class="chart-bar current" style="height: ${currentHeight}px" title="Current: ${formatCurrency(currentMonthly)}"></div>
+                            <div class="chart-bar projected" style="height: ${projectedHeight}px" title="Projected: ${formatCurrency(projectedMonthly)}"></div>
+                        </div>
+                        <span class="chart-label">${month}</span>
+                    </div>
+                `;
+            });
+            
+            chart.innerHTML = html;
+        }
+
+        function exportCostReport() {
+            const report = generateCostReport();
+            downloadFile('SentinelDataLake_CostAnalysis.txt', report);
+        }
+
+        function generateCostReport() {
+            const dailyIngestion = document.getElementById('dailyIngestion').value;
+            const currentTotal = document.getElementById('currentTotalCost').textContent;
+            const projectedTotal = document.getElementById('projectedTotalCost').textContent;
+            const savings = document.getElementById('savingsPercent').textContent;
+            
+            return `MICROSOFT SENTINEL DATA LAKE - COST ANALYSIS REPORT
+Generated: ${new Date().toLocaleString()}
+================================================================
+
+CURRENT ENVIRONMENT
+-------------------
+Daily Ingestion Volume: ${dailyIngestion} GB/day
+Commitment Tier: ${document.getElementById('commitmentTier').selectedOptions[0].text}
+Analytics Retention: ${document.getElementById('currentAnalyticsRetention').value} days
+Archive Retention: ${document.getElementById('currentArchiveRetention').value} days
+Monthly Restore Operations: ${document.getElementById('monthlyRestores').value}
+Avg GB per Restore: ${document.getElementById('avgRestoreGB').value} GB
+
+CURRENT MODEL MONTHLY COST: ${currentTotal}
+
+TARGET CONFIGURATION
+--------------------
+Analytics Retention: ${document.getElementById('targetAnalyticsRetention').value} days
+Total Retention: ${document.getElementById('targetTotalRetention').value} days
+Expected Lake Query Volume: ${document.getElementById('lakeQueryVolume').value} GB/month
+Monthly KQL Jobs: ${document.getElementById('monthlyJobs').value}
+
+DATA LAKE MODEL MONTHLY COST: ${projectedTotal}
+
+SAVINGS ANALYSIS
+----------------
+Potential Savings: ${savings}
+Annual Impact: ~${parseInt(currentTotal.replace(/[^0-9]/g, '')) * 12 - parseInt(projectedTotal.replace(/[^0-9]/g, '')) * 12} USD
+
+NOTES
+-----
+- Prices are estimates based on public Azure pricing
+- Actual costs may vary based on region and agreements
+- Data Lake uses 6:1 compression ratio
+- First 90 days of analytics retention is free with Sentinel
+
+================================================================
+This report is for planning purposes only. Verify with Azure Pricing Calculator.
+`;
+        }
+
+        // ==================== READINESS ASSESSMENT ====================
+
+        const assessmentScores = {
+            technical: { current: 0, max: 40 },
+            organizational: { current: 0, max: 32 },
+            process: { current: 0, max: 28 }
+        };
+
+        const assessmentAnswers = {};
+        let totalQuestions = 0;
+        let answeredQuestions = 0;
+
+        function selectAssessment(btn) {
+            const category = btn.dataset.category;
+            const value = parseInt(btn.dataset.value);
+            const item = btn.closest('.assessment-item');
+            const itemIndex = Array.from(item.parentElement.children).indexOf(item);
+            const key = `${category}-${itemIndex}`;
+
+            // Remove previous selection
+            item.querySelectorAll('.assess-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+
+            // Track answer
+            if (!assessmentAnswers[key]) {
+                answeredQuestions++;
+            }
+            assessmentAnswers[key] = value;
+
+            // Recalculate scores
+            recalculateAssessmentScores();
+            updateAssessmentUI();
+        }
+
+        function recalculateAssessmentScores() {
+            assessmentScores.technical.current = 0;
+            assessmentScores.organizational.current = 0;
+            assessmentScores.process.current = 0;
+
+            for (const [key, value] of Object.entries(assessmentAnswers)) {
+                const category = key.split('-')[0];
+                assessmentScores[category].current += value;
+            }
+        }
+
+        function updateAssessmentUI() {
+            // Update category scores
+            document.getElementById('technicalScore').textContent = 
+                `${assessmentScores.technical.current}/${assessmentScores.technical.max}`;
+            document.getElementById('organizationalScore').textContent = 
+                `${assessmentScores.organizational.current}/${assessmentScores.organizational.max}`;
+            document.getElementById('processScore').textContent = 
+                `${assessmentScores.process.current}/${assessmentScores.process.max}`;
+
+            // Calculate overall score
+            const totalMax = assessmentScores.technical.max + assessmentScores.organizational.max + assessmentScores.process.max;
+            const totalCurrent = assessmentScores.technical.current + assessmentScores.organizational.current + assessmentScores.process.current;
+            const overallPercent = (totalCurrent / totalMax) * 100;
+
+            // Update progress
+            totalQuestions = document.querySelectorAll('.assessment-item').length;
+            const progressPercent = (answeredQuestions / totalQuestions) * 100;
+            document.getElementById('assessmentProgress').textContent = `${Math.round(progressPercent)}%`;
+            document.getElementById('assessmentProgressBar').style.width = `${progressPercent}%`;
+
+            // Update overall score circle
+            const circumference = 283;
+            const offset = circumference - (overallPercent / 100) * circumference;
+            document.getElementById('scoreCircleFill').style.strokeDashoffset = offset;
+            document.getElementById('overallScore').textContent = Math.round(overallPercent);
+
+            // Update score color based on level
+            const scoreFill = document.getElementById('scoreCircleFill');
+            if (overallPercent >= 80) {
+                scoreFill.style.stroke = 'var(--success)';
+                document.getElementById('readinessLevel').textContent = 'Ready to Proceed';
+                document.getElementById('readinessLevel').style.color = 'var(--success)';
+            } else if (overallPercent >= 60) {
+                scoreFill.style.stroke = 'var(--warning)';
+                document.getElementById('readinessLevel').textContent = 'Conditionally Ready';
+                document.getElementById('readinessLevel').style.color = 'var(--warning)';
+            } else if (overallPercent > 0) {
+                scoreFill.style.stroke = 'var(--danger)';
+                document.getElementById('readinessLevel').textContent = 'Not Ready';
+                document.getElementById('readinessLevel').style.color = 'var(--danger)';
+            }
+
+            // Update breakdown bars
+            const techPercent = (assessmentScores.technical.current / assessmentScores.technical.max) * 100;
+            const orgPercent = (assessmentScores.organizational.current / assessmentScores.organizational.max) * 100;
+            const procPercent = (assessmentScores.process.current / assessmentScores.process.max) * 100;
+
+            document.getElementById('technicalBar').style.width = `${techPercent}%`;
+            document.getElementById('organizationalBar').style.width = `${orgPercent}%`;
+            document.getElementById('processBar').style.width = `${procPercent}%`;
+
+            document.getElementById('technicalPercent').textContent = `${Math.round(techPercent)}%`;
+            document.getElementById('organizationalPercent').textContent = `${Math.round(orgPercent)}%`;
+            document.getElementById('processPercent').textContent = `${Math.round(procPercent)}%`;
+
+            // Generate recommendations
+            generateRecommendations(techPercent, orgPercent, procPercent);
+        }
+
+        function generateRecommendations(tech, org, proc) {
+            const recommendations = [];
+
+            if (tech < 60) {
+                recommendations.push({ level: 'critical', text: 'Technical readiness is low. Prioritize Defender portal connection and RBAC planning before proceeding.' });
+            }
+            if (org < 60) {
+                recommendations.push({ level: 'critical', text: 'Organizational alignment needs attention. Engage executive sponsor and SOC team before implementation.' });
+            }
+            if (proc < 60) {
+                recommendations.push({ level: 'critical', text: 'Process readiness gaps identified. Complete SOC content inventory and define success criteria.' });
+            }
+
+            if (tech >= 60 && tech < 80) {
+                recommendations.push({ level: 'warning', text: 'Complete technical prerequisites: verify CMK requirements and service limits for your scale.' });
+            }
+            if (org >= 60 && org < 80) {
+                recommendations.push({ level: 'warning', text: 'Finalize stakeholder alignment: ensure FinOps budget approval and training plan.' });
+            }
+            if (proc >= 60 && proc < 80) {
+                recommendations.push({ level: 'warning', text: 'Strengthen process readiness: document rollback plan and establish monitoring baseline.' });
+            }
+
+            if (tech >= 80 && org >= 80 && proc >= 80) {
+                recommendations.push({ level: 'info', text: 'Strong readiness across all dimensions. Consider starting with a pilot phase to validate assumptions.' });
+            }
+
+            const list = document.getElementById('recommendationsList');
+            if (recommendations.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-muted);">Complete the assessment to receive recommendations.</p>';
+            } else {
+                list.innerHTML = recommendations.map(r => 
+                    `<div class="recommendation-item ${r.level}">
+                        <span>${r.level === 'critical' ? '🔴' : r.level === 'warning' ? '🟡' : '🟢'}</span>
+                        <span>${r.text}</span>
+                    </div>`
+                ).join('');
+            }
+        }
+
+        function toggleAssessmentCategory(header) {
+            const body = header.nextElementSibling;
+            body.style.display = body.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function exportAssessment() {
+            const report = generateAssessmentReport();
+            downloadFile('SentinelDataLake_ReadinessAssessment.txt', report);
+        }
+
+        function generateAssessmentReport() {
+            const totalMax = assessmentScores.technical.max + assessmentScores.organizational.max + assessmentScores.process.max;
+            const totalCurrent = assessmentScores.technical.current + assessmentScores.organizational.current + assessmentScores.process.current;
+            const overallPercent = Math.round((totalCurrent / totalMax) * 100);
+
+            return `MICROSOFT SENTINEL DATA LAKE - READINESS ASSESSMENT REPORT
+Generated: ${new Date().toLocaleString()}
+================================================================
+
+OVERALL READINESS SCORE: ${overallPercent}/100
+
+CATEGORY BREAKDOWN
+------------------
+Technical:      ${assessmentScores.technical.current}/${assessmentScores.technical.max} (${Math.round(assessmentScores.technical.current/assessmentScores.technical.max*100)}%)
+Organizational: ${assessmentScores.organizational.current}/${assessmentScores.organizational.max} (${Math.round(assessmentScores.organizational.current/assessmentScores.organizational.max*100)}%)
+Process:        ${assessmentScores.process.current}/${assessmentScores.process.max} (${Math.round(assessmentScores.process.current/assessmentScores.process.max*100)}%)
+
+READINESS LEVEL: ${overallPercent >= 80 ? 'READY TO PROCEED' : overallPercent >= 60 ? 'CONDITIONALLY READY' : 'NOT READY'}
+
+RECOMMENDATIONS
+---------------
+${document.getElementById('recommendationsList').innerText}
+
+================================================================
+Review and address gaps before proceeding with implementation.
+`;
+        }
+
+        // ==================== PRE-FLIGHT CHECKLIST ====================
+
+        const phaseChecklists = {
+            discovery: {
+                name: 'Phase 1: Discovery',
+                sections: [
+                    {
+                        title: 'Technical Prerequisites',
+                        items: [
+                            { id: 'd1', label: 'Defender portal connection status verified', detail: 'Workspace must be connected to Defender portal for Data Lake enablement' },
+                            { id: 'd2', label: 'Current ingestion volume documented by table', detail: 'Run Usage query to baseline all tables and volumes' },
+                            { id: 'd3', label: 'Retention requirements gathered from stakeholders', detail: 'Document compliance, legal, and operational retention needs' },
+                            { id: 'd4', label: 'CMK status assessed (Data Lake does not support CMK)', detail: 'Identify tables requiring CMK and plan accordingly' },
+                            { id: 'd5', label: 'Service limits reviewed for planned scale', detail: 'Verify job limits, query timeouts, and storage limits' }
+                        ]
+                    },
+                    {
+                        title: 'Stakeholder Alignment',
+                        items: [
+                            { id: 'd6', label: 'Executive sponsor identified and briefed', detail: 'Secure leadership support for project and budget' },
+                            { id: 'd7', label: 'SOC team informed of upcoming changes', detail: 'Initial communication about project scope and timeline' },
+                            { id: 'd8', label: 'FinOps team engaged for cost modeling', detail: 'Review current costs and projected Data Lake costs' },
+                            { id: 'd9', label: 'GRC/Compliance consulted on data residency', detail: 'Validate compliance with data handling requirements' }
+                        ]
+                    },
+                    {
+                        title: 'Documentation',
+                        items: [
+                            { id: 'd10', label: 'SOC content inventory started', detail: 'Begin cataloging rules, workbooks, and hunting queries' },
+                            { id: 'd11', label: 'Current query patterns documented', detail: 'Identify lookback windows and common query patterns' },
+                            { id: 'd12', label: 'Risk register initialized', detail: 'Document initial risks and mitigation strategies' }
+                        ]
+                    }
+                ]
+            },
+            design: {
+                name: 'Phase 2: Design',
+                sections: [
+                    {
+                        title: 'Architecture Decisions',
+                        items: [
+                            { id: 'ds1', label: 'Retention strategy finalized per table tier', detail: 'Primary, Secondary, and Compliance data classifications defined' },
+                            { id: 'ds2', label: 'Table-by-table tier assignment documented', detail: 'Specify analytics vs lake-only for each table type' },
+                            { id: 'ds3', label: 'Historical data migration strategy selected', detail: 'Choose between coexistence bridge, backfill, or fresh start' },
+                            { id: 'ds4', label: 'RBAC model designed', detail: 'Define roles and permissions for Data Lake access' }
+                        ]
+                    },
+                    {
+                        title: 'SOC Content Planning',
+                        items: [
+                            { id: 'ds5', label: 'Analytics rules reviewed for tier compatibility', detail: 'Ensure all rules use analytics tier tables' },
+                            { id: 'ds6', label: 'Workbooks assessed for performance impact', detail: 'Identify workbooks that may need optimization' },
+                            { id: 'ds7', label: 'KQL job templates created for long-range queries', detail: 'Design reusable jobs for >90 day investigations' },
+                            { id: 'ds8', label: 'SOC workflow decision tree designed', detail: 'Document tier-aware investigation process' }
+                        ]
+                    },
+                    {
+                        title: 'Governance & Operations',
+                        items: [
+                            { id: 'ds9', label: 'Cost monitoring approach defined', detail: 'Plan dashboards and alerts for cost tracking' },
+                            { id: 'ds10', label: 'Success criteria and KPIs documented', detail: 'Define measurable goals for implementation' },
+                            { id: 'ds11', label: 'Training curriculum designed', detail: 'Plan SOC training on tier-aware workflows' },
+                            { id: 'ds12', label: 'Rollback procedure documented', detail: 'Define steps to revert if issues arise' }
+                        ]
+                    }
+                ]
+            },
+            pilot: {
+                name: 'Phase 3: Pilot',
+                sections: [
+                    {
+                        title: 'Pre-Pilot Validation',
+                        items: [
+                            { id: 'p1', label: 'Pilot scope defined (tables, users, duration)', detail: 'Select 2-3 representative tables for initial testing' },
+                            { id: 'p2', label: 'Baseline metrics captured', detail: 'Document current query performance and costs' },
+                            { id: 'p3', label: 'Pilot success criteria defined', detail: 'Specific metrics that indicate pilot success' },
+                            { id: 'p4', label: 'Pilot team identified and trained', detail: 'Select analysts for pilot participation' }
+                        ]
+                    },
+                    {
+                        title: 'Technical Readiness',
+                        items: [
+                            { id: 'p5', label: 'Test environment available or prod change window approved', detail: 'Ensure ability to enable Data Lake' },
+                            { id: 'p6', label: 'Monitoring dashboards deployed', detail: 'Visibility into pilot metrics' },
+                            { id: 'p7', label: 'Alert rules configured for pilot tables', detail: 'Detection parity validation alerts' },
+                            { id: 'p8', label: 'KQL jobs tested in non-production', detail: 'Validate job templates work correctly' }
+                        ]
+                    },
+                    {
+                        title: 'Communication',
+                        items: [
+                            { id: 'p9', label: 'Pilot announcement sent to SOC', detail: 'Inform team about pilot scope and timeline' },
+                            { id: 'p10', label: 'Feedback mechanism established', detail: 'Method for pilot participants to report issues' },
+                            { id: 'p11', label: 'Escalation path defined', detail: 'Clear escalation for pilot issues' }
+                        ]
+                    }
+                ]
+            },
+            rollout: {
+                name: 'Phase 4: Scale Rollout',
+                sections: [
+                    {
+                        title: 'Pilot Review',
+                        items: [
+                            { id: 'r1', label: 'Pilot success criteria met', detail: 'All pilot KPIs achieved' },
+                            { id: 'r2', label: 'Pilot issues resolved or mitigated', detail: 'No blocking issues remain' },
+                            { id: 'r3', label: 'Pilot feedback incorporated', detail: 'Lessons learned applied to rollout plan' },
+                            { id: 'r4', label: 'Go/No-Go decision documented', detail: 'Formal approval to proceed' }
+                        ]
+                    },
+                    {
+                        title: 'Rollout Preparation',
+                        items: [
+                            { id: 'r5', label: 'Rollout waves defined', detail: 'Phased approach for remaining tables' },
+                            { id: 'r6', label: 'Change tickets submitted', detail: 'Formal change management approval' },
+                            { id: 'r7', label: 'SOC training completed', detail: 'All analysts trained on tier-aware workflows' },
+                            { id: 'r8', label: 'Runbooks updated', detail: 'Documentation reflects new processes' },
+                            { id: 'r9', label: 'Cost guardrails implemented', detail: 'Budget alerts and limits configured' }
+                        ]
+                    },
+                    {
+                        title: 'Operational Readiness',
+                        items: [
+                            { id: 'r10', label: 'Production monitoring dashboards live', detail: 'Full visibility into rollout metrics' },
+                            { id: 'r11', label: 'On-call team briefed', detail: 'Support team aware of rollout' },
+                            { id: 'r12', label: 'Rollback procedure tested', detail: 'Ability to revert verified' }
+                        ]
+                    }
+                ]
+            },
+            cutover: {
+                name: 'Phase 5: Cutover',
+                sections: [
+                    {
+                        title: 'Pre-Cutover Validation',
+                        items: [
+                            { id: 'c1', label: 'All rollout waves completed successfully', detail: 'No outstanding table migrations' },
+                            { id: 'c2', label: 'Detection parity verified', detail: 'Alert rates match baseline' },
+                            { id: 'c3', label: 'SOC adoption metrics on target', detail: 'Analysts using tier-aware workflows' },
+                            { id: 'c4', label: 'Cost tracking within forecast', detail: 'No unexpected cost overruns' }
+                        ]
+                    },
+                    {
+                        title: 'Archive Retirement',
+                        items: [
+                            { id: 'c5', label: 'Archive dependency audit completed', detail: 'No critical dependencies on archive tier' },
+                            { id: 'c6', label: 'Data migration/coexistence validated', detail: 'Historical data accessible via Data Lake' },
+                            { id: 'c7', label: 'Archive retirement timeline communicated', detail: 'Stakeholders aware of decommission date' },
+                            { id: 'c8', label: 'Final archive data export completed (if needed)', detail: 'Any required data preserved' }
+                        ]
+                    },
+                    {
+                        title: 'Steady State Transition',
+                        items: [
+                            { id: 'c9', label: 'Operational runbooks finalized', detail: 'Day-2 operations documented' },
+                            { id: 'c10', label: 'Governance cadence established', detail: 'Regular review meetings scheduled' },
+                            { id: 'c11', label: 'Project closure report drafted', detail: 'Document outcomes and lessons learned' },
+                            { id: 'c12', label: 'Handoff to operations team completed', detail: 'Project team transitions to BAU support' }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        let checklistState = {};
+
+        function loadPhaseChecklist() {
+            const phase = document.getElementById('phaseSelect').value;
+            const checklist = phaseChecklists[phase];
+            const container = document.getElementById('checklistContainer');
+
+            // Initialize state for this phase if not exists
+            if (!checklistState[phase]) {
+                checklistState[phase] = {};
+                checklist.sections.forEach(section => {
+                    section.items.forEach(item => {
+                        checklistState[phase][item.id] = 'pending';
+                    });
+                });
+            }
+
+            let html = '';
+            checklist.sections.forEach(section => {
+                const sectionItems = section.items;
+                const completed = sectionItems.filter(i => checklistState[phase][i.id] === 'checked').length;
+                
+                html += `
+                    <div class="checklist-section">
+                        <div class="checklist-section-header">
+                            <span>${section.title}</span>
+                            <span class="section-progress">${completed}/${sectionItems.length}</span>
+                        </div>
+                        <div class="checklist-items">
+                            ${sectionItems.map(item => `
+                                <div class="checklist-item ${checklistState[phase][item.id] === 'checked' ? 'completed' : ''}" data-item-id="${item.id}">
+                                    <div class="checklist-checkbox ${checklistState[phase][item.id]}" onclick="toggleChecklistItem('${phase}', '${item.id}')"></div>
+                                    <div class="checklist-content">
+                                        <div class="checklist-label">${item.label}</div>
+                                        <div class="checklist-detail">${item.detail}</div>
+                                    </div>
+                                    <div class="checklist-status">
+                                        <button class="status-btn ${checklistState[phase][item.id] === 'na' ? 'na' : ''}" onclick="markAsNA('${phase}', '${item.id}')">N/A</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            updateGateStatus(phase);
+        }
+
+        function toggleChecklistItem(phase, itemId) {
+            const current = checklistState[phase][itemId];
+            if (current === 'pending') {
+                checklistState[phase][itemId] = 'checked';
+            } else if (current === 'checked') {
+                checklistState[phase][itemId] = 'blocked';
+            } else {
+                checklistState[phase][itemId] = 'pending';
+            }
+            loadPhaseChecklist();
+        }
+
+        function markAsNA(phase, itemId) {
+            checklistState[phase][itemId] = checklistState[phase][itemId] === 'na' ? 'pending' : 'na';
+            loadPhaseChecklist();
+        }
+
+        function updateGateStatus(phase) {
+            const state = checklistState[phase];
+            const items = Object.values(state);
+            const total = items.length;
+            const checked = items.filter(s => s === 'checked').length;
+            const blocked = items.filter(s => s === 'blocked').length;
+            const na = items.filter(s => s === 'na').length;
+            const pending = items.filter(s => s === 'pending').length;
+
+            const gateStatus = document.getElementById('gateStatus');
+            const gateIndicator = document.getElementById('gateIndicator');
+            const gateSummary = document.getElementById('gateSummary');
+
+            gateStatus.className = 'gate-status';
+
+            if (blocked > 0) {
+                gateStatus.classList.add('no-go');
+                gateIndicator.innerHTML = '<span class="gate-icon">🚫</span><span class="gate-text">NO-GO</span>';
+            } else if (pending === 0 || (checked + na === total)) {
+                gateStatus.classList.add('go');
+                gateIndicator.innerHTML = '<span class="gate-icon">✅</span><span class="gate-text">GO</span>';
+            } else if (checked / (total - na) >= 0.8) {
+                gateStatus.classList.add('warning');
+                gateIndicator.innerHTML = '<span class="gate-icon">⚠️</span><span class="gate-text">CONDITIONAL GO</span>';
+            } else {
+                gateIndicator.innerHTML = '<span class="gate-icon">⏳</span><span class="gate-text">IN PROGRESS</span>';
+            }
+
+            gateSummary.innerHTML = `
+                <span class="gate-summary-item">✓ Completed: ${checked}</span>
+                <span class="gate-summary-item">✕ Blocked: ${blocked}</span>
+                <span class="gate-summary-item">○ Pending: ${pending}</span>
+                <span class="gate-summary-item">— N/A: ${na}</span>
+            `;
+        }
+
+        function resetChecklist() {
+            const phase = document.getElementById('phaseSelect').value;
+            if (confirm(`Reset all checklist items for ${phaseChecklists[phase].name}?`)) {
+                checklistState[phase] = null;
+                loadPhaseChecklist();
+            }
+        }
+
+        function exportChecklist() {
+            const phase = document.getElementById('phaseSelect').value;
+            const report = generateChecklistReport(phase);
+            downloadFile(`SentinelDataLake_Checklist_${phase}.txt`, report);
+        }
+
+        function generateChecklistReport(phase) {
+            const checklist = phaseChecklists[phase];
+            const state = checklistState[phase];
+            
+            let report = `MICROSOFT SENTINEL DATA LAKE - PRE-FLIGHT CHECKLIST
+${checklist.name}
+Generated: ${new Date().toLocaleString()}
+================================================================
+
+`;
+            checklist.sections.forEach(section => {
+                report += `\n${section.title.toUpperCase()}\n${'─'.repeat(40)}\n`;
+                section.items.forEach(item => {
+                    const status = state[item.id];
+                    const statusIcon = status === 'checked' ? '[✓]' : status === 'blocked' ? '[✕]' : status === 'na' ? '[—]' : '[ ]';
+                    report += `${statusIcon} ${item.label}\n    ${item.detail}\n`;
+                });
+            });
+
+            const items = Object.values(state);
+            const checked = items.filter(s => s === 'checked').length;
+            const blocked = items.filter(s => s === 'blocked').length;
+
+            report += `\n================================================================
+GATE STATUS: ${blocked > 0 ? 'NO-GO' : checked === items.length ? 'GO' : 'IN PROGRESS'}
+Completed: ${checked}/${items.length}
+Blocked Items: ${blocked}
+================================================================
+`;
+            return report;
+        }
+
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize cost calculator
+            calculateCosts();
+            // Initialize checklist
+            loadPhaseChecklist();
+        });
 
         // Quiz functionality
         function selectOption(option) {
