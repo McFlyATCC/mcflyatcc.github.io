@@ -500,6 +500,116 @@
             background: var(--bg-tertiary);
         }
 
+        /* Clickable metric rows */
+        .metric-row {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .metric-row:hover td {
+            background: var(--accent-red-glow) !important;
+            border-color: var(--accent-red);
+        }
+
+        .metric-row td:first-child::before {
+            content: '▶ ';
+            color: var(--accent-red);
+            font-size: 0.7rem;
+            margin-right: 0.5rem;
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+
+        .metric-row.expanded td:first-child::before {
+            transform: rotate(90deg);
+        }
+
+        .kql-row {
+            background: #0a0a0c !important;
+        }
+
+        .kql-row td {
+            padding: 0 !important;
+            border: none !important;
+        }
+
+        .kql-container {
+            background: #0d0d0f;
+            border: 1px solid var(--accent-red);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            margin: 0 1rem 1rem;
+            overflow: hidden;
+        }
+
+        .kql-container-header {
+            background: var(--bg-tertiary);
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .kql-container-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        .kql-copy-btn {
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .kql-copy-btn:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        .kql-copy-btn.copied {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .kql-container-body {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            color: var(--text-secondary);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .kql-container-body .kql-comment {
+            color: var(--text-muted);
+        }
+
+        .kql-container-body .kql-keyword {
+            color: var(--accent-red);
+        }
+
+        .kql-container-body .kql-function {
+            color: var(--info);
+        }
+
+        .kql-container-body .kql-string {
+            color: var(--success);
+        }
+
         /* Badge styles */
         .badge {
             display: inline-block;
@@ -1807,6 +1917,7 @@
             </div>
 
             <h2>Metrics Framework by Category</h2>
+            <p style="margin-bottom: 1rem;"><span class="badge badge-red">Click any metric row</span> to reveal the KQL query for measurement.</p>
             
             <div class="accordion">
                 <div class="accordion-header" onclick="toggleAccordion(this)">
@@ -1815,7 +1926,7 @@
                 </div>
                 <div class="accordion-content">
                     <div class="accordion-body">
-                        <table class="data-table">
+                        <table class="data-table metrics-table">
                             <thead>
                                 <tr>
                                     <th>Metric</th>
@@ -1825,42 +1936,146 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Interactive Query P95 Latency
+// Measures 95th percentile response time for analytics tier queries
+LAQueryLogs
+| where TimeGenerated > ago(24h)
+| where ResponseCode == 200
+| summarize P95_Latency_Seconds = percentile(ResponseDurationMs, 95) / 1000
+| extend Status = iff(P95_Latency_Seconds < 30, '✅ Within Target', '⚠️ Above Target')">
                                     <td>Interactive Query P95 Latency</td>
                                     <td>95th percentile response time for analytics tier queries</td>
                                     <td>&lt;30 seconds</td>
                                     <td>Daily</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Data Lake Query Timeout Rate
+// Percentage of lake queries exceeding 2-minute sync limit
+LAQueryLogs
+| where TimeGenerated > ago(24h)
+| where QueryText has 'datalake' or QueryText has '_CL'
+| summarize 
+    TotalQueries = count(),
+    TimedOutQueries = countif(ResponseCode == 504 or ResponseDurationMs > 120000)
+| extend TimeoutRate = round(100.0 * TimedOutQueries / TotalQueries, 2)
+| extend Status = iff(TimeoutRate < 5, '✅ Within Target', '⚠️ Above Target')">
                                     <td>Data Lake Query Timeout Rate</td>
                                     <td>Percentage of lake queries exceeding 2-minute sync limit</td>
                                     <td>&lt;5%</td>
                                     <td>Daily</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// KQL Job Success Rate
+// Percentage of scheduled/ad-hoc jobs completing successfully
+// Note: Requires SentinelAudit or custom job logging
+SentinelAudit
+| where TimeGenerated > ago(7d)
+| where OperationName has 'Job'
+| summarize 
+    TotalJobs = count(),
+    Succeeded = countif(Status == 'Succeeded'),
+    Failed = countif(Status == 'Failed'),
+    Running = countif(Status == 'Running')
+| extend SuccessRate = round(100.0 * Succeeded / TotalJobs, 2)
+| extend Status = iff(SuccessRate >= 95, '✅ Within Target', '⚠️ Below Target')
+
+// Alternative using Azure Activity Logs if SentinelAudit unavailable
+AzureActivity
+| where TimeGenerated > ago(7d)
+| where OperationNameValue has 'Microsoft.SecurityInsights'
+| where OperationNameValue has 'job'
+| summarize 
+    TotalJobs = count(),
+    Succeeded = countif(ActivityStatusValue == 'Success'),
+    Failed = countif(ActivityStatusValue == 'Failure')
+| extend SuccessRate = round(100.0 * Succeeded / TotalJobs, 2)">
                                     <td>KQL Job Success Rate</td>
                                     <td>Percentage of scheduled/ad-hoc jobs completing successfully</td>
                                     <td>≥95%</td>
                                     <td>Daily</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// KQL Job Average Runtime
+// Mean execution time for batch jobs
+SentinelAudit
+| where TimeGenerated > ago(7d)
+| where OperationName has 'Job' and Status == 'Succeeded'
+| extend DurationMinutes = DurationMs / 60000
+| summarize 
+    AvgRuntime_Minutes = round(avg(DurationMinutes), 2),
+    MaxRuntime_Minutes = round(max(DurationMinutes), 2),
+    P95Runtime_Minutes = round(percentile(DurationMinutes, 95), 2),
+    JobCount = count()
+| extend Status = iff(AvgRuntime_Minutes < 15, '✅ Within Target', '⚠️ Above Target')
+
+// If duration not available, estimate from job start/end
+// SentinelJobLogs (custom table - implementation varies)
+// | where TimeGenerated > ago(7d)
+// | summarize StartTime = min(TimeGenerated), EndTime = max(TimeGenerated) by JobId
+// | extend DurationMinutes = datetime_diff('minute', EndTime, StartTime)
+// | summarize AvgRuntime = avg(DurationMinutes)">
                                     <td>KQL Job Average Runtime</td>
                                     <td>Mean execution time for batch jobs</td>
                                     <td>&lt;15 minutes</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Data Promotion Latency
+// Time for promoted data to appear in Advanced Hunting
+// This requires custom instrumentation - log when job completes and when data is queryable
+
+// Option 1: If you log promotion events
+// DataPromotionLog_CL
+// | where TimeGenerated > ago(7d)
+// | extend PromotionLatency_Minutes = datetime_diff('minute', DataAvailableTime, JobCompletedTime)
+// | summarize AvgLatency = avg(PromotionLatency_Minutes), P95Latency = percentile(PromotionLatency_Minutes, 95)
+
+// Option 2: Manual test query - run after job completion
+// Check if promoted table has recent data
+let promotedTableName = 'YourPromotedTable_KQL_CL';
+let expectedDataTime = ago(30m); // Adjust based on job completion time
+union withsource=TableName *
+| where TableName == promotedTableName
+| summarize LatestRecord = max(TimeGenerated)
+| extend MinutesSincePromotion = datetime_diff('minute', now(), LatestRecord)
+| extend Status = iff(MinutesSincePromotion < 30, '✅ Data Available', '⚠️ Check Promotion')">
                                     <td>Data Promotion Latency</td>
                                     <td>Time for promoted data to appear in Advanced Hunting</td>
                                     <td>&lt;30 minutes</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Async Query Completion Rate
+// Percentage of async queries completing within 1 hour
+LAQueryLogs
+| where TimeGenerated > ago(7d)
+| where QueryText has 'async' or ResponseDurationMs > 120000
+| summarize 
+    TotalAsyncQueries = count(),
+    CompletedWithin1Hour = countif(ResponseDurationMs <= 3600000 and ResponseCode == 200),
+    TimedOut = countif(ResponseCode == 504 or ResponseDurationMs > 3600000)
+| extend CompletionRate = round(100.0 * CompletedWithin1Hour / TotalAsyncQueries, 2)
+| extend Status = iff(CompletionRate >= 98, '✅ Within Target', '⚠️ Below Target')
+
+// Trend over time
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| where ResponseDurationMs > 120000  // Long-running queries
+| summarize 
+    CompletionRate = round(100.0 * countif(ResponseCode == 200) / count(), 2)
+    by bin(TimeGenerated, 1d)
+| render timechart">
                                     <td>Async Query Completion Rate</td>
                                     <td>Percentage of async queries completing within 1 hour</td>
                                     <td>≥98%</td>
                                     <td>Weekly</td>
                                 </tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1874,7 +2089,7 @@
                 </div>
                 <div class="accordion-content">
                     <div class="accordion-body">
-                        <table class="data-table">
+                        <table class="data-table metrics-table">
                             <thead>
                                 <tr>
                                     <th>Metric</th>
@@ -1884,48 +2099,219 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Monthly Spend Variance
+// Compare actual vs forecasted costs
+// Note: Requires Azure Cost Management data export or API
+
+// Using Usage table for ingestion-based cost estimation
+Usage
+| where TimeGenerated > startofmonth(now())
+| where IsBillable == true
+| summarize TotalGB = sum(Quantity) / 1024
+| extend EstimatedCost_USD = TotalGB * 2.76  // Adjust rate based on your commitment tier
+| extend ForecastedCost_USD = 50000  // Your monthly forecast
+| extend Variance_Percent = round(100.0 * (EstimatedCost_USD - ForecastedCost_USD) / ForecastedCost_USD, 2)
+| extend Status = iff(abs(Variance_Percent) <= 10, '✅ Within Target', '⚠️ Variance Alert')
+
+// Daily trend for month-to-date
+Usage
+| where TimeGenerated > startofmonth(now())
+| where IsBillable == true
+| summarize DailyGB = sum(Quantity) / 1024 by bin(TimeGenerated, 1d)
+| extend EstimatedDailyCost = DailyGB * 2.76
+| render timechart">
                                     <td>Monthly Spend Variance</td>
                                     <td>Actual vs. forecasted monthly costs</td>
                                     <td>±10%</td>
                                     <td>Monthly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Ingestion Cost per GB
+// Effective cost including commitment tier benefits
+Usage
+| where TimeGenerated > ago(30d)
+| where IsBillable == true
+| summarize 
+    TotalGB = sum(Quantity) / 1024,
+    BillableDays = dcount(bin(TimeGenerated, 1d))
+| extend DailyAvgGB = TotalGB / BillableDays
+| extend EffectiveCostPerGB = 2.76  // Adjust based on your commitment tier:
+// Pay-as-you-go: ~$4.30/GB
+// 100 GB/day tier: ~$2.76/GB
+// 500 GB/day tier: ~$2.20/GB
+// 1000 GB/day tier: ~$1.84/GB
+| project TotalGB, DailyAvgGB, EffectiveCostPerGB, EstimatedMonthlyCost = DailyAvgGB * 30 * EffectiveCostPerGB
+
+// Cost by data type
+Usage
+| where TimeGenerated > ago(30d)
+| where IsBillable == true
+| summarize GB = sum(Quantity) / 1024 by DataType
+| extend EstimatedCost = GB * 2.76
+| order by GB desc
+| take 20">
                                     <td>Ingestion Cost per GB</td>
                                     <td>Effective cost of data ingestion including commitment tier</td>
                                     <td>Track trend</td>
                                     <td>Monthly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Lake Storage Cost Efficiency
+// Compare analytics tier vs data lake tier storage costs
+// Note: Actual costs from Azure Cost Management; this estimates based on retention
+
+let AnalyticsTierCostPerGBMonth = 0.12;  // ~$0.12/GB/month for hot storage
+let DataLakeTierCostPerGBMonth = 0.02;   // ~$0.02/GB/month for cold (with 6:1 compression)
+
+Usage
+| where TimeGenerated > ago(30d)
+| where IsBillable == true
+| summarize TotalGB = sum(Quantity) / 1024
+| extend 
+    Analytics90DayCost = TotalGB * 3 * AnalyticsTierCostPerGBMonth,
+    DataLake365DayCost = (TotalGB / 6) * 12 * DataLakeTierCostPerGBMonth,  // 6:1 compression
+    FullAnalytics365DayCost = TotalGB * 12 * AnalyticsTierCostPerGBMonth
+| extend SavingsPercent = round(100.0 * (FullAnalytics365DayCost - (Analytics90DayCost + DataLake365DayCost)) / FullAnalytics365DayCost, 1)
+| project TotalGB, Analytics90DayCost, DataLake365DayCost, FullAnalytics365DayCost, SavingsPercent
+| extend Status = iff(SavingsPercent >= 60, '✅ Good Efficiency', '⚠️ Review Tiering')">
                                     <td>Lake Storage Cost Efficiency</td>
                                     <td>Cost per TB-month in data lake tier vs. analytics tier</td>
                                     <td>≥60% savings</td>
                                     <td>Monthly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Query Scan Volume
+// Total GB scanned by queries per week
+LAQueryLogs
+| where TimeGenerated > ago(7d)
+| summarize 
+    TotalScannedGB = sum(ResponseRowCount * 0.001),  // Rough estimate
+    QueryCount = count(),
+    UniqueUsers = dcount(AADEmail)
+| extend AvgScanPerQuery_MB = (TotalScannedGB * 1024) / QueryCount
+
+// Top queries by estimated scan volume
+LAQueryLogs
+| where TimeGenerated > ago(7d)
+| extend EstimatedScanMB = ResponseRowCount * 0.001 * 1024
+| summarize 
+    TotalScans = count(),
+    AvgScanMB = avg(EstimatedScanMB),
+    TotalScanMB = sum(EstimatedScanMB)
+    by QueryHash = hash(QueryText)
+| order by TotalScanMB desc
+| take 10
+
+// Scan volume trend
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| summarize DailyScanGB = sum(ResponseRowCount * 0.001) by bin(TimeGenerated, 1d)
+| render timechart">
                                     <td>Query Scan Volume</td>
                                     <td>Total GB scanned by lake queries per week</td>
                                     <td>Track & optimize</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Top 10 Query Hotspots
+// Queries with highest data scan volumes - candidates for optimization
+LAQueryLogs
+| where TimeGenerated > ago(7d)
+| where ResponseCode == 200
+| extend 
+    EstimatedScanMB = ResponseRowCount * 0.001 * 1024,
+    QueryPreview = substring(QueryText, 0, 200)
+| summarize 
+    ExecutionCount = count(),
+    TotalScanMB = sum(EstimatedScanMB),
+    AvgDurationSec = avg(ResponseDurationMs) / 1000,
+    Users = make_set(AADEmail)
+    by QueryHash = hash(QueryText), QueryPreview
+| extend AvgScanPerExecution_MB = TotalScanMB / ExecutionCount
+| order by TotalScanMB desc
+| take 10
+| project QueryPreview, ExecutionCount, TotalScanMB, AvgScanPerExecution_MB, AvgDurationSec, UserCount = array_length(Users)
+
+// Identify queries without time filters (expensive!)
+LAQueryLogs
+| where TimeGenerated > ago(7d)
+| where QueryText !has 'ago(' and QueryText !has 'between' and QueryText !has 'TimeGenerated'
+| summarize BadQueryCount = count() by AADEmail
+| order by BadQueryCount desc">
                                     <td>Top 10 Query Hotspots</td>
                                     <td>Queries with highest data scan volumes</td>
                                     <td>Review & refactor</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Commitment Tier Utilization
+// Percentage of committed capacity actually used
+let CommittedGB_PerDay = 500;  // Adjust to your commitment tier
+
+Usage
+| where TimeGenerated > ago(30d)
+| where IsBillable == true
+| summarize DailyGB = sum(Quantity) / 1024 by bin(TimeGenerated, 1d)
+| summarize 
+    AvgDailyGB = avg(DailyGB),
+    MaxDailyGB = max(DailyGB),
+    MinDailyGB = min(DailyGB)
+| extend 
+    UtilizationPercent = round(100.0 * AvgDailyGB / CommittedGB_PerDay, 1),
+    PeakUtilization = round(100.0 * MaxDailyGB / CommittedGB_PerDay, 1)
+| extend Status = case(
+    UtilizationPercent < 70, '⚠️ Underutilized - Consider lower tier',
+    UtilizationPercent > 100, '⚠️ Over capacity - Consider higher tier',
+    '✅ Optimal utilization (85-95%)')
+
+// Daily utilization trend
+Usage
+| where TimeGenerated > ago(30d)
+| where IsBillable == true
+| summarize DailyGB = sum(Quantity) / 1024 by bin(TimeGenerated, 1d)
+| extend UtilizationPercent = 100.0 * DailyGB / 500  // Adjust commitment
+| render timechart">
                                     <td>Commitment Tier Utilization</td>
                                     <td>Percentage of committed capacity actually used</td>
                                     <td>85-95%</td>
                                     <td>Monthly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Cost per Investigation
+// Average query/job costs for >90 day investigations
+// Requires custom logging of investigation activities
+
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| where QueryText has 'ago(90d)' or QueryText has 'ago(180d)' or QueryText has 'ago(365d)'
+    or QueryText has '90d' or QueryText has '180d' or QueryText has '365d'
+| summarize 
+    LongRangeQueries = count(),
+    AvgDurationSec = avg(ResponseDurationMs) / 1000,
+    TotalRows = sum(ResponseRowCount)
+| extend EstimatedScanGB = TotalRows * 0.000001  // Rough estimate
+| extend EstimatedCost = EstimatedScanGB * 0.005  // $0.005/GB for lake queries (estimate)
+| extend CostPerQuery = EstimatedCost / LongRangeQueries
+
+// Track by user/team for chargeback
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| where QueryText has 'ago(90d)' or QueryText has 'ago(180d)' or QueryText has 'ago(365d)'
+| summarize QueryCount = count(), TotalRows = sum(ResponseRowCount) by AADEmail
+| extend EstimatedCost = TotalRows * 0.000001 * 0.005
+| order by EstimatedCost desc">
                                     <td>Cost per Investigation</td>
                                     <td>Average query/job costs for >90 day investigations</td>
                                     <td>Track trend</td>
                                     <td>Monthly</td>
                                 </tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
                             </tbody>
                         </table>
                         
@@ -1944,7 +2330,7 @@
                 </div>
                 <div class="accordion-content">
                     <div class="accordion-body">
-                        <table class="data-table">
+                        <table class="data-table metrics-table">
                             <thead>
                                 <tr>
                                     <th>Metric</th>
@@ -1954,42 +2340,204 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Ingestion Freshness (Analytics Tier)
+// Lag between event time and availability in analytics tier
+let CriticalTables = dynamic(['SecurityEvent', 'SigninLogs', 'SecurityAlert', 'SecurityIncident']);
+
+union withsource=TableName *
+| where TimeGenerated > ago(1h)
+| where TableName in (CriticalTables)
+| summarize 
+    LatestEvent = max(TimeGenerated),
+    RecordCount = count()
+    by TableName
+| extend 
+    FreshnessMinutes = datetime_diff('minute', now(), LatestEvent),
+    Status = iff(datetime_diff('minute', now(), LatestEvent) < 5, '✅ Fresh', '⚠️ Stale')
+| order by FreshnessMinutes desc
+
+// Detailed freshness by table over time
+union withsource=TableName SecurityEvent, SigninLogs, SecurityAlert
+| where TimeGenerated > ago(24h)
+| summarize LatestEvent = max(TimeGenerated) by TableName, bin(TimeGenerated, 5m)
+| extend LagMinutes = datetime_diff('minute', bin(TimeGenerated, 5m), LatestEvent)
+| render timechart">
                                     <td>Ingestion Freshness (Analytics)</td>
                                     <td>Lag between event time and availability in analytics tier</td>
                                     <td>&lt;5 minutes</td>
                                     <td>Real-time</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Ingestion Freshness (Data Lake Tier)
+// Lag between event time and availability in data lake
+// Note: Data lake has expected 90-120 minute lag
+
+// This query runs against data lake via KQL jobs or Data Lake Explorer
+// Adjust table names for your _CL custom tables or lake-specific queries
+
+// Check freshness of data lake tables
+let ExpectedLagMinutes = 120;
+
+// Option 1: Query recently promoted data
+// YourTable_KQL_CL  // Promoted table from data lake
+// | summarize LatestRecord = max(TimeGenerated)
+// | extend LagMinutes = datetime_diff('minute', now(), LatestRecord)
+// | extend Status = iff(LagMinutes < ExpectedLagMinutes, '✅ Within SLA', '⚠️ Delayed')
+
+// Option 2: Monitor via heartbeat table (if configured)
+Heartbeat
+| where TimeGenerated > ago(4h)
+| summarize LatestHeartbeat = max(TimeGenerated) by Computer
+| extend LagMinutes = datetime_diff('minute', now(), LatestHeartbeat)
+| summarize 
+    AvgLag = avg(LagMinutes),
+    MaxLag = max(LagMinutes),
+    StaleCount = countif(LagMinutes > 120)
+| extend Status = iff(MaxLag < 120, '✅ Lake Fresh', '⚠️ Check Lake Availability')">
                                     <td>Ingestion Freshness (Lake)</td>
                                     <td>Lag between event time and availability in data lake</td>
                                     <td>&lt;120 minutes</td>
                                     <td>Hourly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Table Completeness
+// Percentage of expected tables with data in last 24h
+let ExpectedTables = dynamic([
+    'SecurityEvent', 'SecurityAlert', 'SecurityIncident',
+    'SigninLogs', 'AADNonInteractiveUserSignInLogs',
+    'AuditLogs', 'DeviceEvents', 'DeviceProcessEvents',
+    'EmailEvents', 'IdentityInfo', 'Heartbeat'
+]);
+
+Usage
+| where TimeGenerated > ago(24h)
+| where IsBillable == true
+| summarize HasData = count() > 0 by DataType
+| where DataType in (ExpectedTables)
+| summarize 
+    TablesWithData = countif(HasData),
+    TotalExpected = array_length(ExpectedTables)
+| extend 
+    CompletenessPercent = round(100.0 * TablesWithData / TotalExpected, 1),
+    MissingTables = TotalExpected - TablesWithData
+| extend Status = iff(CompletenessPercent == 100, '✅ All Tables Active', '⚠️ Missing Data')
+
+// Identify which tables are missing
+let ActiveTables = Usage
+| where TimeGenerated > ago(24h)
+| where IsBillable == true
+| distinct DataType;
+print ExpectedTables
+| mv-expand ExpectedTable = ExpectedTables to typeof(string)
+| where ExpectedTable !in (ActiveTables)
+| project MissingTable = ExpectedTable">
                                     <td>Table Completeness</td>
                                     <td>Percentage of expected tables with data in last 24h</td>
                                     <td>100%</td>
                                     <td>Daily</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Ingestion Gap Duration
+// Total minutes of ingestion gaps per week by table
+let CriticalTables = dynamic(['SecurityEvent', 'SigninLogs', 'SecurityAlert']);
+let GapThresholdMinutes = 15;
+
+union withsource=TableName *
+| where TimeGenerated > ago(7d)
+| where TableName in (CriticalTables)
+| summarize EventCount = count() by TableName, bin(TimeGenerated, 5m)
+| order by TableName, TimeGenerated asc
+| extend PrevTime = prev(TimeGenerated, 1, datetime(null)), PrevTable = prev(TableName, 1, '')
+| where PrevTable == TableName
+| extend GapMinutes = datetime_diff('minute', TimeGenerated, PrevTime)
+| where GapMinutes > GapThresholdMinutes
+| summarize 
+    GapCount = count(),
+    TotalGapMinutes = sum(GapMinutes),
+    MaxGapMinutes = max(GapMinutes)
+    by TableName
+| extend Status = iff(TotalGapMinutes < 30, '✅ Minimal Gaps', '⚠️ Review Connectors')
+
+// Visualize gaps over time
+union withsource=TableName SecurityEvent, SigninLogs
+| where TimeGenerated > ago(7d)
+| summarize EventCount = count() by TableName, bin(TimeGenerated, 1h)
+| render timechart">
                                     <td>Ingestion Gap Duration</td>
                                     <td>Total minutes of ingestion gaps per week by table</td>
                                     <td>&lt;30 min/week</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Schema Drift Events
+// Number of unexpected schema changes detected
+// Monitor for new columns, removed columns, or type changes
+
+// Option 1: Compare current schema to baseline
+// Run periodically and diff against stored baseline
+union withsource=TableName SecurityEvent
+| getschema
+| project TableName, ColumnName, ColumnType
+// Compare to baseline stored in a watchlist or custom table
+
+// Option 2: Monitor for new/unexpected columns
+let BaselineColumns = dynamic(['TimeGenerated', 'Computer', 'Account', 'EventID', 'Activity']);  // Your expected columns
+union withsource=TableName SecurityEvent
+| take 1
+| getschema
+| where ColumnName !in (BaselineColumns)
+| summarize NewColumns = make_list(ColumnName)
+| extend DriftDetected = array_length(NewColumns) > 0
+| extend Status = iff(DriftDetected, '⚠️ Schema Drift Detected', '✅ Schema Stable')
+
+// Option 3: Track schema over time (requires custom logging)
+// SchemaAudit_CL
+// | where TimeGenerated > ago(7d)
+// | summarize Changes = dcount(ColumnName) by TableName, bin(TimeGenerated, 1d)
+// | where Changes > 0">
                                     <td>Schema Drift Events</td>
                                     <td>Number of unexpected schema changes detected</td>
                                     <td>0</td>
                                     <td>Daily</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Retention Compliance
+// Tables matching target retention configuration
+// Note: Requires querying Azure Resource Graph or using management APIs
+
+// This KQL estimates retention by checking oldest available data
+let TargetAnalyticsRetentionDays = 90;
+let TargetTotalRetentionDays = 365;
+
+Usage
+| where IsBillable == true
+| summarize 
+    OldestData = min(TimeGenerated),
+    NewestData = max(TimeGenerated)
+    by DataType
+| extend 
+    ActualRetentionDays = datetime_diff('day', NewestData, OldestData),
+    Status = iff(datetime_diff('day', NewestData, OldestData) >= TargetAnalyticsRetentionDays, 
+                 '✅ Compliant', '⚠️ Review Retention')
+| order by ActualRetentionDays asc
+
+// For accurate retention settings, use Azure Resource Graph:
+// resources
+// | where type == 'microsoft.operationalinsights/workspaces/tables'
+// | extend retentionDays = properties.retentionInDays
+// | project name, retentionDays
+// | where retentionDays != 90  // Flag non-compliant tables">
                                     <td>Retention Compliance</td>
                                     <td>Tables matching target retention configuration</td>
                                     <td>100%</td>
                                     <td>Weekly</td>
                                 </tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -2003,7 +2551,7 @@
                 </div>
                 <div class="accordion-content">
                     <div class="accordion-body">
-                        <table class="data-table">
+                        <table class="data-table metrics-table">
                             <thead>
                                 <tr>
                                     <th>Metric</th>
@@ -2013,48 +2561,229 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Detection Rule Firing Rate
+// Comparison to pre-migration baseline
+let BaselineAlertRate = 150;  // Your average daily alerts before migration
+
+SecurityAlert
+| where TimeGenerated > ago(7d)
+| summarize DailyAlerts = count() by bin(TimeGenerated, 1d)
+| summarize 
+    AvgDailyAlerts = avg(DailyAlerts),
+    MinAlerts = min(DailyAlerts),
+    MaxAlerts = max(DailyAlerts)
+| extend 
+    VariancePercent = round(100.0 * (AvgDailyAlerts - BaselineAlertRate) / BaselineAlertRate, 1),
+    Status = iff(abs(AvgDailyAlerts - BaselineAlertRate) / BaselineAlertRate <= 0.05, 
+                 '✅ Within ±5% of Baseline', '⚠️ Investigate Variance')
+
+// Trend comparison
+SecurityAlert
+| where TimeGenerated > ago(30d)
+| summarize AlertCount = count() by bin(TimeGenerated, 1d)
+| extend Baseline = BaselineAlertRate
+| render timechart">
                                     <td>Detection Rule Firing Rate</td>
                                     <td>Comparison to pre-migration baseline</td>
                                     <td>±5% of baseline</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Analytics Rule Health
+// Percentage of rules executing without errors
+SentinelHealth
+| where TimeGenerated > ago(24h)
+| where SentinelResourceType == 'Analytic Rule'
+| summarize 
+    TotalRules = dcount(SentinelResourceName),
+    HealthyRules = dcountif(SentinelResourceName, Status == 'Success'),
+    UnhealthyRules = dcountif(SentinelResourceName, Status != 'Success')
+| extend 
+    HealthPercent = round(100.0 * HealthyRules / TotalRules, 1),
+    Status = iff(HealthPercent >= 99, '✅ Healthy', '⚠️ Review Failed Rules')
+
+// List unhealthy rules
+SentinelHealth
+| where TimeGenerated > ago(24h)
+| where SentinelResourceType == 'Analytic Rule'
+| where Status != 'Success'
+| summarize 
+    LastError = arg_max(TimeGenerated, *),
+    ErrorCount = count()
+    by SentinelResourceName
+| project RuleName = SentinelResourceName, LastError = TimeGenerated, Status, Description, ErrorCount
+| order by ErrorCount desc">
                                     <td>Analytics Rule Health</td>
                                     <td>Percentage of rules executing without errors</td>
                                     <td>≥99%</td>
                                     <td>Daily</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// MTTD (Mean Time to Detect)
+// Average time from event to alert generation
+SecurityAlert
+| where TimeGenerated > ago(7d)
+| where isnotempty(StartTime)
+| extend DetectionDelay_Minutes = datetime_diff('minute', TimeGenerated, StartTime)
+| where DetectionDelay_Minutes >= 0 and DetectionDelay_Minutes < 1440  // Filter outliers
+| summarize 
+    MTTD_Minutes = avg(DetectionDelay_Minutes),
+    MTTD_P50 = percentile(DetectionDelay_Minutes, 50),
+    MTTD_P95 = percentile(DetectionDelay_Minutes, 95),
+    AlertCount = count()
+| extend MTTD_Hours = round(MTTD_Minutes / 60, 2)
+
+// MTTD trend over time
+SecurityAlert
+| where TimeGenerated > ago(30d)
+| where isnotempty(StartTime)
+| extend DetectionDelay_Minutes = datetime_diff('minute', TimeGenerated, StartTime)
+| where DetectionDelay_Minutes >= 0 and DetectionDelay_Minutes < 1440
+| summarize MTTD = avg(DetectionDelay_Minutes) by bin(TimeGenerated, 1d)
+| render timechart">
                                     <td>MTTD (Mean Time to Detect)</td>
                                     <td>Average time from event to alert generation</td>
                                     <td>Track trend</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// MTTI (Mean Time to Investigate)
+// Average investigation duration for incidents
+SecurityIncident
+| where TimeGenerated > ago(30d)
+| where Status == 'Closed'
+| where isnotempty(CreatedTime) and isnotempty(ClosedTime)
+| extend InvestigationDuration_Hours = datetime_diff('hour', ClosedTime, CreatedTime)
+| where InvestigationDuration_Hours >= 0 and InvestigationDuration_Hours < 720  // Filter outliers (30 days)
+| summarize 
+    MTTI_Hours = avg(InvestigationDuration_Hours),
+    MTTI_P50 = percentile(InvestigationDuration_Hours, 50),
+    MTTI_P95 = percentile(InvestigationDuration_Hours, 95),
+    IncidentCount = count()
+| extend MTTI_Days = round(MTTI_Hours / 24, 1)
+
+// MTTI by severity
+SecurityIncident
+| where TimeGenerated > ago(30d)
+| where Status == 'Closed'
+| extend InvestigationDuration_Hours = datetime_diff('hour', ClosedTime, CreatedTime)
+| where InvestigationDuration_Hours >= 0 and InvestigationDuration_Hours < 720
+| summarize MTTI_Hours = avg(InvestigationDuration_Hours) by Severity
+| order by case(Severity, 'High', 1, 'Medium', 2, 'Low', 3, 'Informational', 4, 5)">
                                     <td>MTTI (Mean Time to Investigate)</td>
                                     <td>Average investigation duration for incidents</td>
                                     <td>Improve vs. baseline</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// 365-Day Investigation Success
+// Long-range investigations completed without restore/search
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| extend 
+    IsLongRange = QueryText has 'ago(90d)' or QueryText has 'ago(180d)' or QueryText has 'ago(365d)'
+                  or QueryText has 'ago(1y)' or QueryText matches regex @'ago\(\d{3,}d\)',
+    UsedRestore = QueryText has 'search' or QueryText has '_RST' or QueryText has 'restore'
+| where IsLongRange
+| summarize 
+    TotalLongRangeQueries = count(),
+    LakeFirstQueries = countif(not(UsedRestore)),
+    RestoreQueries = countif(UsedRestore)
+| extend 
+    LakeFirstPercent = round(100.0 * LakeFirstQueries / TotalLongRangeQueries, 1),
+    Status = iff(LakeFirstPercent >= 95, '✅ Lake-First Adopted', '⚠️ Review Workflows')
+
+// Trend over time
+LAQueryLogs
+| where TimeGenerated > ago(90d)
+| extend IsLongRange = QueryText has 'ago(90d)' or QueryText has 'ago(180d)' or QueryText has 'ago(365d)'
+| where IsLongRange
+| summarize 
+    LakeFirstPercent = round(100.0 * countif(QueryText !has 'restore' and QueryText !has 'search') / count(), 1)
+    by bin(TimeGenerated, 7d)
+| render timechart">
                                     <td>365-Day Investigation Success</td>
                                     <td>Long-range investigations completed without restore/search</td>
                                     <td>≥95% (post-enable)</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Workbook Render Success
+// Top workbooks rendering without timeout/error
+// Note: Requires workbook telemetry or custom logging
+
+// Using LAQueryLogs to identify workbook-related queries
+LAQueryLogs
+| where TimeGenerated > ago(24h)
+| where RequestClientApp has 'Workbook' or QueryText has 'workbook'
+| summarize 
+    TotalRenders = count(),
+    Successful = countif(ResponseCode == 200),
+    Failed = countif(ResponseCode != 200),
+    AvgDuration_Sec = avg(ResponseDurationMs) / 1000
+| extend 
+    SuccessRate = round(100.0 * Successful / TotalRenders, 1),
+    Status = iff(Successful == TotalRenders, '✅ All Workbooks Healthy', '⚠️ Review Failures')
+
+// Identify slow/failing workbook queries
+LAQueryLogs
+| where TimeGenerated > ago(24h)
+| where RequestClientApp has 'Workbook'
+| where ResponseCode != 200 or ResponseDurationMs > 30000
+| summarize 
+    FailureCount = countif(ResponseCode != 200),
+    SlowCount = countif(ResponseDurationMs > 30000)
+    by QueryHash = hash(substring(QueryText, 0, 100))
+| order by FailureCount desc">
                                     <td>Workbook Render Success</td>
                                     <td>Top workbooks rendering without timeout/error</td>
                                     <td>100%</td>
                                     <td>Daily</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// TI Matching Coverage
+// Days of historical data scanned for retrospective TI
+// Requires tracking of TI matching job executions
+
+// Option 1: Check ThreatIntelligenceIndicator matching coverage
+ThreatIntelligenceIndicator
+| where TimeGenerated > ago(30d)
+| summarize 
+    LatestTI = max(TimeGenerated),
+    OldestTI = min(TimeGenerated),
+    IndicatorCount = dcount(IndicatorId)
+| extend CoverageDays = datetime_diff('day', LatestTI, OldestTI)
+
+// Option 2: If using scheduled TI matching jobs
+// TIMatchingJobLog_CL  // Custom table for job tracking
+// | where TimeGenerated > ago(30d)
+// | summarize 
+//     JobsRun = count(),
+//     DataDaysScanned = sum(DaysScanned),
+//     MatchesFound = sum(MatchCount)
+// | extend AvgCoverage = DataDaysScanned / JobsRun
+
+// Option 3: Check for TI-related alerts from historical data
+SecurityAlert
+| where TimeGenerated > ago(30d)
+| where AlertType has 'TI' or Description has 'threat intelligence'
+| extend AlertDataAge = datetime_diff('day', TimeGenerated, StartTime)
+| summarize 
+    TIAlerts = count(),
+    MaxLookback = max(AlertDataAge)
+| extend CoverageStatus = iff(MaxLookback >= 365, '✅ Full 365-day Coverage', strcat('⚠️ ', MaxLookback, ' days'))">
                                     <td>TI Matching Coverage</td>
                                     <td>Days of historical data scanned for retrospective TI</td>
                                     <td>365 days</td>
                                     <td>Monthly</td>
                                 </tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -2068,7 +2797,7 @@
                 </div>
                 <div class="accordion-content">
                     <div class="accordion-body">
-                        <table class="data-table">
+                        <table class="data-table metrics-table">
                             <thead>
                                 <tr>
                                     <th>Metric</th>
@@ -2078,42 +2807,207 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// SOC Tier-Aware Workflow Adoption
+// Analysts using lake-first for >90d investigations
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| where AADEmail != ''  // Only authenticated users
+| extend 
+    IsLongRangeQuery = QueryText has 'ago(90d)' or QueryText has 'ago(180d)' 
+                       or QueryText has 'ago(365d)' or QueryText has 'ago(1y)',
+    UsesLakeFirst = QueryText has 'datalake' or QueryText has '_CL' 
+                    or (not(QueryText has 'restore') and not(QueryText has 'search'))
+| where IsLongRangeQuery
+| summarize 
+    TotalLongRangeUsers = dcount(AADEmail),
+    LakeFirstUsers = dcountif(AADEmail, UsesLakeFirst)
+| extend 
+    AdoptionPercent = round(100.0 * LakeFirstUsers / TotalLongRangeUsers, 1),
+    Status = iff(LakeFirstUsers / TotalLongRangeUsers >= 0.8, '✅ Strong Adoption', '⚠️ More Training Needed')
+
+// Adoption by user
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| where AADEmail != ''
+| extend IsLongRangeQuery = QueryText has 'ago(90d)' or QueryText has 'ago(180d)' or QueryText has 'ago(365d)'
+| where IsLongRangeQuery
+| summarize 
+    TotalQueries = count(),
+    LakeFirstQueries = countif(not(QueryText has 'restore'))
+    by AADEmail
+| extend AdoptionRate = round(100.0 * LakeFirstQueries / TotalQueries, 1)
+| order by AdoptionRate asc">
                                     <td>SOC Tier-Aware Workflow Adoption</td>
                                     <td>Analysts using lake-first for >90d investigations</td>
                                     <td>≥80%</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Restore/Search Usage Reduction
+// Decrease in legacy restore operations vs. baseline
+let BaselineRestoreCount = 50;  // Your weekly baseline before migration
+
+LAQueryLogs
+| where TimeGenerated > ago(7d)
+| where QueryText has 'search' or QueryText has '_RST' or QueryText has 'restore'
+| summarize CurrentRestoreCount = count()
+| extend 
+    ReductionPercent = round(100.0 * (BaselineRestoreCount - CurrentRestoreCount) / BaselineRestoreCount, 1),
+    Status = iff(CurrentRestoreCount <= BaselineRestoreCount * 0.5, '✅ ≥50% Reduction', '⚠️ Below Target')
+
+// Trend over time
+LAQueryLogs
+| where TimeGenerated > ago(90d)
+| where QueryText has 'search' or QueryText has '_RST' or QueryText has 'restore'
+| summarize RestoreCount = count() by bin(TimeGenerated, 7d)
+| extend Baseline = BaselineRestoreCount
+| render timechart
+
+// Restore usage by user (identify training needs)
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| where QueryText has 'search' or QueryText has '_RST' or QueryText has 'restore'
+| summarize RestoreCount = count() by AADEmail
+| order by RestoreCount desc
+| take 10">
                                     <td>Restore/Search Usage Reduction</td>
                                     <td>Decrease in legacy restore operations vs. baseline</td>
                                     <td>≥50% reduction</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// KQL Job Adoption
+// Number of unique analysts using KQL jobs
+SentinelAudit
+| where TimeGenerated > ago(30d)
+| where OperationName has 'Job' and OperationName has 'Create'
+| summarize 
+    TotalJobsCreated = count(),
+    UniqueUsers = dcount(Identity),
+    JobsByUser = make_bag(pack(Identity, count()))
+| extend Status = iff(UniqueUsers >= 5, '✅ Good Adoption', '⚠️ Increase Training')
+
+// Job creation trend
+SentinelAudit
+| where TimeGenerated > ago(90d)
+| where OperationName has 'Job'
+| summarize 
+    JobsCreated = countif(OperationName has 'Create'),
+    UniqueUsers = dcount(Identity)
+    by bin(TimeGenerated, 7d)
+| render timechart
+
+// Alternative: Use Azure Activity Logs
+AzureActivity
+| where TimeGenerated > ago(30d)
+| where OperationNameValue has 'Microsoft.SecurityInsights' and OperationNameValue has 'job'
+| summarize JobCount = count(), UniqueUsers = dcount(Caller) by bin(TimeGenerated, 7d)">
                                     <td>KQL Job Adoption</td>
                                     <td>Number of unique analysts using KQL jobs</td>
                                     <td>Track growth</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Training Completion Rate
+// SOC members completing tier-aware training
+// Note: Requires integration with LMS or custom tracking
+
+// Option 1: Custom training log table
+// TrainingCompletions_CL
+// | where CourseName has 'Data Lake' or CourseName has 'Tier-Aware'
+// | summarize 
+//     CompletedUsers = dcount(UserEmail),
+//     TotalSOCMembers = 25  // Your SOC team size
+// | extend CompletionRate = round(100.0 * CompletedUsers / TotalSOCMembers, 1)
+
+// Option 2: Infer from usage patterns (proxy metric)
+// Users who have successfully used lake-first patterns
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| where QueryText has 'ago(90d)' or QueryText has 'ago(180d)' or QueryText has 'ago(365d)'
+| where QueryText !has 'restore' and QueryText !has 'search'
+| summarize TrainedUsers = dcount(AADEmail)
+| extend TotalSOCMembers = 25  // Your team size
+| extend 
+    InferredTrainingRate = round(100.0 * TrainedUsers / TotalSOCMembers, 1),
+    Status = iff(TrainedUsers == TotalSOCMembers, '✅ All Trained', strcat('⚠️ ', TotalSOCMembers - TrainedUsers, ' need training'))">
                                     <td>Training Completion Rate</td>
                                     <td>SOC members completing tier-aware training</td>
                                     <td>100%</td>
                                     <td>Monthly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// KB Article Usage
+// Views of updated lake-first runbooks
+// Note: Requires KB system integration (ServiceNow, Confluence, etc.)
+
+// Option 1: If KB views are logged to Sentinel
+// KBViewLogs_CL
+// | where TimeGenerated > ago(30d)
+// | where ArticleTitle has 'Data Lake' or ArticleTitle has 'Lake-First' or ArticleTitle has 'Tier-Aware'
+// | summarize 
+//     TotalViews = count(),
+//     UniqueViewers = dcount(ViewerEmail)
+// | extend AvgViewsPerUser = TotalViews / UniqueViewers
+
+// Option 2: Proxy via query patterns that match KB guidance
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| where QueryText has 'where TimeGenerated >' and QueryText has 'project'  // Following best practices
+| extend FollowsGuidance = QueryText has 'ago(' and QueryText has 'project' and QueryText has 'summarize'
+| summarize 
+    GuidanceFollowed = countif(FollowsGuidance),
+    TotalQueries = count()
+| extend AdherenceRate = round(100.0 * GuidanceFollowed / TotalQueries, 1)
+| extend Status = iff(AdherenceRate >= 70, '✅ KB Guidance Followed', '⚠️ Reinforce Training')">
                                     <td>KB Article Usage</td>
                                     <td>Views of updated lake-first runbooks</td>
                                     <td>Track adoption</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Support Ticket Volume
+// Data lake related issues/questions
+// Note: Requires ServiceNow/Jira integration or custom logging
+
+// Option 1: Custom support ticket table
+// SupportTickets_CL
+// | where TimeGenerated > ago(30d)
+// | where Category has 'Data Lake' or Description has 'data lake' or Description has 'KQL job'
+// | summarize 
+//     TicketCount = count(),
+//     AvgResolutionHours = avg(ResolutionTimeHours)
+//     by bin(TimeGenerated, 7d)
+// | render timechart
+
+// Option 2: Proxy via failed queries (users hitting issues)
+LAQueryLogs
+| where TimeGenerated > ago(30d)
+| where ResponseCode != 200
+| summarize 
+    FailedQueries = count(),
+    UniqueUsersWithIssues = dcount(AADEmail)
+    by bin(TimeGenerated, 7d)
+| extend Status = iff(FailedQueries < prev(FailedQueries), '✅ Declining', '⚠️ Increasing')
+| render timechart
+
+// Common error patterns (potential FAQ content)
+LAQueryLogs
+| where TimeGenerated > ago(7d)
+| where ResponseCode != 200
+| summarize ErrorCount = count() by ResponseCode
+| order by ErrorCount desc">
                                     <td>Support Ticket Volume</td>
                                     <td>Data lake related issues/questions</td>
                                     <td>Declining trend</td>
                                     <td>Weekly</td>
                                 </tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -2127,7 +3021,7 @@
                 </div>
                 <div class="accordion-content">
                     <div class="accordion-body">
-                        <table class="data-table">
+                        <table class="data-table metrics-table">
                             <thead>
                                 <tr>
                                     <th>Metric</th>
@@ -2137,42 +3031,203 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// RBAC Change Events
+// Unauthorized or unexpected permission changes
+AzureActivity
+| where TimeGenerated > ago(24h)
+| where OperationNameValue has 'Microsoft.Authorization/roleAssignments'
+| where ActivityStatusValue == 'Success'
+| extend 
+    ChangeType = case(
+        OperationNameValue has 'write', 'Added',
+        OperationNameValue has 'delete', 'Removed',
+        'Modified'),
+    IsExpected = Caller in ('expected-admin@company.com', 'automation-account')  // Your approved list
+| summarize 
+    TotalChanges = count(),
+    UnexpectedChanges = countif(not(IsExpected))
+| extend Status = iff(UnexpectedChanges == 0, '✅ No Unauthorized Changes', '⚠️ Review Required')
+
+// Detailed RBAC changes
+AzureActivity
+| where TimeGenerated > ago(7d)
+| where OperationNameValue has 'Microsoft.Authorization/roleAssignments/write'
+| project TimeGenerated, Caller, ResourceGroup, Properties = Properties_d
+| extend RoleDefinition = tostring(Properties.requestbody)
+| order by TimeGenerated desc">
                                     <td>RBAC Change Events</td>
                                     <td>Unauthorized or unexpected permission changes</td>
                                     <td>0</td>
                                     <td>Daily</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Access Review Completion
+// Quarterly access reviews completed on schedule
+// Note: Requires integration with identity governance or custom tracking
+
+// Option 1: If using Entra ID Access Reviews
+AuditLogs
+| where TimeGenerated > ago(90d)
+| where OperationName has 'Access Review'
+| where Result == 'success'
+| summarize 
+    ReviewsCompleted = dcount(CorrelationId),
+    ReviewersParticipated = dcount(InitiatedBy.user.userPrincipalName)
+| extend 
+    ExpectedReviews = 4,  // Your expected quarterly reviews
+    CompletionRate = round(100.0 * ReviewsCompleted / 4, 1)
+| extend Status = iff(ReviewsCompleted >= ExpectedReviews, '✅ All Reviews Complete', '⚠️ Reviews Pending')
+
+// Option 2: Manual tracking table
+// AccessReviewLog_CL
+// | where TimeGenerated > ago(90d)
+// | where ReviewType == 'DataLakeAccess'
+// | summarize 
+//     CompletedReviews = countif(Status == 'Completed'),
+//     PendingReviews = countif(Status == 'Pending')
+// | extend CompletionRate = 100.0 * CompletedReviews / (CompletedReviews + PendingReviews)">
                                     <td>Access Review Completion</td>
                                     <td>Quarterly access reviews completed on schedule</td>
                                     <td>100%</td>
                                     <td>Quarterly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Managed Identity Drift
+// Changes to onboarding-created identities
+AzureActivity
+| where TimeGenerated > ago(7d)
+| where ResourceProviderValue has 'Microsoft.ManagedIdentity'
+    or (OperationNameValue has 'roleAssignments' 
+        and Properties_d has 'msg-resources')  // Data lake managed identity naming pattern
+| summarize 
+    IdentityChanges = count(),
+    ChangeTypes = make_set(OperationNameValue)
+| extend Status = iff(IdentityChanges == 0, '✅ No Drift', '⚠️ Review Identity Changes')
+
+// Detailed identity activity
+AzureActivity
+| where TimeGenerated > ago(30d)
+| where Caller has 'msg-resources' or ResourceId has 'managedIdentities'
+| project TimeGenerated, Caller, OperationNameValue, ActivityStatusValue, ResourceGroup
+| order by TimeGenerated desc
+
+// Monitor sign-ins from managed identities
+AADServicePrincipalSignInLogs
+| where TimeGenerated > ago(7d)
+| where ServicePrincipalName has 'msg-resources'
+| summarize 
+    SignInCount = count(),
+    UniqueResources = dcount(ResourceDisplayName),
+    FailedSignIns = countif(ResultType != '0')
+| extend Status = iff(FailedSignIns == 0, '✅ Healthy', '⚠️ Failed Sign-ins Detected')">
                                     <td>Managed Identity Drift</td>
                                     <td>Changes to onboarding-created identities</td>
                                     <td>0 unauthorized</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Policy Compliance
+// Azure Policy violations related to data lake resources
+AzureActivity
+| where TimeGenerated > ago(24h)
+| where OperationNameValue has 'Microsoft.PolicyInsights'
+| where Properties_d has 'NonCompliant'
+| extend PolicyName = tostring(Properties_d.policyDefinitionName)
+| summarize ViolationCount = count() by PolicyName
+| extend Status = iff(ViolationCount == 0, '✅ Compliant', '⚠️ Violations Found')
+
+// Detailed policy compliance
+AzureActivity
+| where TimeGenerated > ago(7d)
+| where CategoryValue == 'Policy'
+| where ActivityStatusValue == 'Failed' or Properties_d has 'NonCompliant'
+| project TimeGenerated, OperationNameValue, ResourceGroup, PolicyViolation = Properties_d
+| order by TimeGenerated desc
+
+// Alternative: Query Azure Policy compliance state
+// resources
+// | where type == 'microsoft.policyinsights/policystates'
+// | where properties.complianceState == 'NonCompliant'
+// | where properties.resourceType has 'Microsoft.OperationalInsights' 
+//         or properties.resourceType has 'Microsoft.SecurityInsights'
+// | project resourceGroup, policyDefinitionName = properties.policyDefinitionName">
                                     <td>Policy Compliance</td>
                                     <td>Azure Policy violations related to data lake resources</td>
                                     <td>0</td>
                                     <td>Daily</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Audit Log Coverage
+// Data lake activities captured in audit logs
+SentinelAudit
+| where TimeGenerated > ago(7d)
+| summarize 
+    TotalAuditEvents = count(),
+    UniqueOperations = dcount(OperationName),
+    OperationTypes = make_set(OperationName)
+| extend Status = iff(TotalAuditEvents > 0, '✅ Audit Logging Active', '⚠️ No Audit Events')
+
+// Verify key operations are logged
+let ExpectedOperations = dynamic(['Job', 'Query', 'Table', 'Connector', 'Retention']);
+SentinelAudit
+| where TimeGenerated > ago(7d)
+| summarize OperationsLogged = make_set(OperationName)
+| extend 
+    MissingOperations = set_difference(ExpectedOperations, OperationsLogged),
+    CoverageStatus = iff(array_length(set_difference(ExpectedOperations, OperationsLogged)) == 0, 
+                        '✅ Full Coverage', '⚠️ Missing Operations')
+
+// Audit volume trend
+SentinelAudit
+| where TimeGenerated > ago(30d)
+| summarize AuditEvents = count() by bin(TimeGenerated, 1d)
+| render timechart">
                                     <td>Audit Log Coverage</td>
                                     <td>Data lake activities captured in audit logs</td>
                                     <td>100%</td>
                                     <td>Weekly</td>
                                 </tr>
-                                <tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
+                                
+                                <tr class="metric-row" onclick="toggleKQL(this)" data-kql="// Change Control Adherence
+// Configuration changes following approval workflow
+// Note: Requires integration with ITSM or custom change tracking
+
+// Option 1: Cross-reference changes with approved tickets
+AzureActivity
+| where TimeGenerated > ago(7d)
+| where OperationNameValue has 'Microsoft.OperationalInsights' 
+    or OperationNameValue has 'Microsoft.SecurityInsights'
+| where OperationNameValue has 'write' or OperationNameValue has 'delete'
+| where ActivityStatusValue == 'Success'
+| extend ChangeTicket = extract(@'CHG\d+', 0, tostring(Properties_d))  // Extract change ticket
+| summarize 
+    TotalChanges = count(),
+    WithTicket = countif(isnotempty(ChangeTicket)),
+    WithoutTicket = countif(isempty(ChangeTicket))
+| extend 
+    AdherenceRate = round(100.0 * WithTicket / TotalChanges, 1),
+    Status = iff(WithoutTicket == 0, '✅ All Changes Approved', '⚠️ Unapproved Changes')
+
+// List changes without tickets for review
+AzureActivity
+| where TimeGenerated > ago(7d)
+| where OperationNameValue has 'Microsoft.OperationalInsights/workspaces' 
+| where ActivityStatusValue == 'Success'
+| extend ChangeTicket = extract(@'CHG\d+', 0, tostring(Properties_d))
+| where isempty(ChangeTicket)
+| project TimeGenerated, Caller, OperationNameValue, ResourceGroup
+| order by TimeGenerated desc">
                                     <td>Change Control Adherence</td>
                                     <td>Configuration changes following approval workflow</td>
                                     <td>100%</td>
                                     <td>Weekly</td>
                                 </tr>
+                                <tr class="kql-row" style="display: none;"><td colspan="4"><div class="kql-container"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -3103,6 +4158,85 @@
         function toggleAccordion(header) {
             const accordion = header.parentElement;
             accordion.classList.toggle('open');
+        }
+
+        // KQL Toggle functionality for metric rows
+        function toggleKQL(row) {
+            const kqlRow = row.nextElementSibling;
+            const kqlData = row.dataset.kql;
+            const isExpanded = row.classList.contains('expanded');
+
+            // Close all other expanded rows in the same table
+            const table = row.closest('table');
+            table.querySelectorAll('.metric-row.expanded').forEach(r => {
+                if (r !== row) {
+                    r.classList.remove('expanded');
+                    r.nextElementSibling.style.display = 'none';
+                }
+            });
+
+            if (isExpanded) {
+                row.classList.remove('expanded');
+                kqlRow.style.display = 'none';
+            } else {
+                row.classList.add('expanded');
+                kqlRow.style.display = 'table-row';
+                
+                // Populate KQL container
+                const container = kqlRow.querySelector('.kql-container');
+                const highlightedKQL = highlightKQL(kqlData);
+                container.innerHTML = `
+                    <div class="kql-container-header">
+                        <span class="kql-container-title">📋 KQL Query</span>
+                        <button class="kql-copy-btn" onclick="copyKQL(this, event)">Copy to Clipboard</button>
+                    </div>
+                    <div class="kql-container-body">${highlightedKQL}</div>
+                `;
+                container.dataset.kql = kqlData;
+            }
+        }
+
+        // KQL Syntax Highlighting
+        function highlightKQL(kql) {
+            // Escape HTML
+            let escaped = kql.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            // Highlight comments
+            escaped = escaped.replace(/(\/\/.*)/g, '<span class="kql-comment">$1</span>');
+            
+            // Highlight strings
+            escaped = escaped.replace(/('[^']*')/g, '<span class="kql-string">$1</span>');
+            
+            // Highlight keywords
+            const keywords = ['where', 'summarize', 'project', 'extend', 'order by', 'take', 'render', 'union', 'join', 'let', 'by', 'on', 'and', 'or', 'not', 'in', 'has', 'contains', 'between', 'ago', 'now', 'bin', 'count', 'dcount', 'sum', 'avg', 'min', 'max', 'percentile', 'make_set', 'make_list', 'countif', 'dcountif', 'sumif', 'iff', 'case', 'isnull', 'isnotempty', 'isempty', 'tostring', 'toint', 'todouble', 'datetime', 'timespan', 'dynamic', 'withsource'];
+            keywords.forEach(kw => {
+                const regex = new RegExp(`\\b(${kw})\\b`, 'gi');
+                escaped = escaped.replace(regex, '<span class="kql-function">$1</span>');
+            });
+            
+            // Highlight table names (capitalized words at start of lines or after union/join)
+            escaped = escaped.replace(/^([A-Z][a-zA-Z_]+)/gm, '<span class="kql-keyword">$1</span>');
+            
+            return escaped;
+        }
+
+        // Copy KQL to clipboard
+        function copyKQL(btn, event) {
+            event.stopPropagation();
+            const container = btn.closest('.kql-container');
+            const kql = container.dataset.kql;
+            
+            navigator.clipboard.writeText(kql).then(() => {
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy to Clipboard';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                btn.textContent = 'Failed';
+            });
         }
 
         // Quiz functionality
