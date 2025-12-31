@@ -916,6 +916,7 @@
                 <button class="nav-tab" data-tab="architecture">Architecture</button>
                 <button class="nav-tab" data-tab="implementation">Implementation</button>
                 <button class="nav-tab" data-tab="operations">Operations</button>
+                <button class="nav-tab" data-tab="metrics">Metrics</button>
                 <button class="nav-tab" data-tab="kql">KQL & Analytics</button>
                 <button class="nav-tab" data-tab="assessment">Assessment</button>
                 <button class="nav-tab" data-tab="resources">Resources</button>
@@ -1775,6 +1776,810 @@
             </table>
         </section>
 
+        <!-- POST-IMPLEMENTATION METRICS SECTION -->
+        <section id="metrics" class="content-section">
+            <h1>Post-Implementation Metrics</h1>
+            <p>Effective data lake operations require continuous monitoring across multiple dimensions. This section provides a comprehensive framework for measuring success, identifying issues, and driving continuous improvement.</p>
+
+            <div class="callout callout-info">
+                <div class="callout-title">📊 Metrics Philosophy</div>
+                <p>Post-implementation metrics should answer three critical questions: (1) Is the data lake performing as expected? (2) Are we achieving cost efficiency goals? (3) Is the SOC adopting tier-aware workflows effectively?</p>
+            </div>
+
+            <h2>Key Performance Indicators (KPIs)</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" style="font-size: 1.8rem;">≥50%</div>
+                    <div class="stat-label">Restore/Search Reduction</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="font-size: 1.8rem;">≥80%</div>
+                    <div class="stat-label">SOC Adoption Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="font-size: 1.8rem;">≥95%</div>
+                    <div class="stat-label">Job Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="font-size: 1.8rem;">±10%</div>
+                    <div class="stat-label">Cost Variance Target</div>
+                </div>
+            </div>
+
+            <h2>Metrics Framework by Category</h2>
+            
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h4>🔴 Performance Metrics</h4>
+                    <div class="accordion-icon">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                    <th>Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Interactive Query P95 Latency</td>
+                                    <td>95th percentile response time for analytics tier queries</td>
+                                    <td>&lt;30 seconds</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td>Data Lake Query Timeout Rate</td>
+                                    <td>Percentage of lake queries exceeding 2-minute sync limit</td>
+                                    <td>&lt;5%</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td>KQL Job Success Rate</td>
+                                    <td>Percentage of scheduled/ad-hoc jobs completing successfully</td>
+                                    <td>≥95%</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td>KQL Job Average Runtime</td>
+                                    <td>Mean execution time for batch jobs</td>
+                                    <td>&lt;15 minutes</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Data Promotion Latency</td>
+                                    <td>Time for promoted data to appear in Advanced Hunting</td>
+                                    <td>&lt;30 minutes</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Async Query Completion Rate</td>
+                                    <td>Percentage of async queries completing within 1 hour</td>
+                                    <td>≥98%</td>
+                                    <td>Weekly</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h4>💰 Cost & FinOps Metrics</h4>
+                    <div class="accordion-icon">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                    <th>Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Monthly Spend Variance</td>
+                                    <td>Actual vs. forecasted monthly costs</td>
+                                    <td>±10%</td>
+                                    <td>Monthly</td>
+                                </tr>
+                                <tr>
+                                    <td>Ingestion Cost per GB</td>
+                                    <td>Effective cost of data ingestion including commitment tier</td>
+                                    <td>Track trend</td>
+                                    <td>Monthly</td>
+                                </tr>
+                                <tr>
+                                    <td>Lake Storage Cost Efficiency</td>
+                                    <td>Cost per TB-month in data lake tier vs. analytics tier</td>
+                                    <td>≥60% savings</td>
+                                    <td>Monthly</td>
+                                </tr>
+                                <tr>
+                                    <td>Query Scan Volume</td>
+                                    <td>Total GB scanned by lake queries per week</td>
+                                    <td>Track & optimize</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Top 10 Query Hotspots</td>
+                                    <td>Queries with highest data scan volumes</td>
+                                    <td>Review & refactor</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Commitment Tier Utilization</td>
+                                    <td>Percentage of committed capacity actually used</td>
+                                    <td>85-95%</td>
+                                    <td>Monthly</td>
+                                </tr>
+                                <tr>
+                                    <td>Cost per Investigation</td>
+                                    <td>Average query/job costs for >90 day investigations</td>
+                                    <td>Track trend</td>
+                                    <td>Monthly</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="callout callout-warning" style="margin-top: 1rem;">
+                            <div class="callout-title">⚠️ Cost Anomaly Thresholds</div>
+                            <p><strong>Alert at:</strong> 20% daily spike | <strong>Escalate at:</strong> 50% weekly variance | <strong>Stop-the-line at:</strong> 100% monthly overrun</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h4>📈 Data Quality & Availability Metrics</h4>
+                    <div class="accordion-icon">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                    <th>Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ingestion Freshness (Analytics)</td>
+                                    <td>Lag between event time and availability in analytics tier</td>
+                                    <td>&lt;5 minutes</td>
+                                    <td>Real-time</td>
+                                </tr>
+                                <tr>
+                                    <td>Ingestion Freshness (Lake)</td>
+                                    <td>Lag between event time and availability in data lake</td>
+                                    <td>&lt;120 minutes</td>
+                                    <td>Hourly</td>
+                                </tr>
+                                <tr>
+                                    <td>Table Completeness</td>
+                                    <td>Percentage of expected tables with data in last 24h</td>
+                                    <td>100%</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td>Ingestion Gap Duration</td>
+                                    <td>Total minutes of ingestion gaps per week by table</td>
+                                    <td>&lt;30 min/week</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Schema Drift Events</td>
+                                    <td>Number of unexpected schema changes detected</td>
+                                    <td>0</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td>Retention Compliance</td>
+                                    <td>Tables matching target retention configuration</td>
+                                    <td>100%</td>
+                                    <td>Weekly</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h4>🛡️ Security & Detection Metrics</h4>
+                    <div class="accordion-icon">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                    <th>Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Detection Rule Firing Rate</td>
+                                    <td>Comparison to pre-migration baseline</td>
+                                    <td>±5% of baseline</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Analytics Rule Health</td>
+                                    <td>Percentage of rules executing without errors</td>
+                                    <td>≥99%</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td>MTTD (Mean Time to Detect)</td>
+                                    <td>Average time from event to alert generation</td>
+                                    <td>Track trend</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>MTTI (Mean Time to Investigate)</td>
+                                    <td>Average investigation duration for incidents</td>
+                                    <td>Improve vs. baseline</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>365-Day Investigation Success</td>
+                                    <td>Long-range investigations completed without restore/search</td>
+                                    <td>≥95% (post-enable)</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Workbook Render Success</td>
+                                    <td>Top workbooks rendering without timeout/error</td>
+                                    <td>100%</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td>TI Matching Coverage</td>
+                                    <td>Days of historical data scanned for retrospective TI</td>
+                                    <td>365 days</td>
+                                    <td>Monthly</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h4>👥 Adoption & Usage Metrics</h4>
+                    <div class="accordion-icon">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                    <th>Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>SOC Tier-Aware Workflow Adoption</td>
+                                    <td>Analysts using lake-first for >90d investigations</td>
+                                    <td>≥80%</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Restore/Search Usage Reduction</td>
+                                    <td>Decrease in legacy restore operations vs. baseline</td>
+                                    <td>≥50% reduction</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>KQL Job Adoption</td>
+                                    <td>Number of unique analysts using KQL jobs</td>
+                                    <td>Track growth</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Training Completion Rate</td>
+                                    <td>SOC members completing tier-aware training</td>
+                                    <td>100%</td>
+                                    <td>Monthly</td>
+                                </tr>
+                                <tr>
+                                    <td>KB Article Usage</td>
+                                    <td>Views of updated lake-first runbooks</td>
+                                    <td>Track adoption</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Support Ticket Volume</td>
+                                    <td>Data lake related issues/questions</td>
+                                    <td>Declining trend</td>
+                                    <td>Weekly</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h4>🔐 Governance & Compliance Metrics</h4>
+                    <div class="accordion-icon">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                    <th>Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>RBAC Change Events</td>
+                                    <td>Unauthorized or unexpected permission changes</td>
+                                    <td>0</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td>Access Review Completion</td>
+                                    <td>Quarterly access reviews completed on schedule</td>
+                                    <td>100%</td>
+                                    <td>Quarterly</td>
+                                </tr>
+                                <tr>
+                                    <td>Managed Identity Drift</td>
+                                    <td>Changes to onboarding-created identities</td>
+                                    <td>0 unauthorized</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Policy Compliance</td>
+                                    <td>Azure Policy violations related to data lake resources</td>
+                                    <td>0</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td>Audit Log Coverage</td>
+                                    <td>Data lake activities captured in audit logs</td>
+                                    <td>100%</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td>Change Control Adherence</td>
+                                    <td>Configuration changes following approval workflow</td>
+                                    <td>100%</td>
+                                    <td>Weekly</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Monitoring Cadence</h2>
+            <div class="grid-2">
+                <div class="card card-highlight">
+                    <h3>Daily Checklist</h3>
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: rgba(34, 197, 94, 0.2); color: var(--success);">☑</div>
+                        <div class="feature-content">
+                            <h4>Ingestion Health</h4>
+                            <p>Verify all critical tables receiving data; check for anomalies in volume (±20%)</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: rgba(34, 197, 94, 0.2); color: var(--success);">☑</div>
+                        <div class="feature-content">
+                            <h4>Job Status</h4>
+                            <p>Review KQL job failures; investigate any errors; restart failed scheduled jobs</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: rgba(34, 197, 94, 0.2); color: var(--success);">☑</div>
+                        <div class="feature-content">
+                            <h4>Detection Parity</h4>
+                            <p>Confirm analytics rules executing; compare alert volume to baseline</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: rgba(34, 197, 94, 0.2); color: var(--success);">☑</div>
+                        <div class="feature-content">
+                            <h4>Cost Pulse</h4>
+                            <p>Quick check on daily spend; flag any spikes &gt;20% from average</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-highlight">
+                    <h3>Weekly Review</h3>
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--info);">📊</div>
+                        <div class="feature-content">
+                            <h4>Query Hotspot Analysis</h4>
+                            <p>Identify top 10 queries by scan volume; coach analysts on optimization</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--info);">📊</div>
+                        <div class="feature-content">
+                            <h4>Restore/Search Trend</h4>
+                            <p>Track legacy restore usage; identify barriers to lake-first adoption</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--info);">📊</div>
+                        <div class="feature-content">
+                            <h4>Retention Compliance</h4>
+                            <p>Verify table settings match baseline; remediate drift within 48h</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--info);">📊</div>
+                        <div class="feature-content">
+                            <h4>RBAC Audit</h4>
+                            <p>Review permission changes; validate managed identity assignments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 1.5rem;">
+                <div class="card">
+                    <h3>Monthly Analysis</h3>
+                    <ul>
+                        <li><strong>Cost Review:</strong> Full month spend vs. forecast; identify optimization opportunities</li>
+                        <li><strong>Performance Trends:</strong> Query latency, job success rates, timeout patterns</li>
+                        <li><strong>Adoption Metrics:</strong> SOC workflow compliance; training completion status</li>
+                        <li><strong>Capacity Planning:</strong> Ingestion growth trends; storage utilization forecast</li>
+                        <li><strong>Query Template Refresh:</strong> Update standard queries based on hotspot analysis</li>
+                        <li><strong>Stakeholder Report:</strong> Executive summary of KPIs and cost efficiency</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Quarterly Assessment</h3>
+                    <ul>
+                        <li><strong>Architecture Review:</strong> Evaluate tier strategy; assess new capabilities</li>
+                        <li><strong>Risk Register Update:</strong> Reassess risk probabilities and mitigation effectiveness</li>
+                        <li><strong>Access Review:</strong> Full RBAC audit; remove stale permissions</li>
+                        <li><strong>Content Refresh:</strong> Update detection rules, workbooks, hunting queries</li>
+                        <li><strong>Governance Minutes:</strong> Document decisions, exceptions, and action items</li>
+                        <li><strong>Roadmap Alignment:</strong> Review Microsoft feature releases; plan adoption</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h2>Operational Dashboards</h2>
+            <p>Build and maintain these dashboards to provide visibility across the metrics framework:</p>
+
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <span class="terminal-title">dashboard_specifications.yaml</span>
+                </div>
+                <div class="terminal-body">
+<pre>
+<span style="color: var(--accent-red);">dashboards:</span>
+
+  <span style="color: var(--info);">data_lake_health:</span>
+    <span style="color: var(--text-muted);"># Primary operational dashboard</span>
+    <span style="color: var(--warning);">refresh:</span> <span style="color: var(--success);">5 minutes</span>
+    <span style="color: var(--warning);">widgets:</span>
+      - Ingestion volume by table (last 24h vs 7d avg)
+      - Data freshness indicators (analytics & lake tiers)
+      - KQL job status summary (success/failed/running)
+      - Active alerts and incidents count
+      - Top 5 tables by ingestion volume
+
+  <span style="color: var(--info);">finops_cost_tracker:</span>
+    <span style="color: var(--text-muted);"># Cost management and optimization</span>
+    <span style="color: var(--warning);">refresh:</span> <span style="color: var(--success);">1 hour</span>
+    <span style="color: var(--warning);">widgets:</span>
+      - Daily/weekly/monthly spend trend
+      - Cost by component (ingestion, storage, query)
+      - Top 10 query scan hotspots
+      - Commitment tier utilization gauge
+      - Cost anomaly alerts (flagged items)
+      - Projected month-end spend
+
+  <span style="color: var(--info);">soc_adoption:</span>
+    <span style="color: var(--text-muted);"># Workflow adoption tracking</span>
+    <span style="color: var(--warning);">refresh:</span> <span style="color: var(--success);">1 hour</span>
+    <span style="color: var(--warning);">widgets:</span>
+      - Restore/search usage trend (target: declining)
+      - Lake query volume by analyst
+      - KQL job creation by team
+      - Investigation completion rates by lookback window
+      - Training completion percentage
+
+  <span style="color: var(--info);">detection_parity:</span>
+    <span style="color: var(--text-muted);"># Security operations continuity</span>
+    <span style="color: var(--warning);">refresh:</span> <span style="color: var(--success);">15 minutes</span>
+    <span style="color: var(--warning);">widgets:</span>
+      - Analytics rule execution status
+      - Alert volume vs baseline (7d/30d comparison)
+      - Detection rule health (errors/warnings)
+      - Workbook render success rate
+      - Incident creation trend
+</pre>
+                </div>
+            </div>
+
+            <h2>Sample KQL for Metrics Collection</h2>
+            <div class="code-block">
+<span class="comment">// Daily Ingestion Volume by Table</span>
+<span class="keyword">Usage</span>
+| <span class="function">where</span> TimeGenerated > ago(24h)
+| <span class="function">summarize</span> IngestedGB = sum(Quantity) / 1024 <span class="function">by</span> DataType
+| <span class="function">order by</span> IngestedGB desc
+| <span class="function">take</span> 20
+
+<span class="comment">// KQL Job Success Rate (requires audit logs)</span>
+<span class="keyword">SentinelAudit</span>
+| <span class="function">where</span> TimeGenerated > ago(7d)
+| <span class="function">where</span> OperationName contains <span class="string">"Job"</span>
+| <span class="function">summarize</span> 
+    TotalJobs = count(),
+    SuccessfulJobs = countif(Status == <span class="string">"Succeeded"</span>),
+    FailedJobs = countif(Status == <span class="string">"Failed"</span>)
+| <span class="function">extend</span> SuccessRate = round(100.0 * SuccessfulJobs / TotalJobs, 2)
+
+<span class="comment">// Detection Rule Health Check</span>
+<span class="keyword">SentinelHealth</span>
+| <span class="function">where</span> TimeGenerated > ago(24h)
+| <span class="function">where</span> SentinelResourceType == <span class="string">"Analytic Rule"</span>
+| <span class="function">summarize</span> 
+    HealthyRules = countif(Status == <span class="string">"Success"</span>),
+    UnhealthyRules = countif(Status != <span class="string">"Success"</span>)
+| <span class="function">extend</span> HealthPercentage = round(100.0 * HealthyRules / (HealthyRules + UnhealthyRules), 2)
+
+<span class="comment">// Restore/Search Usage Trend</span>
+<span class="keyword">LAQueryLogs</span>
+| <span class="function">where</span> TimeGenerated > ago(30d)
+| <span class="function">where</span> QueryText contains <span class="string">"search"</span> or QueryText contains <span class="string">"restore"</span>
+| <span class="function">summarize</span> RestoreSearchCount = count() <span class="function">by</span> bin(TimeGenerated, 1d)
+| <span class="function">render</span> timechart
+            </div>
+
+            <h2>Alerting Thresholds</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Condition</th>
+                        <th>Severity</th>
+                        <th>Threshold</th>
+                        <th>Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ingestion gap detected</td>
+                        <td><span class="badge badge-red">Critical</span></td>
+                        <td>&gt;30 min for critical tables</td>
+                        <td>Page on-call; investigate connector health</td>
+                    </tr>
+                    <tr>
+                        <td>KQL job failure rate spike</td>
+                        <td><span class="badge badge-red">Critical</span></td>
+                        <td>&gt;10% failure rate</td>
+                        <td>Review failed jobs; check service limits</td>
+                    </tr>
+                    <tr>
+                        <td>Cost anomaly detected</td>
+                        <td><span class="badge badge-yellow">High</span></td>
+                        <td>&gt;50% daily variance</td>
+                        <td>Identify source; restrict broad queries</td>
+                    </tr>
+                    <tr>
+                        <td>Analytics rule failures</td>
+                        <td><span class="badge badge-yellow">High</span></td>
+                        <td>&gt;5 rules unhealthy</td>
+                        <td>Review rule health; remediate errors</td>
+                    </tr>
+                    <tr>
+                        <td>Data lake availability lag</td>
+                        <td><span class="badge badge-yellow">High</span></td>
+                        <td>&gt;180 minutes</td>
+                        <td>Open support ticket; use analytics tier</td>
+                    </tr>
+                    <tr>
+                        <td>RBAC change on managed identity</td>
+                        <td><span class="badge badge-yellow">High</span></td>
+                        <td>Any unauthorized change</td>
+                        <td>Investigate; revert if unauthorized</td>
+                    </tr>
+                    <tr>
+                        <td>Retention config drift</td>
+                        <td><span class="badge badge-blue">Medium</span></td>
+                        <td>Any table != baseline</td>
+                        <td>Review; remediate within 48h</td>
+                    </tr>
+                    <tr>
+                        <td>Query timeout rate elevated</td>
+                        <td><span class="badge badge-blue">Medium</span></td>
+                        <td>&gt;10% timeout rate</td>
+                        <td>Coach analysts; update query templates</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Maturity Model</h2>
+            <p>Assess your organization's data lake operations maturity and identify improvement opportunities:</p>
+
+            <div class="architecture-diagram">
+                <div class="tier-container">
+                    <div class="tier-box" style="border-color: #ef4444;">
+                        <div class="tier-label" style="color: #ef4444;">Level 1: Foundational</div>
+                        <div class="grid-2">
+                            <div>
+                                <h4>Characteristics</h4>
+                                <ul>
+                                    <li>Data lake enabled and operational</li>
+                                    <li>Basic retention configured</li>
+                                    <li>Manual monitoring processes</li>
+                                    <li>Limited SOC adoption</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>Next Steps</h4>
+                                <ul>
+                                    <li>Implement automated monitoring</li>
+                                    <li>Create operational dashboards</li>
+                                    <li>Roll out SOC training</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tier-box" style="border-color: var(--warning); margin-top: 1rem;">
+                        <div class="tier-label" style="color: var(--warning);">Level 2: Operational</div>
+                        <div class="grid-2">
+                            <div>
+                                <h4>Characteristics</h4>
+                                <ul>
+                                    <li>Automated health monitoring</li>
+                                    <li>Cost tracking dashboards</li>
+                                    <li>50%+ SOC adoption</li>
+                                    <li>Basic KQL job usage</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>Next Steps</h4>
+                                <ul>
+                                    <li>Implement FinOps guardrails</li>
+                                    <li>Optimize query patterns</li>
+                                    <li>Expand KQL job templates</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tier-box" style="border-color: var(--info); margin-top: 1rem;">
+                        <div class="tier-label" style="color: var(--info);">Level 3: Optimized</div>
+                        <div class="grid-2">
+                            <div>
+                                <h4>Characteristics</h4>
+                                <ul>
+                                    <li>Proactive cost optimization</li>
+                                    <li>80%+ SOC adoption</li>
+                                    <li>Automated alerting on all KPIs</li>
+                                    <li>Quarterly governance cadence</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>Next Steps</h4>
+                                <ul>
+                                    <li>Implement advanced analytics</li>
+                                    <li>Integrate ML workflows</li>
+                                    <li>Automate remediation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tier-box" style="border-color: var(--success); margin-top: 1rem;">
+                        <div class="tier-label" style="color: var(--success);">Level 4: Advanced</div>
+                        <div class="grid-2">
+                            <div>
+                                <h4>Characteristics</h4>
+                                <ul>
+                                    <li>Predictive cost forecasting</li>
+                                    <li>ML-driven anomaly detection</li>
+                                    <li>Near-zero restore/search usage</li>
+                                    <li>Continuous improvement culture</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>Ongoing Focus</h4>
+                                <ul>
+                                    <li>Innovation and experimentation</li>
+                                    <li>Cross-team knowledge sharing</li>
+                                    <li>Industry benchmarking</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Continuous Improvement Process</h2>
+            <div class="card">
+                <h3>Monthly Optimization Cycle</h3>
+                <div class="terminal" style="margin-top: 1rem;">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">continuous_improvement.txt</span>
+                    </div>
+                    <div class="terminal-body">
+<pre>
+┌─────────────────────────────────────────────────────────────────┐
+│                  MONTHLY OPTIMIZATION CYCLE                      │
+└─────────────────────────────────────────────────────────────────┘
+
+     ┌──────────────┐
+     │   MEASURE    │  Week 1: Collect metrics data
+     │   ════════   │  - Export KPIs from dashboards
+     └──────┬───────┘  - Identify variances from targets
+            │
+            ▼
+     ┌──────────────┐
+     │   ANALYZE    │  Week 2: Root cause analysis
+     │   ════════   │  - Query hotspot review
+     └──────┬───────┘  - Cost driver identification
+            │
+            ▼
+     ┌──────────────┐
+     │   IMPROVE    │  Week 3: Implement changes
+     │   ════════   │  - Update query templates
+     └──────┬───────┘  - Refactor expensive queries
+            │          - Adjust training materials
+            ▼
+     ┌──────────────┐
+     │   CONTROL    │  Week 4: Validate & document
+     │   ════════   │  - Measure improvement
+     └──────┬───────┘  - Update runbooks
+            │          - Share learnings
+            ▼
+     ┌──────────────┐
+     │   REPEAT     │  Next month: Continue cycle
+     └──────────────┘
+</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout callout-success" style="margin-top: 2rem;">
+                <div class="callout-title">🎯 Key Success Factors</div>
+                <p><strong>Executive Sponsorship:</strong> Ensure leadership visibility into cost and adoption metrics. <strong>SOC Buy-in:</strong> Involve analysts in query optimization and workflow design. <strong>Automation:</strong> Automate as much metric collection and alerting as possible. <strong>Documentation:</strong> Maintain living runbooks that evolve with learnings.</p>
+            </div>
+        </section>
+
         <!-- KQL SECTION -->
         <section id="kql" class="content-section">
             <h1>KQL & Analytics</h1>
@@ -2289,7 +3094,7 @@
 
         // Progress tracking
         function updateProgress() {
-            const totalSections = 7;
+            const totalSections = 8;
             const progress = (completedSections.size / totalSections) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
         }
