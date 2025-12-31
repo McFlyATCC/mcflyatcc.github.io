@@ -1370,6 +1370,103 @@
             gap: 1rem;
         }
 
+        /* XDR Submenu Styles */
+        .xdr-submenu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .xdr-submenu-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .xdr-submenu-btn:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-2px);
+        }
+
+        .xdr-submenu-btn.active {
+            background: var(--accent-red-glow);
+            border-color: var(--accent-red);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .xdr-submenu-btn .submenu-icon {
+            font-size: 1.5rem;
+        }
+
+        .xdr-submenu-btn .submenu-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .xdr-submenu-btn.active .submenu-label {
+            color: var(--accent-red);
+        }
+
+        .xdr-topic {
+            display: none;
+        }
+
+        .xdr-topic.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 900px) {
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .xdr-submenu-btn {
+                min-width: 100px;
+                padding: 0.75rem 1rem;
+            }
+            .xdr-submenu-btn .submenu-icon {
+                font-size: 1.25rem;
+            }
+            .xdr-submenu-btn .submenu-label {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .xdr-submenu {
+                justify-content: center;
+            }
+        }
+
         /* Badge styles */
         .badge {
             display: inline-block;
@@ -1786,6 +1883,7 @@
                 <button class="nav-tab" data-tab="architecture">Architecture</button>
                 <button class="nav-tab" data-tab="implementation">Implementation</button>
                 <button class="nav-tab" data-tab="planning-tools">Planning Tools</button>
+                <button class="nav-tab" data-tab="xdr">XDR Integration</button>
                 <button class="nav-tab" data-tab="operations">Operations</button>
                 <button class="nav-tab" data-tab="metrics">Metrics</button>
                 <button class="nav-tab" data-tab="kql">KQL & Analytics</button>
@@ -2882,6 +2980,1106 @@
                 <div class="checklist-actions">
                     <button class="export-btn" onclick="exportChecklist()">📄 Export Checklist</button>
                     <button class="export-btn secondary" onclick="resetChecklist()">🔄 Reset Checklist</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- XDR INTEGRATION SECTION -->
+        <section id="xdr" class="content-section">
+            <h1>XDR Integration</h1>
+            <p>Microsoft Sentinel Data Lake is deeply integrated with Microsoft Defender XDR, creating a unified security operations platform. This section covers XDR-specific capabilities and how they interact with the Data Lake.</p>
+
+            <div class="xdr-submenu">
+                <button class="xdr-submenu-btn active" onclick="showXDRTopic('xdr-overview')">
+                    <span class="submenu-icon">🎯</span>
+                    <span class="submenu-label">XDR Overview</span>
+                </button>
+                <button class="xdr-submenu-btn" onclick="showXDRTopic('unified-portal')">
+                    <span class="submenu-icon">🏢</span>
+                    <span class="submenu-label">Unified Portal</span>
+                </button>
+                <button class="xdr-submenu-btn" onclick="showXDRTopic('data-sources')">
+                    <span class="submenu-icon">📊</span>
+                    <span class="submenu-label">XDR Data Sources</span>
+                </button>
+                <button class="xdr-submenu-btn" onclick="showXDRTopic('advanced-hunting')">
+                    <span class="submenu-icon">🔍</span>
+                    <span class="submenu-label">Advanced Hunting</span>
+                </button>
+                <button class="xdr-submenu-btn" onclick="showXDRTopic('incident-management')">
+                    <span class="submenu-icon">🚨</span>
+                    <span class="submenu-label">Incident Management</span>
+                </button>
+                <button class="xdr-submenu-btn" onclick="showXDRTopic('automated-response')">
+                    <span class="submenu-icon">⚡</span>
+                    <span class="submenu-label">Automated Response</span>
+                </button>
+                <button class="xdr-submenu-btn" onclick="showXDRTopic('threat-intelligence')">
+                    <span class="submenu-icon">🧠</span>
+                    <span class="submenu-label">Threat Intelligence</span>
+                </button>
+                <button class="xdr-submenu-btn" onclick="showXDRTopic('xdr-datalake')">
+                    <span class="submenu-icon">💾</span>
+                    <span class="submenu-label">XDR + Data Lake</span>
+                </button>
+            </div>
+
+            <!-- XDR Overview -->
+            <div id="xdr-overview" class="xdr-topic active">
+                <h2>What is Microsoft Defender XDR?</h2>
+                
+                <div class="card card-highlight">
+                    <p><strong>Extended Detection and Response (XDR)</strong> is a unified security incident platform that automatically collects and correlates data across multiple security layers—email, endpoint, identity, and cloud applications—to provide faster threat detection and response.</p>
+                </div>
+
+                <div class="grid-2" style="margin-top: 1.5rem;">
+                    <div class="card">
+                        <h3>🔄 From Siloed to Unified</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Traditional SOC</th>
+                                    <th>XDR Approach</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Multiple consoles</td>
+                                    <td>Single unified portal</td>
+                                </tr>
+                                <tr>
+                                    <td>Manual correlation</td>
+                                    <td>Automatic incident fusion</td>
+                                </tr>
+                                <tr>
+                                    <td>Alert fatigue</td>
+                                    <td>Prioritized incidents</td>
+                                </tr>
+                                <tr>
+                                    <td>Fragmented visibility</td>
+                                    <td>Cross-domain context</td>
+                                </tr>
+                                <tr>
+                                    <td>Separate data stores</td>
+                                    <td>Unified data lake</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <h3>🛡️ Microsoft Defender XDR Products</h3>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--info);">💻</div>
+                            <div class="feature-content">
+                                <h4>Defender for Endpoint</h4>
+                                <p>Endpoint protection, EDR, threat & vulnerability management</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: rgba(34, 197, 94, 0.2); color: var(--success);">👤</div>
+                            <div class="feature-content">
+                                <h4>Defender for Identity</h4>
+                                <p>Identity threat detection, lateral movement, compromised credentials</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--warning);">📧</div>
+                            <div class="feature-content">
+                                <h4>Defender for Office 365</h4>
+                                <p>Email protection, phishing, BEC, safe attachments/links</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">☁️</div>
+                            <div class="feature-content">
+                                <h4>Defender for Cloud Apps</h4>
+                                <p>CASB, shadow IT discovery, SaaS security posture</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">XDR vs. SIEM vs. SOAR</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Capability</th>
+                            <th>SIEM</th>
+                            <th>SOAR</th>
+                            <th>XDR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Primary Function</strong></td>
+                            <td>Log aggregation & correlation</td>
+                            <td>Orchestration & automation</td>
+                            <td>Cross-layer detection & response</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Sources</strong></td>
+                            <td>Any (via connectors)</td>
+                            <td>SIEM alerts + tools</td>
+                            <td>Native security products</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Detection</strong></td>
+                            <td>Rule-based, custom analytics</td>
+                            <td>Relies on SIEM/XDR</td>
+                            <td>ML-driven, automatic correlation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Response</strong></td>
+                            <td>Manual or via SOAR</td>
+                            <td>Automated playbooks</td>
+                            <td>Built-in automated actions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Microsoft Product</strong></td>
+                            <td>Microsoft Sentinel</td>
+                            <td>Sentinel + Logic Apps</td>
+                            <td>Microsoft Defender XDR</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-info" style="margin-top: 1.5rem;">
+                    <div class="callout-title">💡 Key Insight</div>
+                    <p>Microsoft's strategy is <strong>SIEM + XDR convergence</strong>. Sentinel provides the breadth (any data source, long retention), while Defender XDR provides the depth (native integrations, automated response). The Defender portal unifies both experiences.</p>
+                </div>
+            </div>
+
+            <!-- Unified Portal -->
+            <div id="unified-portal" class="xdr-topic">
+                <h2>The Unified Security Operations Portal</h2>
+                
+                <div class="card card-highlight">
+                    <p>The <strong>Microsoft Defender portal</strong> (security.microsoft.com) serves as the unified command center for security operations, bringing together Defender XDR and Microsoft Sentinel into a single experience.</p>
+                </div>
+
+                <div class="architecture-diagram" style="margin-top: 1.5rem;">
+                    <h3>Portal Architecture</h3>
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-dot red"></div>
+                            <div class="terminal-dot yellow"></div>
+                            <div class="terminal-dot green"></div>
+                            <span class="terminal-title">unified_portal_architecture.txt</span>
+                        </div>
+                        <div class="terminal-body">
+<pre>
+┌─────────────────────────────────────────────────────────────────────┐
+│                    MICROSOFT DEFENDER PORTAL                         │
+│                    security.microsoft.com                            │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    UNIFIED EXPERIENCE                        │   │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │   │
+│  │  │  Incidents  │ │  Advanced   │ │   Action    │           │   │
+│  │  │  & Alerts   │ │  Hunting    │ │   Center    │           │   │
+│  │  └─────────────┘ └─────────────┘ └─────────────┘           │   │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │   │
+│  │  │  Threat     │ │  Reports &  │ │  Settings & │           │   │
+│  │  │  Analytics  │ │  Dashboards │ │  Governance │           │   │
+│  │  └─────────────┘ └─────────────┘ └─────────────┘           │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                              │                                       │
+│         ┌────────────────────┴────────────────────┐                 │
+│         ▼                                         ▼                 │
+│  ┌─────────────────┐                    ┌─────────────────┐        │
+│  │  DEFENDER XDR   │                    │    SENTINEL     │        │
+│  │  ─────────────  │                    │  ─────────────  │        │
+│  │  • Endpoints    │                    │  • All Logs     │        │
+│  │  • Identity     │◄───── Sync ───────►│  • Analytics    │        │
+│  │  • Email        │                    │  • Automation   │        │
+│  │  • Cloud Apps   │                    │  • Workbooks    │        │
+│  └────────┬────────┘                    └────────┬────────┘        │
+│           │                                      │                  │
+│           └──────────────────┬───────────────────┘                  │
+│                              ▼                                       │
+│                    ┌─────────────────┐                              │
+│                    │   DATA LAKE     │                              │
+│                    │  ─────────────  │                              │
+│                    │  Unified        │                              │
+│                    │  Long-term      │                              │
+│                    │  Storage        │                              │
+│                    └─────────────────┘                              │
+└─────────────────────────────────────────────────────────────────────┘
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Portal Navigation</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Investigation Hub</h4>
+                        <ul>
+                            <li><strong>Incidents:</strong> Unified incident queue with XDR + Sentinel alerts</li>
+                            <li><strong>Alerts:</strong> All alerts with automatic correlation</li>
+                            <li><strong>Advanced Hunting:</strong> KQL across all data sources</li>
+                            <li><strong>Actions & Submissions:</strong> Pending actions, remediation history</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Asset Management</h4>
+                        <ul>
+                            <li><strong>Devices:</strong> Full device inventory with risk scores</li>
+                            <li><strong>Identities:</strong> User and service account security posture</li>
+                            <li><strong>Apps:</strong> Cloud app discovery and governance</li>
+                            <li><strong>Mailboxes:</strong> Email security configuration</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Sentinel in Defender Portal</h3>
+                <div class="card">
+                    <p>When Sentinel is connected to the Defender portal, you gain access to Sentinel-specific features within the unified experience:</p>
+                    <div class="grid-3" style="margin-top: 1rem;">
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: var(--accent-red-glow); color: var(--accent-red);">📋</div>
+                            <div class="feature-content">
+                                <h4>Content Hub</h4>
+                                <p>Solutions, connectors, analytics rules</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: var(--accent-red-glow); color: var(--accent-red);">📊</div>
+                            <div class="feature-content">
+                                <h4>Workbooks</h4>
+                                <p>Custom dashboards and visualizations</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: var(--accent-red-glow); color: var(--accent-red);">⚙️</div>
+                            <div class="feature-content">
+                                <h4>Data Connectors</h4>
+                                <p>Third-party and custom log sources</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: var(--accent-red-glow); color: var(--accent-red);">📈</div>
+                            <div class="feature-content">
+                                <h4>Analytics Rules</h4>
+                                <p>Custom detection logic</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: var(--accent-red-glow); color: var(--accent-red);">🤖</div>
+                            <div class="feature-content">
+                                <h4>Automation Rules</h4>
+                                <p>Playbooks and response automation</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: var(--accent-red-glow); color: var(--accent-red);">🔍</div>
+                            <div class="feature-content">
+                                <h4>Hunting Queries</h4>
+                                <p>Saved queries and bookmarks</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout callout-warning" style="margin-top: 1.5rem;">
+                    <div class="callout-title">⚠️ Portal Prerequisite</div>
+                    <p><strong>Sentinel must be connected to the Defender portal to enable Data Lake.</strong> This connection enables unified RBAC, incident sync, and the data lake tier. The connection is a one-way door—once connected, you manage Sentinel primarily through the Defender portal.</p>
+                </div>
+            </div>
+
+            <!-- Data Sources -->
+            <div id="data-sources" class="xdr-topic">
+                <h2>XDR Data Sources & Tables</h2>
+                
+                <div class="card card-highlight">
+                    <p>Microsoft Defender XDR generates rich security telemetry across endpoints, identities, email, and cloud apps. These tables are automatically available in Advanced Hunting and can be retained long-term in the Data Lake.</p>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Defender for Endpoint Tables</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Description</th>
+                            <th>Key Use Cases</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>DeviceEvents</code></td>
+                            <td>Security events including Windows Defender actions</td>
+                            <td>Malware detection, ASR rules, exploit guard</td>
+                        </tr>
+                        <tr>
+                            <td><code>DeviceProcessEvents</code></td>
+                            <td>Process creation and related events</td>
+                            <td>Execution anomalies, LOLBins, command lines</td>
+                        </tr>
+                        <tr>
+                            <td><code>DeviceNetworkEvents</code></td>
+                            <td>Network connections and related events</td>
+                            <td>C2 detection, lateral movement, data exfil</td>
+                        </tr>
+                        <tr>
+                            <td><code>DeviceFileEvents</code></td>
+                            <td>File creation, modification, and deletion</td>
+                            <td>Ransomware, persistence, staging</td>
+                        </tr>
+                        <tr>
+                            <td><code>DeviceRegistryEvents</code></td>
+                            <td>Registry key changes</td>
+                            <td>Persistence mechanisms, configuration changes</td>
+                        </tr>
+                        <tr>
+                            <td><code>DeviceLogonEvents</code></td>
+                            <td>Logon events on devices</td>
+                            <td>Credential access, lateral movement</td>
+                        </tr>
+                        <tr>
+                            <td><code>DeviceImageLoadEvents</code></td>
+                            <td>DLL loading events</td>
+                            <td>DLL hijacking, injection techniques</td>
+                        </tr>
+                        <tr>
+                            <td><code>DeviceInfo</code></td>
+                            <td>Device inventory and properties</td>
+                            <td>Asset management, exposure analysis</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 2rem;">Defender for Identity Tables</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Description</th>
+                            <th>Key Use Cases</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>IdentityLogonEvents</code></td>
+                            <td>Authentication events from AD and Entra ID</td>
+                            <td>Brute force, pass-the-hash, anomalous logons</td>
+                        </tr>
+                        <tr>
+                            <td><code>IdentityQueryEvents</code></td>
+                            <td>LDAP and DNS queries</td>
+                            <td>Reconnaissance, enumeration detection</td>
+                        </tr>
+                        <tr>
+                            <td><code>IdentityDirectoryEvents</code></td>
+                            <td>Directory changes and activities</td>
+                            <td>Privilege escalation, group membership changes</td>
+                        </tr>
+                        <tr>
+                            <td><code>IdentityInfo</code></td>
+                            <td>User account information</td>
+                            <td>User context enrichment, risk scoring</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 2rem;">Defender for Office 365 Tables</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Description</th>
+                            <th>Key Use Cases</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>EmailEvents</code></td>
+                            <td>Email delivery and filtering events</td>
+                            <td>Phishing campaigns, spam analysis</td>
+                        </tr>
+                        <tr>
+                            <td><code>EmailAttachmentInfo</code></td>
+                            <td>Attachment metadata and analysis</td>
+                            <td>Malicious attachment detection</td>
+                        </tr>
+                        <tr>
+                            <td><code>EmailUrlInfo</code></td>
+                            <td>URL information in emails</td>
+                            <td>Phishing URL detection</td>
+                        </tr>
+                        <tr>
+                            <td><code>EmailPostDeliveryEvents</code></td>
+                            <td>Post-delivery actions (ZAP, user reports)</td>
+                            <td>Remediation tracking</td>
+                        </tr>
+                        <tr>
+                            <td><code>UrlClickEvents</code></td>
+                            <td>Safe Links click events</td>
+                            <td>User click-through on suspicious links</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 2rem;">Defender for Cloud Apps Tables</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Description</th>
+                            <th>Key Use Cases</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>CloudAppEvents</code></td>
+                            <td>Activities in connected cloud apps</td>
+                            <td>Anomalous app usage, data exfil to cloud</td>
+                        </tr>
+                        <tr>
+                            <td><code>CloudAppDiscoveryLogs</code></td>
+                            <td>Shadow IT discovery data</td>
+                            <td>Unsanctioned app usage</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-success" style="margin-top: 2rem;">
+                    <div class="callout-title">💡 Data Lake Tip</div>
+                    <p>XDR tables are high-volume but high-value for investigations. Consider keeping <code>DeviceProcessEvents</code>, <code>DeviceNetworkEvents</code>, and <code>IdentityLogonEvents</code> in the analytics tier for 90 days, then extend to 365+ days via the Data Lake for historical threat hunting and compliance.</p>
+                </div>
+            </div>
+
+            <!-- Advanced Hunting -->
+            <div id="advanced-hunting" class="xdr-topic">
+                <h2>Advanced Hunting</h2>
+                
+                <div class="card card-highlight">
+                    <p><strong>Advanced Hunting</strong> is the unified query experience in the Defender portal, allowing KQL queries across both XDR tables and Sentinel data. With Data Lake enabled, queries can span up to 12 years of historical data.</p>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Query Scope</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>XDR Data (Native)</h4>
+                        <ul>
+                            <li>Device* tables (Endpoint)</li>
+                            <li>Identity* tables (Identity)</li>
+                            <li>Email* tables (Office 365)</li>
+                            <li>CloudApp* tables (Cloud Apps)</li>
+                            <li>Alert and incident tables</li>
+                        </ul>
+                        <p class="input-hint" style="margin-top: 0.5rem;">30 days default retention, extendable via Data Lake</p>
+                    </div>
+                    <div class="card">
+                        <h4>Sentinel Data (Connected)</h4>
+                        <ul>
+                            <li>All Sentinel tables</li>
+                            <li>Custom log tables (*_CL)</li>
+                            <li>Third-party connectors</li>
+                            <li>Azure service logs</li>
+                            <li>Data Lake tier tables</li>
+                        </ul>
+                        <p class="input-hint" style="margin-top: 0.5rem;">Retention based on table configuration</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Cross-Domain Query Examples</h3>
+                
+                <div class="code-block">
+<span class="comment">// Correlate endpoint malware with email delivery</span>
+<span class="comment">// Find if malware on device came from email attachment</span>
+<span class="keyword">let</span> MalwareDevices = <span class="keyword">DeviceEvents</span>
+| <span class="function">where</span> TimeGenerated > ago(7d)
+| <span class="function">where</span> ActionType == <span class="string">"AntivirusDetection"</span>
+| <span class="function">project</span> DeviceName, SHA256, DetectionTime = TimeGenerated;
+
+<span class="keyword">EmailAttachmentInfo</span>
+| <span class="function">where</span> TimeGenerated > ago(7d)
+| <span class="function">join</span> kind=inner MalwareDevices <span class="function">on</span> SHA256
+| <span class="function">project</span> RecipientEmailAddress, SenderFromAddress, FileName, 
+         Subject, DetectionTime, DeviceName
+                </div>
+
+                <div class="code-block">
+<span class="comment">// Track lateral movement from identity to endpoint</span>
+<span class="comment">// User authenticated, then appeared on new device</span>
+<span class="keyword">IdentityLogonEvents</span>
+| <span class="function">where</span> TimeGenerated > ago(24h)
+| <span class="function">where</span> LogonType == <span class="string">"Interactive"</span>
+| <span class="function">summarize</span> FirstSeen = min(TimeGenerated), 
+            DevicesSeen = make_set(DeviceName) <span class="function">by</span> AccountUpn
+| <span class="function">where</span> array_length(DevicesSeen) > 3
+| <span class="function">project</span> AccountUpn, DevicesSeen, FirstSeen
+                </div>
+
+                <div class="code-block">
+<span class="comment">// Hunt for data exfiltration: large file uploads to cloud apps</span>
+<span class="keyword">CloudAppEvents</span>
+| <span class="function">where</span> TimeGenerated > ago(7d)
+| <span class="function">where</span> ActionType == <span class="string">"FileUploaded"</span>
+| <span class="function">summarize</span> TotalUploadMB = sum(ActivityObjects[0].Size) / 1048576,
+            FileCount = count() <span class="function">by</span> AccountDisplayName, Application
+| <span class="function">where</span> TotalUploadMB > 100
+| <span class="function">order by</span> TotalUploadMB desc
+                </div>
+
+                <h3 style="margin-top: 2rem;">Data Lake Long-Range Queries</h3>
+                <p>With Data Lake enabled, use the time picker or KQL time filters to query historical data beyond the analytics tier:</p>
+
+                <div class="code-block">
+<span class="comment">// Historical threat hunt: Search for IOC across 365 days</span>
+<span class="comment">// This query runs against the Data Lake tier</span>
+<span class="keyword">let</span> SuspiciousHash = <span class="string">"a1b2c3d4e5f6..."</span>;
+
+<span class="keyword">DeviceFileEvents</span>
+| <span class="function">where</span> TimeGenerated > ago(365d)  <span class="comment">// Data Lake query</span>
+| <span class="function">where</span> SHA256 == SuspiciousHash
+| <span class="function">project</span> TimeGenerated, DeviceName, FileName, FolderPath, 
+         InitiatingProcessFileName, InitiatingProcessAccountName
+                </div>
+
+                <div class="callout callout-warning" style="margin-top: 1.5rem;">
+                    <div class="callout-title">⚠️ Query Performance</div>
+                    <p><strong>Analytics Tier:</strong> Sub-second to seconds for most queries.<br>
+                    <strong>Data Lake Tier:</strong> May take 90-120+ seconds. For queries >2 minutes, use KQL Jobs or async mode. Always filter by time first, then entity.</p>
+                </div>
+            </div>
+
+            <!-- Incident Management -->
+            <div id="incident-management" class="xdr-topic">
+                <h2>Unified Incident Management</h2>
+                
+                <div class="card card-highlight">
+                    <p>The unified incident queue in the Defender portal automatically correlates alerts from both Defender XDR and Microsoft Sentinel, creating comprehensive incidents that span the entire attack chain.</p>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Incident Correlation</h3>
+                <div class="architecture-diagram">
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-dot red"></div>
+                            <div class="terminal-dot yellow"></div>
+                            <div class="terminal-dot green"></div>
+                            <span class="terminal-title">incident_correlation_flow.txt</span>
+                        </div>
+                        <div class="terminal-body">
+<pre>
+                         UNIFIED INCIDENT CORRELATION
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                      │
+│   DEFENDER XDR ALERTS              SENTINEL ALERTS                  │
+│   ─────────────────                ──────────────                   │
+│   • Malware detected               • Firewall block                 │
+│   • Suspicious process             • VPN anomaly                    │
+│   • Identity compromise            • Custom rule trigger            │
+│                                                                      │
+│         │                                  │                        │
+│         └──────────────┬───────────────────┘                        │
+│                        ▼                                             │
+│              ┌─────────────────┐                                    │
+│              │   CORRELATION   │                                    │
+│              │     ENGINE      │                                    │
+│              └────────┬────────┘                                    │
+│                       │                                              │
+│         Correlation factors:                                         │
+│         • Same user/account                                          │
+│         • Same device/host                                           │
+│         • Same IP address                                            │
+│         • Time proximity                                             │
+│         • Attack stage sequencing                                    │
+│                       │                                              │
+│                       ▼                                              │
+│         ┌─────────────────────────┐                                 │
+│         │    UNIFIED INCIDENT     │                                 │
+│         │   ─────────────────     │                                 │
+│         │   ID: INC-2024-00123    │                                 │
+│         │   Severity: High        │                                 │
+│         │   Status: Active        │                                 │
+│         │   Alerts: 7             │                                 │
+│         │   Entities: 3           │                                 │
+│         │   ─────────────────     │                                 │
+│         │   Attack Story:         │                                 │
+│         │   Phishing → Execution  │                                 │
+│         │   → Persistence →       │                                 │
+│         │   Lateral Movement      │                                 │
+│         └─────────────────────────┘                                 │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Incident Investigation Experience</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Attack Story</h4>
+                        <p>Visual timeline showing the sequence of alerts and how the attack progressed through the kill chain.</p>
+                        <ul>
+                            <li>Chronological event ordering</li>
+                            <li>MITRE ATT&CK mapping</li>
+                            <li>Entity relationship graph</li>
+                            <li>Evidence and artifacts</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Entity Pages</h4>
+                        <p>360-degree view of involved entities (users, devices, IPs, files) with full context.</p>
+                        <ul>
+                            <li>Risk score and exposure level</li>
+                            <li>Recent activity timeline</li>
+                            <li>Related alerts and incidents</li>
+                            <li>Direct response actions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Incident Response Actions</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Scope</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Isolate device</strong></td>
+                            <td>Endpoint</td>
+                            <td>Network isolation while maintaining management access</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Run antivirus scan</strong></td>
+                            <td>Endpoint</td>
+                            <td>Trigger full or quick scan on device</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Restrict app execution</strong></td>
+                            <td>Endpoint</td>
+                            <td>Block non-Microsoft signed executables</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Disable user</strong></td>
+                            <td>Identity</td>
+                            <td>Disable account in Entra ID</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Revoke sessions</strong></td>
+                            <td>Identity</td>
+                            <td>Force re-authentication for user</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Soft delete email</strong></td>
+                            <td>Email</td>
+                            <td>Move malicious emails to deleted items</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hard delete email</strong></td>
+                            <td>Email</td>
+                            <td>Permanently remove emails from mailboxes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Block URL/file</strong></td>
+                            <td>Global</td>
+                            <td>Add to block list across organization</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Automated Response -->
+            <div id="automated-response" class="xdr-topic">
+                <h2>Automated Investigation & Response</h2>
+                
+                <div class="card card-highlight">
+                    <p><strong>Automated Investigation and Response (AIR)</strong> in Defender XDR automatically investigates alerts and takes remediation actions, reducing analyst workload and response time.</p>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">AIR Workflow</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker">1</div>
+                        <div class="timeline-content">
+                            <h4>Alert Triggers Investigation</h4>
+                            <p>An alert matching AIR criteria automatically starts an investigation. This includes malware alerts, suspicious behavior, and certain identity alerts.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker">2</div>
+                        <div class="timeline-content">
+                            <h4>Evidence Collection</h4>
+                            <p>AIR collects related evidence: processes, files, registry keys, network connections, and user activities connected to the alert.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker">3</div>
+                        <div class="timeline-content">
+                            <h4>Verdict Determination</h4>
+                            <p>Each piece of evidence is analyzed and assigned a verdict: Malicious, Suspicious, Clean, or Unknown.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker">4</div>
+                        <div class="timeline-content">
+                            <h4>Remediation Actions</h4>
+                            <p>Based on verdicts, AIR proposes or takes remediation actions (depending on automation level): quarantine file, stop process, disable user, etc.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Automation Levels</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Behavior</th>
+                            <th>Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-red">No automation</span></td>
+                            <td>No automated actions; all manual</td>
+                            <td>High-compliance environments</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-yellow">Semi</span></td>
+                            <td>Approval required for all actions</td>
+                            <td>Balanced control and speed</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-blue">Semi (exclude folders)</span></td>
+                            <td>Auto-approve except for sensitive paths</td>
+                            <td>Protect critical file locations</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-green">Full</span></td>
+                            <td>All remediation actions automatic</td>
+                            <td>High-volume, trusted environments</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 2rem;">Sentinel Automation Integration</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Automation Rules</h4>
+                        <p>Sentinel automation rules can trigger on incidents and alerts:</p>
+                        <ul>
+                            <li>Auto-assign to analysts</li>
+                            <li>Change severity or status</li>
+                            <li>Add tags for categorization</li>
+                            <li>Trigger playbooks</li>
+                            <li>Suppress known false positives</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Playbooks (Logic Apps)</h4>
+                        <p>Orchestrate complex response workflows:</p>
+                        <ul>
+                            <li>Enrich incidents with external data</li>
+                            <li>Send notifications (Teams, email)</li>
+                            <li>Create tickets in ITSM</li>
+                            <li>Block IOCs in firewalls</li>
+                            <li>Isolate VMs in Azure</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout callout-info" style="margin-top: 1.5rem;">
+                    <div class="callout-title">💡 Best Practice</div>
+                    <p>Combine Defender XDR AIR for native Microsoft product response with Sentinel playbooks for third-party integrations. This creates a comprehensive automation layer that covers your entire security stack.</p>
+                </div>
+            </div>
+
+            <!-- Threat Intelligence -->
+            <div id="threat-intelligence" class="xdr-topic">
+                <h2>Threat Intelligence in XDR</h2>
+                
+                <div class="card card-highlight">
+                    <p>Microsoft Defender XDR includes integrated threat intelligence from Microsoft's security research teams, enriching alerts and enabling proactive threat hunting.</p>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Threat Intelligence Sources</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🔴 Microsoft Threat Intelligence</h4>
+                        <ul>
+                            <li><strong>Microsoft Threat Intelligence Center (MSTIC):</strong> Nation-state threat tracking</li>
+                            <li><strong>Microsoft Security Research:</strong> Malware and vulnerability analysis</li>
+                            <li><strong>Digital Crimes Unit (DCU):</strong> Cybercrime disruption</li>
+                            <li><strong>Global threat sensors:</strong> Billions of signals daily</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>🔵 Sentinel TI Integration</h4>
+                        <ul>
+                            <li><strong>TAXII feeds:</strong> Industry standard TI sharing</li>
+                            <li><strong>STIX format:</strong> Structured threat information</li>
+                            <li><strong>Custom indicators:</strong> Organization-specific IOCs</li>
+                            <li><strong>TI platforms:</strong> MISP, ThreatConnect, etc.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Threat Analytics</h3>
+                <p>The Threat Analytics dashboard provides curated reports on active threats:</p>
+                
+                <div class="card" style="margin-top: 1rem;">
+                    <div class="grid-3">
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--danger);">📰</div>
+                            <div class="feature-content">
+                                <h4>Threat Reports</h4>
+                                <p>Detailed analysis of emerging threats, TTPs, and IOCs</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--warning);">📊</div>
+                            <div class="feature-content">
+                                <h4>Impact Assessment</h4>
+                                <p>Which devices, users, and mailboxes are affected</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background: rgba(34, 197, 94, 0.2); color: var(--success);">🛡️</div>
+                            <div class="feature-content">
+                                <h4>Mitigations</h4>
+                                <p>Recommended actions and configuration guidance</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">TI Matching with Data Lake</h3>
+                <p>With Data Lake enabled, you can perform retrospective TI matching across historical data:</p>
+
+                <div class="code-block">
+<span class="comment">// Retrospective IOC hunt across 365 days</span>
+<span class="comment">// Check if newly discovered malicious IP was seen historically</span>
+<span class="keyword">let</span> MaliciousIPs = dynamic([<span class="string">"192.168.1.100"</span>, <span class="string">"10.0.0.50"</span>]);
+
+<span class="keyword">DeviceNetworkEvents</span>
+| <span class="function">where</span> TimeGenerated > ago(365d)  <span class="comment">// Data Lake query</span>
+| <span class="function">where</span> RemoteIP in (MaliciousIPs)
+| <span class="function">summarize</span> 
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated),
+    ConnectionCount = count(),
+    DevicesAffected = dcount(DeviceName)
+    <span class="function">by</span> RemoteIP
+| <span class="function">order by</span> FirstSeen asc
+                </div>
+
+                <div class="code-block">
+<span class="comment">// Match Sentinel ThreatIntelligenceIndicator against Device events</span>
+<span class="keyword">let</span> TIIndicators = <span class="keyword">ThreatIntelligenceIndicator</span>
+| <span class="function">where</span> isnotempty(NetworkIP)
+| <span class="function">project</span> NetworkIP, Description, ThreatType, ConfidenceScore;
+
+<span class="keyword">DeviceNetworkEvents</span>
+| <span class="function">where</span> TimeGenerated > ago(90d)
+| <span class="function">join</span> kind=inner TIIndicators <span class="function">on</span> $left.RemoteIP == $right.NetworkIP
+| <span class="function">project</span> TimeGenerated, DeviceName, RemoteIP, RemotePort,
+         ThreatType, Description, ConfidenceScore
+                </div>
+
+                <div class="callout callout-success" style="margin-top: 1.5rem;">
+                    <div class="callout-title">🎯 Data Lake Advantage</div>
+                    <p>When new threat intelligence reveals IOCs from attacks that began months ago, the Data Lake enables you to search 12 years of historical data to determine if your organization was affected—without expensive restore operations.</p>
+                </div>
+            </div>
+
+            <!-- XDR + Data Lake -->
+            <div id="xdr-datalake" class="xdr-topic">
+                <h2>XDR + Data Lake Synergy</h2>
+                
+                <div class="card card-highlight">
+                    <p>The combination of Microsoft Defender XDR and Sentinel Data Lake creates a powerful security data platform that balances real-time detection with long-term retention and compliance.</p>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Architecture Overview</h3>
+                <div class="architecture-diagram">
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-dot red"></div>
+                            <div class="terminal-dot yellow"></div>
+                            <div class="terminal-dot green"></div>
+                            <span class="terminal-title">xdr_datalake_architecture.txt</span>
+                        </div>
+                        <div class="terminal-body">
+<pre>
+┌─────────────────────────────────────────────────────────────────────┐
+│                     XDR + DATA LAKE ARCHITECTURE                     │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│   REAL-TIME LAYER (0-90 days)                                       │
+│   ═══════════════════════════                                       │
+│   ┌─────────────────────────────────────────────────────────────┐  │
+│   │                    ANALYTICS TIER                            │  │
+│   │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │  │
+│   │  │ XDR Tables  │  │  Sentinel   │  │  3rd Party  │         │  │
+│   │  │ Device*     │  │  Azure Logs │  │  Connectors │         │  │
+│   │  │ Identity*   │  │  SecurityE* │  │  Custom_CL  │         │  │
+│   │  │ Email*      │  │  AAD Logs   │  │             │         │  │
+│   │  └─────────────┘  └─────────────┘  └─────────────┘         │  │
+│   │                           │                                  │  │
+│   │  • Sub-second queries     │  • Real-time detection          │  │
+│   │  • Analytics rules        │  • Automated response           │  │
+│   │  • Live dashboards        │  • AIR investigations           │  │
+│   └───────────────────────────┼─────────────────────────────────┘  │
+│                               │                                      │
+│                               ▼ Automatic mirroring                  │
+│                                                                      │
+│   HISTORICAL LAYER (90 days - 12 years)                             │
+│   ═════════════════════════════════════                             │
+│   ┌─────────────────────────────────────────────────────────────┐  │
+│   │                     DATA LAKE TIER                           │  │
+│   │                                                              │  │
+│   │   ┌─────────────────────────────────────────────────────┐   │  │
+│   │   │              DELTA PARQUET FORMAT                    │   │  │
+│   │   │           6:1 Compression Ratio                      │   │  │
+│   │   │                                                      │   │  │
+│   │   │  • XDR historical data    • Compliance retention    │   │  │
+│   │   │  • Sentinel archives      • Forensic investigations │   │  │
+│   │   │  • Custom log history     • Retroactive TI matching │   │  │
+│   │   └─────────────────────────────────────────────────────┘   │  │
+│   │                                                              │  │
+│   │  Access Methods:                                             │  │
+│   │  • KQL Jobs (async, up to 1 hour)                           │  │
+│   │  • Advanced Hunting (extended time range)                    │  │
+│   │  • Summary Rules (pre-aggregation)                          │  │
+│   └─────────────────────────────────────────────────────────────┘  │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Key Integration Points</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🔄 Data Flow</h4>
+                        <ul>
+                            <li>XDR data ingested into Sentinel workspace</li>
+                            <li>Automatic mirroring to Data Lake after analytics retention</li>
+                            <li>No manual data movement required</li>
+                            <li>Consistent schema across tiers</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>🔍 Query Unification</h4>
+                        <ul>
+                            <li>Single KQL query spans both tiers</li>
+                            <li>Automatic tier routing based on time range</li>
+                            <li>Same table names, same columns</li>
+                            <li>Transparent to analysts</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">XDR Tables in Data Lake</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Table Category</th>
+                            <th>Recommended Analytics Retention</th>
+                            <th>Recommended Total Retention</th>
+                            <th>Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>DeviceProcessEvents</strong></td>
+                            <td>90 days</td>
+                            <td>365 days</td>
+                            <td>Critical for threat hunting; high volume</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DeviceNetworkEvents</strong></td>
+                            <td>90 days</td>
+                            <td>365 days</td>
+                            <td>C2 detection, lateral movement analysis</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DeviceFileEvents</strong></td>
+                            <td>90 days</td>
+                            <td>180 days</td>
+                            <td>Moderate volume; ransomware investigations</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IdentityLogonEvents</strong></td>
+                            <td>90 days</td>
+                            <td>365 days</td>
+                            <td>Compliance; identity attack patterns</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EmailEvents</strong></td>
+                            <td>90 days</td>
+                            <td>365 days</td>
+                            <td>Phishing campaigns; BEC investigations</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CloudAppEvents</strong></td>
+                            <td>90 days</td>
+                            <td>180 days</td>
+                            <td>Shadow IT; data exfiltration</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AlertEvidence</strong></td>
+                            <td>90 days</td>
+                            <td>730 days (2 yr)</td>
+                            <td>Compliance; incident reconstruction</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 2rem;">Use Case: Full Attack Timeline</h3>
+                <div class="card">
+                    <p>With XDR + Data Lake, analysts can reconstruct the complete attack timeline from initial compromise to detection:</p>
+                    
+                    <div class="code-block">
+<span class="comment">// Comprehensive attack timeline across 180 days</span>
+<span class="comment">// Correlate email delivery, endpoint execution, identity access</span>
+<span class="keyword">let</span> TargetUser = <span class="string">"user@contoso.com"</span>;
+<span class="keyword">let</span> TimeRange = 180d;
+
+<span class="comment">// Step 1: Initial access via email</span>
+<span class="keyword">let</span> EmailDelivery = <span class="keyword">EmailEvents</span>
+| <span class="function">where</span> TimeGenerated > ago(TimeRange)
+| <span class="function">where</span> RecipientEmailAddress == TargetUser
+| <span class="function">where</span> DeliveryAction == <span class="string">"Delivered"</span>
+| <span class="function">project</span> TimeGenerated, Subject, SenderFromAddress, 
+         NetworkMessageId, AttachmentCount;
+
+<span class="comment">// Step 2: Execution on endpoint</span>
+<span class="keyword">let</span> ProcessExecution = <span class="keyword">DeviceProcessEvents</span>
+| <span class="function">where</span> TimeGenerated > ago(TimeRange)
+| <span class="function">where</span> AccountName contains TargetUser
+| <span class="function">where</span> InitiatingProcessFileName in (<span class="string">"outlook.exe"</span>, <span class="string">"winword.exe"</span>, <span class="string">"excel.exe"</span>)
+| <span class="function">project</span> TimeGenerated, DeviceName, FileName, ProcessCommandLine;
+
+<span class="comment">// Step 3: Identity-based lateral movement</span>
+<span class="keyword">let</span> IdentityActions = <span class="keyword">IdentityLogonEvents</span>
+| <span class="function">where</span> TimeGenerated > ago(TimeRange)
+| <span class="function">where</span> AccountUpn == TargetUser
+| <span class="function">project</span> TimeGenerated, LogonType, DeviceName, DestinationIPAddress;
+
+<span class="comment">// Combine into timeline</span>
+<span class="function">union</span>
+    (EmailDelivery | <span class="function">extend</span> Phase = <span class="string">"1-Initial Access"</span>),
+    (ProcessExecution | <span class="function">extend</span> Phase = <span class="string">"2-Execution"</span>),
+    (IdentityActions | <span class="function">extend</span> Phase = <span class="string">"3-Lateral Movement"</span>)
+| <span class="function">order by</span> TimeGenerated asc
+| <span class="function">project</span> TimeGenerated, Phase, Details = pack_all()
+                    </div>
+                </div>
+
+                <div class="callout callout-success" style="margin-top: 2rem;">
+                    <div class="callout-title">🎯 Key Takeaway</div>
+                    <p>The XDR + Data Lake combination delivers the best of both worlds: <strong>real-time XDR detection and response</strong> for active threats, and <strong>long-term Data Lake retention</strong> for compliance, forensics, and historical threat hunting. This unified architecture eliminates data silos and reduces total cost of ownership.</p>
                 </div>
             </div>
         </section>
@@ -5378,7 +6576,7 @@ AzureActivity
 
         // Progress tracking
         function updateProgress() {
-            const totalSections = 9;
+            const totalSections = 10;
             const progress = (completedSections.size / totalSections) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
         }
@@ -5479,6 +6677,14 @@ AzureActivity
             
             if (toolId === 'cost-calculator') calculateCosts();
             if (toolId === 'preflight-checklist') loadPhaseChecklist();
+        }
+
+        // XDR Topic Navigation
+        function showXDRTopic(topicId) {
+            document.querySelectorAll('.xdr-topic').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.xdr-submenu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(topicId).classList.add('active');
+            event.target.closest('.xdr-submenu-btn').classList.add('active');
         }
 
         // ==================== COST CALCULATOR ====================
